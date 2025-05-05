@@ -74,12 +74,7 @@ body {
 /* Links */
 a {
     font-weight: 500;
-    color: var(--primary-color);
     text-decoration: none;
-}
-
-a:hover {
-    color: var(--secondary-color);
 }
 
 /* Auth pages */

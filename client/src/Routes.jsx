@@ -29,7 +29,7 @@ function AppRoutes() {
 	return (
 		<AuthProvider>
 			<Router>
-				<div className="min-h-screen bg-gray-100">
+				<div className="min-h-screen bg-gray-100 pt-16">
 					<Navigation />
 					<main>
 						<Routes>
