@@ -40,18 +40,30 @@ const eventSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'Event date is required']
     },
+    endDate: {
+        type: Date
+    },
     location: {
+        type: {
+            type: String,
+            enum: ['online', 'offline'],
+            required: [true, 'Location type is required']
+        },
         city: {
             type: String,
-            required: [true, 'City is required']
+            required: function() { return this.location.type === 'offline'; }
         },
         venue: {
             type: String,
-            required: [true, 'Venue is required']
+            required: function() { return this.location.type === 'offline'; }
         },
         address: {
             type: String,
-            required: [true, 'Address is required']
+            required: function() { return this.location.type === 'offline'; }
+        },
+        onlineUrl: {
+            type: String,
+            required: function() { return this.location.type === 'online'; }
         },
         coordinates: {
             type: [Number], // [longitude, latitude]
@@ -70,6 +82,40 @@ const eventSchema = new mongoose.Schema({
     capacity: {
         type: Number,
         required: [true, 'Event capacity is required']
+    },
+    isPublished: {
+        type: Boolean,
+        default: true
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
+    analytics: {
+        views: {
+            type: Number,
+            default: 0
+        },
+        uniqueVisitors: {
+            type: Number,
+            default: 0
+        },
+        registrationsDaily: [{
+            date: {
+                type: Date
+            },
+            count: {
+                type: Number,
+                default: 0
+            }
+        }]
+    },
+    registrationDeadline: {
+        type: Date
+    },
+    price: {
+        type: Number,
+        default: 0
     },
     createdAt: {
         type: Date,
