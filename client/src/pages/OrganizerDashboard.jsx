@@ -148,15 +148,15 @@ const OrganizerDashboard = () => {
           </div>
           
           {events.length === 0 ? (
-            <div className="bg-gray-100 rounded-lg p-10 text-center text-gray-500">
-              <p>You haven't created any events yet.</p>
+          <div className="bg-gray-100 rounded-lg p-10 text-center text-gray-500">
+            <p>You haven't created any events yet.</p>
               <button 
                 onClick={() => setShowCreateModal(true)}
                 className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
               >
-                Create Your First Event
-              </button>
-            </div>
+              Create Your First Event
+            </button>
+          </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.map((event) => (

@@ -8,7 +8,7 @@ exports.getDashboard = async (req, res) => {
     try {
         // Get organizer info without password
         const user = await User.findById(req.user._id).select('-password');
-        
+
         // Get count of events organized by this user
         const eventCount = await Event.countDocuments({ organizer: req.user._id });
         

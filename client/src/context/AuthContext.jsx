@@ -60,9 +60,9 @@ export const AuthProvider = ({ children }) => {
 				// Don't immediately remove token on network errors
 				// This prevents logout on temporary server issues or connectivity problems
 				if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-					localStorage.removeItem('token');
-					setToken(null);
-					setUser(null);
+				localStorage.removeItem('token');
+				setToken(null);
+				setUser(null);
 				}
 			}
 
