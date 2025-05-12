@@ -2,19 +2,20 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ requiredRole, redirectPath = "/login" }) => {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, token } = useAuth();
 
-  // If still loading, show loading indicator or nothing
-  if (loading) {
+  // If still loading and we have a token, don't redirect, just show loading
+  if (loading && token) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
+        <h2 className="text-xl font-semibold text-gray-700 ml-4">Loading...</h2>
       </div>
     );
   }
 
   // If not authenticated, redirect to login
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !loading) {
     return <Navigate to={redirectPath} replace />;
   }
 

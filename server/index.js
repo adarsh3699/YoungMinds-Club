@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const organizerRoutes = require('./routes/organizer');
 const userRoutes = require('./routes/user');
+const eventRoutes = require('./routes/event');
 
 // Create Express app
 const app = express();
@@ -35,6 +36,7 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/organizer', organizerRoutes);
 app.use('/user', userRoutes);
+app.use('/events', eventRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

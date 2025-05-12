@@ -57,9 +57,13 @@ export const AuthProvider = ({ children }) => {
 				}
 			} catch (error) {
 				console.error('Token verification error:', error);
-				localStorage.removeItem('token');
-				setToken(null);
-				setUser(null);
+				// Don't immediately remove token on network errors
+				// This prevents logout on temporary server issues or connectivity problems
+				if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+					localStorage.removeItem('token');
+					setToken(null);
+					setUser(null);
+				}
 			}
 
 			setLoading(false);

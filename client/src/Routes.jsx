@@ -12,12 +12,27 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const UserDashboard = lazy(() => import('./pages/UserDashboard'));
 const OrganizerDashboard = lazy(() => import('./pages/OrganizerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const EventDetails = lazy(() => import('./pages/EventDetails'));
+const MyEvents = lazy(() => import('./pages/MyEvents'));
+const EventFeedback = lazy(() => import('./pages/EventFeedback'));
+const EventManagePage = lazy(() => import('./pages/EventManagePage'));
 
 // Dashboard router component that routes to the appropriate dashboard based on user role
 const DashboardRouter = () => {
-	const { user, isAdmin, isOrganizer } = useAuth();
+	const { user, isAdmin, isOrganizer, loading, token } = useAuth();
 
-	if (!user) return <Navigate to="/login" />;
+	// If still loading and we have a token, don't redirect yet
+	if (loading && token) {
+		return (
+			<div className="flex flex-col justify-center items-center h-[70vh]">
+				<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
+				<h2 className="text-xl font-semibold text-gray-700">Loading</h2>
+			</div>
+		);
+	}
+
+	// Only redirect to login if we're sure the user is not authenticated
+	if (!user && !loading) return <Navigate to="/login" />;
 
 	if (isAdmin) {
 		return <AdminDashboard />;
@@ -46,9 +61,17 @@ function AppRoutes() {
 								<Route path="/" element={<HomePage />} />
 								<Route path="/login" element={<LoginPage />} />
 								<Route path="/register" element={<RegisterPage />} />
+								<Route path="/event/:id" element={<EventDetails />} />
 
 								{/* Protected routes */}
 								<Route path="/dashboard" element={<DashboardRouter />} />
+								
+								{/* User routes */}
+								<Route element={<ProtectedRoute />}>
+									<Route path="/user/profile" element={<UserDashboard />} />
+									<Route path="/my-events" element={<MyEvents />} />
+									<Route path="/event/:id/feedback" element={<EventFeedback />} />
+								</Route>
 
 								{/* Admin routes */}
 								<Route element={<ProtectedRoute requiredRole="admin" />}>
@@ -58,11 +81,7 @@ function AppRoutes() {
 								{/* Organizer routes */}
 								<Route element={<ProtectedRoute requiredRole={['organizer', 'admin']} />}>
 									<Route path="/organizer/events" element={<OrganizerDashboard />} />
-								</Route>
-
-								{/* User routes */}
-								<Route element={<ProtectedRoute />}>
-									<Route path="/user/profile" element={<UserDashboard />} />
+									<Route path="/organizer/event/:id" element={<EventManagePage />} />
 								</Route>
 
 								{/* Fallback route */}
