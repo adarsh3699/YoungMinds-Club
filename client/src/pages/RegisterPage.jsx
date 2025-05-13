@@ -12,19 +12,8 @@ const RegisterPage = () => {
 
 				<div className="space-y-8">
 					<div className="flex items-start space-x-4">
-						<div className="bg-white bg-opacity-20 p-2 rounded-full">
-							<svg
-								className="w-6 h-6"
-								fill="currentColor"
-								viewBox="0 0 20 20"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									fillRule="evenodd"
-									d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-									clipRule="evenodd"
-								/>
-							</svg>
+						<div className="bg-white bg-opacity-20 p-2 rounded-full flex items-center justify-center">
+							<span className="text-lg font-bold">🎁</span>
 						</div>
 						<div>
 							<h3 className="font-bold text-lg">Free Membership</h3>
@@ -33,19 +22,8 @@ const RegisterPage = () => {
 					</div>
 
 					<div className="flex items-start space-x-4">
-						<div className="bg-white bg-opacity-20 p-2 rounded-full">
-							<svg
-								className="w-6 h-6"
-								fill="currentColor"
-								viewBox="0 0 20 20"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									fillRule="evenodd"
-									d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-									clipRule="evenodd"
-								/>
-							</svg>
+						<div className="bg-white bg-opacity-20 p-2 rounded-full flex items-center justify-center">
+							<span className="text-lg font-bold">🔄</span>
 						</div>
 						<div>
 							<h3 className="font-bold text-lg">Weekly Activities</h3>
@@ -54,19 +32,8 @@ const RegisterPage = () => {
 					</div>
 
 					<div className="flex items-start space-x-4">
-						<div className="bg-white bg-opacity-20 p-2 rounded-full">
-							<svg
-								className="w-6 h-6"
-								fill="currentColor"
-								viewBox="0 0 20 20"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									fillRule="evenodd"
-									d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-									clipRule="evenodd"
-								/>
-							</svg>
+						<div className="bg-white bg-opacity-20 p-2 rounded-full flex items-center justify-center">
+							<span className="text-lg font-bold">🤝</span>
 						</div>
 						<div>
 							<h3 className="font-bold text-lg">Supportive Community</h3>
@@ -77,14 +44,14 @@ const RegisterPage = () => {
 			</div>
 
 			{/* Right side - Register Form */}
-			<div className="flex-1 flex items-center justify-center p-6 bg-gray-50">
+			<div className="flex-1 flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-900">
 				<div className="w-full max-w-md">
 					<div className="text-center mb-10">
-						<h2 className="text-3xl font-bold text-gray-800">Create your account</h2>
-						<p className="text-gray-600 mt-2">Join YoungMinds Club and start your journey</p>
+						<h2 className="text-3xl font-bold text-gray-800 dark:text-white">Create your account</h2>
+						<p className="text-gray-600 dark:text-gray-300 mt-2">Join YoungMinds Club and start your journey</p>
 					</div>
 
-					<div className="bg-white rounded-xl shadow-lg p-8">
+					<div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
 						<RegisterForm />
 					</div>
 				</div>

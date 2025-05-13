@@ -5,7 +5,7 @@ const HomePage = () => {
 	const { isAuthenticated } = useAuth();
 
 	return (
-		<div className="bg-white">
+		<div className="bg-white dark:bg-gray-900">
 			{/* Hero section */}
 			<div className="relative bg-gradient-to-r from-blue-500 to-purple-600">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
@@ -28,7 +28,7 @@ const HomePage = () => {
 								</Link>
 								<Link
 									to="/dashboard"
-									className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-blue-700 bg-white hover:bg-blue-50 sm:px-8"
+									className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-blue-700 bg-white dark:text-blue-300 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 sm:px-8"
 								>
 									Dashboard
 								</Link>
@@ -43,7 +43,7 @@ const HomePage = () => {
 								</Link>
 								<Link
 									to="/login"
-									className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-blue-700 bg-white hover:bg-blue-50 sm:px-8"
+									className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-blue-700 bg-white dark:text-blue-300 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 sm:px-8"
 								>
 									Log In
 								</Link>
@@ -54,14 +54,14 @@ const HomePage = () => {
 			</div>
 
 			{/* Feature section */}
-			<div className="py-16 bg-gray-50 overflow-hidden">
+			<div className="py-16 bg-gray-50 dark:bg-gray-800 overflow-hidden">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="text-center">
-						<h2 className="text-base font-semibold text-blue-600 tracking-wide uppercase">Features</h2>
-						<p className="mt-1 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
+						<h2 className="text-base font-semibold text-blue-600 dark:text-blue-400 tracking-wide uppercase">Features</h2>
+						<p className="mt-1 text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight">
 							Why Join YoungMinds Club?
 						</p>
-						<p className="max-w-xl mt-5 mx-auto text-xl text-gray-500">
+						<p className="max-w-xl mt-5 mx-auto text-xl text-gray-500 dark:text-gray-300">
 							Everything you need to learn, grow, and connect with other young minds.
 						</p>
 					</div>
@@ -69,7 +69,7 @@ const HomePage = () => {
 					<div className="mt-12">
 						<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
 							<div className="pt-6">
-								<div className="flow-root bg-white rounded-lg px-6 pb-8 shadow-md">
+								<div className="flow-root bg-white dark:bg-gray-700 rounded-lg px-6 pb-8 shadow-md">
 									<div className="-mt-6">
 										<div>
 											<span className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
@@ -89,10 +89,10 @@ const HomePage = () => {
 												</svg>
 											</span>
 										</div>
-										<h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
+										<h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">
 											Discover Activities
 										</h3>
-										<p className="mt-5 text-base text-gray-500">
+										<p className="mt-5 text-base text-gray-500 dark:text-gray-300">
 											Find activities based on your interests, location, and availability. Filter
 											by category, date, and type.
 										</p>
@@ -101,7 +101,7 @@ const HomePage = () => {
 							</div>
 
 							<div className="pt-6">
-								<div className="flow-root bg-white rounded-lg px-6 pb-8 shadow-md">
+								<div className="flow-root bg-white dark:bg-gray-700 rounded-lg px-6 pb-8 shadow-md">
 									<div className="-mt-6">
 										<div>
 											<span className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
@@ -121,10 +121,10 @@ const HomePage = () => {
 												</svg>
 											</span>
 										</div>
-										<h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
+										<h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">
 											Learn & Grow
 										</h3>
-										<p className="mt-5 text-base text-gray-500">
+										<p className="mt-5 text-base text-gray-500 dark:text-gray-300">
 											Access educational resources, join workshops, and develop new skills with
 											our interactive programs.
 										</p>
@@ -133,7 +133,7 @@ const HomePage = () => {
 							</div>
 
 							<div className="pt-6">
-								<div className="flow-root bg-white rounded-lg px-6 pb-8 shadow-md">
+								<div className="flow-root bg-white dark:bg-gray-700 rounded-lg px-6 pb-8 shadow-md">
 									<div className="-mt-6">
 										<div>
 											<span className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
@@ -153,10 +153,10 @@ const HomePage = () => {
 												</svg>
 											</span>
 										</div>
-										<h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">
+										<h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">
 											Connect & Collaborate
 										</h3>
-										<p className="mt-5 text-base text-gray-500">
+										<p className="mt-5 text-base text-gray-500 dark:text-gray-300">
 											Meet like-minded young people, collaborate on projects, and build lasting
 											friendships.
 										</p>
@@ -169,7 +169,7 @@ const HomePage = () => {
 			</div>
 
 			{/* CTA section */}
-			<div className="bg-blue-600">
+			<div className="bg-blue-600 dark:bg-blue-800">
 				<div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
 					<h2 className="text-3xl font-extrabold text-white sm:text-4xl">
 						<span className="block">Ready to get started?</span>
@@ -180,7 +180,7 @@ const HomePage = () => {
 					</p>
 					<Link
 						to="/register"
-						className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50 sm:w-auto"
+						className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 dark:text-blue-100 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 sm:w-auto"
 					>
 						Sign up for free
 					</Link>

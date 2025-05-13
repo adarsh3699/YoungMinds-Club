@@ -6,12 +6,12 @@ import './CreateEventModal.css';
 
 const InputField = ({ label, name, value, onChange, placeholder, type = 'text', error, className = '', required = false, icon = null }) => (
   <div className={className}>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
       {label}{required && '*'}
     </label>
     <div className="relative">
       {icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 dark:text-gray-400">
           {icon}
         </div>
       )}
@@ -20,17 +20,17 @@ const InputField = ({ label, name, value, onChange, placeholder, type = 'text', 
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full ${icon ? 'pl-10' : 'pl-3'} p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+        className={`w-full ${icon ? 'pl-10' : 'pl-3'} p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
         placeholder={placeholder}
       />
     </div>
-    {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    {error && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{error}</p>}
   </div>
 );
 
 const TextareaField = ({ label, name, value, onChange, placeholder, rows = 3, maxLength, error, className = '', required = false }) => (
   <div className={className}>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
       {label}{required && '*'}{maxLength && ` (Max ${maxLength} chars)`}
     </label>
     <textarea
@@ -39,22 +39,22 @@ const TextareaField = ({ label, name, value, onChange, placeholder, rows = 3, ma
       onChange={onChange}
       rows={rows}
       maxLength={maxLength}
-      className={`w-full p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+      className={`w-full p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
       placeholder={placeholder}
     ></textarea>
-    {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
-    {maxLength && <p className="text-xs text-gray-500 mt-1">{value.length}/{maxLength} characters</p>}
+    {error && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{error}</p>}
+    {maxLength && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{value.length}/{maxLength} characters</p>}
   </div>
 );
 
 const SelectField = ({ label, name, value, onChange, options, error, className = '', required = false, icon = null }) => (
   <div className={className}>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
       {label}{required && '*'}
     </label>
     <div className="relative">
       {icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500 dark:text-gray-400">
           {icon}
         </div>
       )}
@@ -62,7 +62,7 @@ const SelectField = ({ label, name, value, onChange, options, error, className =
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full ${icon ? 'pl-10' : 'pl-3'} p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 appearance-none bg-no-repeat bg-right ${error ? 'border-red-500' : 'border-gray-300'}`}
+        className={`w-full ${icon ? 'pl-10' : 'pl-3'} p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 appearance-none bg-no-repeat bg-right ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
         style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}
       >
         {options.map((option) => (
@@ -70,7 +70,7 @@ const SelectField = ({ label, name, value, onChange, options, error, className =
         ))}
       </select>
     </div>
-    {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    {error && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{error}</p>}
   </div>
 );
 
@@ -332,7 +332,7 @@ const CreateEventModal = ({
   
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] shadow-2xl">
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] shadow-2xl">
         <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white z-10 flex justify-between items-center p-5 border-b rounded-t-lg">
           <h2 className="text-xl font-bold flex items-center">
             {isEditing ? (
@@ -355,7 +355,7 @@ const CreateEventModal = ({
         </div>
         
         <div 
-          className="custom-scrollbar overflow-y-auto overflow-x-hidden" 
+          className="custom-scrollbar overflow-y-auto overflow-x-hidden dark:bg-gray-800" 
           style={{ maxHeight: 'calc(90vh - 73px)', borderRadius: '0 0 0.5rem 0.5rem' }}
         >
           <form onSubmit={handleSubmit} className="p-6">
@@ -419,17 +419,19 @@ const CreateEventModal = ({
                 {/* Event Image Upload */}
                 <div>
                   <div className="flex items-center mb-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600 mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Event Poster*
                     </label>
                   </div>
                   <div 
                     {...getRootProps()}
                     className={`border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all hover:shadow-md
-                      ${isDragActive ? 'border-blue-400 bg-blue-50' : errors.poster ? 'border-red-400' : 'border-gray-300 hover:bg-gray-50'}`}
+                      ${isDragActive ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500' : 
+                      errors.poster ? 'border-red-400 dark:border-red-600' : 
+                      'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                   >
                     <input {...getInputProps()} />
                     {posterPreview ? (
@@ -459,27 +461,27 @@ const CreateEventModal = ({
                     ) : (
                       <div className="text-center">
                         <div className="flex flex-col items-center justify-center gap-2">
-                          <div className="p-3 bg-blue-100 rounded-full">
-                            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                            <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                             </svg>
                           </div>
-                          <p className="text-sm font-medium text-gray-700">
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             {isDragActive ? 'Drop the file here...' : 'Drag & drop an image, or click to browse'}
                           </p>
-                          <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 5MB</p>
                         </div>
                       </div>
                     )}
                   </div>
-                  {errors.poster && <p className="mt-1 text-sm text-red-500">{errors.poster}</p>}
+                  {errors.poster && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.poster}</p>}
                 </div>
                 
                 {/* Date and Time */}
                 <div className="space-y-4">
                   <div className="flex items-center mb-1">
-                    <CalendarIcon className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="text-sm font-medium text-gray-700">Event Schedule</h3>
+                    <CalendarIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Event Schedule</h3>
                   </div>
                   <InputField
                     label="Start Date and Time"
@@ -499,16 +501,7 @@ const CreateEventModal = ({
                     type="datetime-local"
                     value={formData.endDate}
                     onChange={handleChange}
-                    className="flex-1"
-                    icon={<CalendarIcon className="h-5 w-5 text-gray-400" />}
-                  />
-                  
-                  <InputField
-                    label="Registration Deadline"
-                    name="registrationDeadline"
-                    type="datetime-local"
-                    value={formData.registrationDeadline}
-                    onChange={handleChange}
+                    error={errors.endDate}
                     className="flex-1"
                     icon={<CalendarIcon className="h-5 w-5 text-gray-400" />}
                   />
@@ -517,11 +510,11 @@ const CreateEventModal = ({
                 {/* Location Information */}
                 <div className="space-y-4">
                   <div className="flex items-center mb-1">
-                    <MapPinIcon className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="text-sm font-medium text-gray-700">Location Details</h3>
+                    <MapPinIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Location Details</h3>
                   </div>
                   
-                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
                     <div className="flex space-x-4 mb-3">
                       <label className="inline-flex items-center">
                         <input
@@ -532,7 +525,7 @@ const CreateEventModal = ({
                           onChange={handleLocationTypeChange}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="ml-2 text-gray-700">Offline (Physical)</span>
+                        <span className="ml-2 text-gray-700 dark:text-gray-300">Offline (Physical)</span>
                       </label>
                       <label className="inline-flex items-center">
                         <input
@@ -543,7 +536,7 @@ const CreateEventModal = ({
                           onChange={handleLocationTypeChange}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="ml-2 text-gray-700">Online</span>
+                        <span className="ml-2 text-gray-700 dark:text-gray-300">Online</span>
                       </label>
                     </div>
                     
@@ -607,42 +600,42 @@ const CreateEventModal = ({
             
             {/* Additional Information - Full Width */}
             <div className="mt-8">
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-base font-medium text-gray-900 mb-4">Additional Details</h3>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 className="text-base font-medium text-gray-900 dark:text-white mb-4">Additional Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <div className="flex items-center mb-1">
-                      <TagIcon className="h-5 w-5 text-blue-600 mr-2" />
-                      <label className="text-sm font-medium text-gray-700">
+                      <TagIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tags (Press Enter to add)
                       </label>
                     </div>
-                    <div className="flex items-center bg-white border border-gray-300 rounded-md overflow-hidden">
-                      <TagIcon className="h-5 w-5 text-gray-400 ml-3 mr-2" />
+                    <div className="flex items-center bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                      <TagIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 ml-3 mr-2" />
                       <input
                         type="text"
                         value={tagInput}
                         onChange={handleTagInputChange}
                         onKeyDown={handleTagInputKeyDown}
-                        className="w-full p-2.5 border-none focus:ring-0 focus:outline-none"
+                        className="w-full p-2.5 border-none focus:ring-0 focus:outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                         placeholder="Add tags related to your event"
                       />
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mt-3">
                       {formData.tags.length === 0 && (
-                        <p className="text-xs text-gray-500 italic">No tags added yet. Tags help attendees find your event more easily.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 italic">No tags added yet. Tags help attendees find your event more easily.</p>
                       )}
                       {formData.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1.5 rounded-full flex items-center"
+                          className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs font-medium px-2.5 py-1.5 rounded-full flex items-center"
                         >
                           {tag}
                           <button
                             type="button"
                             onClick={() => removeTag(tag)}
-                            className="ml-1.5 text-blue-800 hover:text-blue-900 flex items-center justify-center"
+                            className="ml-1.5 text-blue-800 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 flex items-center justify-center"
                             aria-label={`Remove tag ${tag}`}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -657,14 +650,14 @@ const CreateEventModal = ({
                   <div className="space-y-5">
                     <div>
                       <div className="flex items-center mb-1">
-                        <UsersIcon className="h-5 w-5 text-blue-600 mr-2" />
-                        <label className="text-sm font-medium text-gray-700">
+                        <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           Capacity*
                         </label>
                       </div>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                          <UsersIcon className="h-5 w-5 text-gray-400" />
+                          <UsersIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                         </div>
                         <input
                           type="number"
@@ -672,25 +665,25 @@ const CreateEventModal = ({
                           value={formData.capacity}
                           onChange={handleChange}
                           min="1"
-                          className={`w-full pl-10 p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${errors.capacity ? 'border-red-500' : 'border-gray-300'}`}
+                          className={`w-full pl-10 p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${errors.capacity ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
                         />
                       </div>
-                      {errors.capacity && <p className="mt-1 text-sm text-red-500">{errors.capacity}</p>}
-                      <p className="text-xs text-gray-500 mt-1">Maximum number of attendees allowed</p>
+                      {errors.capacity && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.capacity}</p>}
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Maximum number of attendees allowed</p>
                     </div>
                     
                     <div>
                       <div className="flex items-center mb-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600 mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
-                        <label className="text-sm font-medium text-gray-700">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                           Price (₹)
                         </label>
                       </div>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                          <span className="text-gray-500 text-sm font-medium">₹</span>
+                          <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">₹</span>
                         </div>
                         <input
                           type="number"
@@ -699,21 +692,21 @@ const CreateEventModal = ({
                           onChange={handleChange}
                           min="0"
                           step="1"
-                          className="w-full pl-10 p-2.5 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full pl-10 p-2.5 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                         />
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Set to 0 for free events</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Set to 0 for free events</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="mt-8 pt-5 border-t border-gray-200 flex justify-end space-x-4">
+            <div className="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors"
+                className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors"
               >
                 Cancel
               </button>

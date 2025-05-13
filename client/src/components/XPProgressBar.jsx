@@ -39,18 +39,18 @@ const XPProgressBar = ({ xp }) => {
     <div className="w-full">
       <div className="flex justify-between mb-1">
         <div>
-          <span className="text-sm font-medium text-gray-700">XP: {xp}</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">XP: {xp}</span>
         </div>
         {nextLevel && (
           <div>
-            <span className="text-sm font-medium text-gray-500">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
               {xpForNextLevel} XP to reach {nextLevel.name}
             </span>
           </div>
         )}
       </div>
       
-      <div className="w-full bg-gray-200 rounded-full h-4 relative mb-1">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 relative mb-1">
         <div 
           className="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-700 ease-out"
           style={{ width: `${progressPercentage}%` }}
@@ -60,7 +60,7 @@ const XPProgressBar = ({ xp }) => {
         {levels.slice(1, -1).map((level, index) => (
           <div 
             key={level.name}
-            className="absolute top-0 bottom-0 border-l border-white"
+            className="absolute top-0 bottom-0 border-l border-white dark:border-gray-600"
             style={{ 
               left: `${(level.min / levels[levels.length - 1].min) * 100}%`,
               opacity: xp >= level.min ? 0.5 : 0.2
@@ -70,7 +70,7 @@ const XPProgressBar = ({ xp }) => {
       </div>
       
       {/* Level labels */}
-      <div className="flex justify-between text-xs text-gray-500 mt-1">
+      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
         {levels.map((level, index) => {
           // Don't show Master min, only show up to Veteran
           if (index === levels.length - 1) return null;
@@ -78,7 +78,7 @@ const XPProgressBar = ({ xp }) => {
           return (
             <div 
               key={level.name} 
-              className={`${index === 0 ? 'text-left' : index === levels.length - 2 ? 'text-right' : 'text-center'} ${currentLevel.name === level.name ? 'font-semibold text-blue-600' : ''}`}
+              className={`${index === 0 ? 'text-left' : index === levels.length - 2 ? 'text-right' : 'text-center'} ${currentLevel.name === level.name ? 'font-semibold text-blue-600 dark:text-blue-400' : ''}`}
               style={{ 
                 minWidth: '45px',
                 opacity: xp >= level.min ? 1 : 0.5

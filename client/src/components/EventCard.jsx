@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { formatDate } from '../utils/formatDate';
 
-const EventCard = ({ event, isSaved = false, showActions = true, onSaveToggle }) => {
-  const { title, shortDescription, poster, date, location, _id: id, type, tags = [] } = event;
+const EventCard = ({ event, onSaveToggle }) => {
+  const { title, shortDescription, poster, date, location, _id: id, type, tags = [], isSaved = false } = event;
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isEventSaved, setIsEventSaved] = useState(isSaved);
@@ -63,7 +63,7 @@ const EventCard = ({ event, isSaved = false, showActions = true, onSaveToggle })
   const formattedDate = formatDate(date);
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full">
       <Link to={`/event/${id}`} className="block h-48 overflow-hidden relative">
         <img 
           src={poster} 
@@ -77,29 +77,27 @@ const EventCard = ({ event, isSaved = false, showActions = true, onSaveToggle })
       
       <div className="p-4 flex-grow flex flex-col">
         <div className="flex items-start justify-between">
-          <h3 className="text-lg font-bold text-gray-800 mb-1 hover:text-blue-600">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-1 hover:text-blue-600 dark:hover:text-blue-400">
             <Link to={`/event/${id}`}>{title}</Link>
           </h3>
-          {showActions && (
-            <button 
-              onClick={handleSaveEvent}
-              className="text-gray-400 hover:text-yellow-500 transition-colors"
-              title={isEventSaved ? "Remove from saved" : "Save for later"}
-            >
-              {isEventSaved ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-              )}
-            </button>
-          )}
+          <button 
+            onClick={handleSaveEvent}
+            className="text-gray-400 dark:text-gray-500 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
+            title={isEventSaved ? "Remove from saved" : "Save for later"}
+          >
+            {isEventSaved ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500 dark:text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+            )}
+          </button>
         </div>
         
-        <div className="mb-2 text-sm text-gray-600">
+        <div className="mb-2 text-sm text-gray-600 dark:text-gray-300">
           <div className="flex items-center mb-1">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -116,14 +114,14 @@ const EventCard = ({ event, isSaved = false, showActions = true, onSaveToggle })
           </div>
         </div>
         
-        <p className="text-gray-600 text-sm mb-4 flex-grow">{shortDescription}</p>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">{shortDescription}</p>
         
         {tags.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-1">
             {tags.map((tag, index) => (
               <span 
                 key={index}
-                className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded"
               >
                 #{tag}
               </span>
@@ -131,20 +129,18 @@ const EventCard = ({ event, isSaved = false, showActions = true, onSaveToggle })
           </div>
         )}
         
-        {showActions && (
-          <div className="mt-auto">
-            {registrationError && (
-              <p className="text-red-500 text-xs mb-2">{registrationError}</p>
-            )}
-            <button
-              onClick={handleRegister}
-              disabled={isRegistering}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
-            >
-              {isRegistering ? 'Registering...' : 'Register Now'}
-            </button>
-          </div>
-        )}
+        <div className="mt-auto">
+          {registrationError && (
+            <p className="text-red-500 dark:text-red-400 text-xs mb-2">{registrationError}</p>
+          )}
+          <button
+            onClick={handleRegister}
+            disabled={isRegistering}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+          >
+            {isRegistering ? 'Registering...' : 'Register Now'}
+          </button>
+        </div>
       </div>
     </div>
   );

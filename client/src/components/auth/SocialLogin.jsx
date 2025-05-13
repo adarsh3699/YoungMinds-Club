@@ -5,17 +5,17 @@ const SocialLogin = () => {
 		<div className="mt-8">
 			<div className="relative">
 				<div className="absolute inset-0 flex items-center">
-					<div className="w-full border-t border-gray-300"></div>
+					<div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
 				</div>
 				<div className="relative flex justify-center text-sm">
-					<span className="px-3 bg-white text-gray-500">Or continue with</span>
+					<span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
 				</div>
 			</div>
 
 			<div className="mt-6">
 				<a
 					href="http://localhost:4000/api/auth/google"
-					className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+					className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 				>
 					<svg viewBox="0 0 24 24" width="20" height="20" className="mr-3">
 						<g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">

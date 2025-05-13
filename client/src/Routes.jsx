@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navigation from './components/Navigation';
+import Footer from './components/Footer';
 import './styles/main.css';
 
 // Lazy load page components
@@ -26,7 +27,7 @@ const DashboardRouter = () => {
 		return (
 			<div className="flex flex-col justify-center items-center h-[70vh]">
 				<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-				<h2 className="text-xl font-semibold text-gray-700">Loading</h2>
+				<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
 			</div>
 		);
 	}
@@ -47,13 +48,13 @@ function AppRoutes() {
 	return (
 		<AuthProvider>
 			<Router>
-				<div className="min-h-screen bg-gray-100 pt-16">
+				<div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
 					<Navigation />
-					<main>
+					<main className="flex-grow pt-16">
 						<Suspense fallback={
 							<div className="flex flex-col justify-center items-center h-[70vh]">
 								<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-								<h2 className="text-xl font-semibold text-gray-700">Loading</h2>
+								<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
 							</div>
 						}>
 							<Routes>
@@ -89,6 +90,7 @@ function AppRoutes() {
 							</Routes>
 						</Suspense>
 					</main>
+					<Footer />
 				</div>
 			</Router>
 		</AuthProvider>

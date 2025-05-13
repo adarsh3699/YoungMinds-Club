@@ -64,10 +64,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div className="max-w-6xl mx-auto p-6 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Admin Dashboard</h1>
           <button
             onClick={logout}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -77,58 +77,58 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-blue-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Total Users</h3>
-            <p className="text-3xl font-bold">{users.length}</p>
+          <div className="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Total Users</h3>
+            <p className="text-3xl font-bold text-blue-700 dark:text-blue-400">{users.length}</p>
           </div>
-          <div className="bg-green-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Organizers</h3>
-            <p className="text-3xl font-bold">
+          <div className="bg-green-50 dark:bg-green-900 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Organizers</h3>
+            <p className="text-3xl font-bold text-green-700 dark:text-green-400">
               {users.filter((u) => u.role === "organizer").length}
             </p>
           </div>
-          <div className="bg-purple-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Regular Users</h3>
-            <p className="text-3xl font-bold">
+          <div className="bg-purple-50 dark:bg-purple-900 p-6 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Regular Users</h3>
+            <p className="text-3xl font-bold text-purple-700 dark:text-purple-400">
               {users.filter((u) => u.role === "user").length}
             </p>
           </div>
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">User Management</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">User Management</h2>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
               {error}
             </div>
           )}
 
           {loading ? (
-            <div className="text-center py-10">Loading users...</div>
+            <div className="text-center py-10 text-gray-600 dark:text-gray-400">Loading users...</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border">
+              <table className="min-w-full bg-white dark:bg-gray-800 border dark:border-gray-700">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="py-2 px-4 border text-left">Name</th>
-                    <th className="py-2 px-4 border text-left">Email</th>
-                    <th className="py-2 px-4 border text-left">Role</th>
-                    <th className="py-2 px-4 border text-left">Actions</th>
+                  <tr className="bg-gray-100 dark:bg-gray-700">
+                    <th className="py-2 px-4 border dark:border-gray-600 text-left text-gray-800 dark:text-gray-200">Name</th>
+                    <th className="py-2 px-4 border dark:border-gray-600 text-left text-gray-800 dark:text-gray-200">Email</th>
+                    <th className="py-2 px-4 border dark:border-gray-600 text-left text-gray-800 dark:text-gray-200">Role</th>
+                    <th className="py-2 px-4 border dark:border-gray-600 text-left text-gray-800 dark:text-gray-200">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user) => (
-                    <tr key={user._id} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-4 border">{user.name}</td>
-                      <td className="py-2 px-4 border">{user.email}</td>
-                      <td className="py-2 px-4 border">
+                    <tr key={user._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{user.name}</td>
+                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{user.email}</td>
+                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">
                         <select
                           value={user.role}
                           onChange={(e) =>
                             handleRoleChange(user._id, e.target.value)
                           }
-                          className="p-1 border rounded"
+                          className="p-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                           disabled={user._id === user?._id} // Can't change your own role
                         >
                           <option value="user">User</option>
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
                           <option value="admin">Admin</option>
                         </select>
                       </td>
-                      <td className="py-2 px-4 border">
+                      <td className="py-2 px-4 border dark:border-gray-700">
                         <button
                           onClick={() => handleDeleteUser(user._id)}
                           className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
                     <tr>
                       <td
                         colSpan="4"
-                        className="py-4 text-center text-gray-500"
+                        className="py-4 text-center text-gray-500 dark:text-gray-400"
                       >
                         No users found
                       </td>
@@ -164,20 +164,20 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        <div className="border-t pt-6">
-          <h2 className="text-xl font-semibold mb-4">Your Account</h2>
+        <div className="border-t dark:border-gray-700 pt-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Your Account</h2>
           <div className="grid grid-cols-2 gap-4 max-w-md">
             <div>
-              <p className="text-gray-600">Name</p>
-              <p className="font-medium">{user?.name}</p>
+              <p className="text-gray-600 dark:text-gray-400">Name</p>
+              <p className="font-medium text-gray-800 dark:text-white">{user?.name}</p>
             </div>
             <div>
-              <p className="text-gray-600">Email</p>
-              <p className="font-medium">{user?.email}</p>
+              <p className="text-gray-600 dark:text-gray-400">Email</p>
+              <p className="font-medium text-gray-800 dark:text-white">{user?.email}</p>
             </div>
             <div>
-              <p className="text-gray-600">Role</p>
-              <p className="font-medium capitalize">{user?.role}</p>
+              <p className="text-gray-600 dark:text-gray-400">Role</p>
+              <p className="font-medium capitalize text-gray-800 dark:text-white">{user?.role}</p>
             </div>
           </div>
         </div>

@@ -77,7 +77,7 @@ const RegisterForm = () => {
 	return (
 		<div className="p-8">
 			{error && (
-				<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>
+				<div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">{error}</div>
 			)}
 
 			<form onSubmit={handleSubmit} className="space-y-5">
@@ -138,9 +138,9 @@ const RegisterForm = () => {
 			</form>
 
 			<div className="mt-6 text-center">
-				<p className="text-gray-600">
+				<p className="text-gray-600 dark:text-gray-300">
 					Already have an account?{' '}
-					<Link to="/login" className="text-blue-500 hover:underline font-medium">
+					<Link to="/login" className="text-blue-500 dark:text-blue-400 hover:underline font-medium">
 						Log In
 					</Link>
 				</p>
