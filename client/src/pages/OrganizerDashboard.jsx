@@ -9,8 +9,10 @@ import {
   UsersIcon, 
   CurrencyDollarIcon, 
   PlusIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
+import { Modal, Tabs, SelectInput } from "../components/common";
 
 const OrganizerDashboard = () => {
   const { user } = useAuth();
@@ -21,6 +23,8 @@ const OrganizerDashboard = () => {
   const [events, setEvents] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, eventId: null, eventTitle: '' });
+  const [eventFilter, setEventFilter] = useState('all');
 
   // Fetch dashboard data
   useEffect(() => {
@@ -51,17 +55,45 @@ const OrganizerDashboard = () => {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+  const confirmDeleteEvent = (eventId, eventTitle) => {
+    setDeleteModal({ isOpen: true, eventId, eventTitle });
+  };
+
+  const handleDeleteEvent = async () => {
       try {
-        await axios.delete(`/organizer/events/${eventId}`);
-        setEvents(events.filter(event => event._id !== eventId));
+      await axios.delete(`/organizer/events/${deleteModal.eventId}`);
+      setEvents(events.filter(event => event._id !== deleteModal.eventId));
+      setDeleteModal({ isOpen: false, eventId: null, eventTitle: '' });
       } catch (error) {
         console.error("Error deleting event:", error);
         alert("Failed to delete event. Please try again.");
       }
-    }
   };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, eventId: null, eventTitle: '' });
+  };
+
+  const filterOptions = [
+    { value: 'all', label: 'All Events' },
+    { value: 'upcoming', label: 'Upcoming Events' },
+    { value: 'past', label: 'Past Events' }
+  ];
+
+  // Filter events based on selection
+  const getFilteredEvents = () => {
+    const now = new Date();
+    
+    if (eventFilter === 'upcoming') {
+      return events.filter(event => new Date(event.date) >= now);
+    } else if (eventFilter === 'past') {
+      return events.filter(event => new Date(event.date) < now);
+    }
+    
+    return events;
+  };
+
+  const filteredEvents = getFilteredEvents();
 
   if (loading) {
     return (
@@ -138,6 +170,14 @@ const OrganizerDashboard = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Your Events</h2>
+            <div className="flex space-x-4 items-center">
+              <div className="w-48">
+                <SelectInput
+                  value={eventFilter}
+                  onChange={(e) => setEventFilter(e.target.value)}
+                  options={filterOptions}
+                />
+              </div>
             <button 
               onClick={() => setRefreshTrigger(prev => prev + 1)} 
               className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
@@ -145,6 +185,7 @@ const OrganizerDashboard = () => {
               <ArrowPathIcon className="h-5 w-5 mr-1" />
               Refresh
             </button>
+            </div>
           </div>
           
           {events.length === 0 ? (
@@ -157,16 +198,20 @@ const OrganizerDashboard = () => {
               Create Your First Event
             </button>
           </div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-10 text-center text-gray-500 dark:text-gray-400">
+              <p>No {eventFilter} events found.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event) => (
+              {filteredEvents.map((event) => (
                 <EventCard 
                   key={event._id} 
                   event={event} 
                   isOrganizer={true}
                   onManage={() => navigate(`/organizer/event/${event._id}`)}
                   onEdit={() => navigate(`/organizer/event/${event._id}/edit`)}
-                  onDelete={() => handleDeleteEvent(event._id)}
+                  onDelete={() => confirmDeleteEvent(event._id, event.title)}
                 />
               ))}
             </div>
@@ -174,7 +219,14 @@ const OrganizerDashboard = () => {
         </div>
 
         <div className="border-t dark:border-gray-700 pt-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Your Account</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Dashboard</h2>
+          
+          <Tabs
+            tabs={[
+              {
+                key: 'overview',
+                label: 'Overview',
+                content: (
           <div className="grid grid-cols-2 gap-4 max-w-md">
             <div>
               <p className="text-gray-600 dark:text-gray-400">Name</p>
@@ -189,16 +241,76 @@ const OrganizerDashboard = () => {
               <p className="font-medium capitalize text-gray-800 dark:text-white">{user?.role}</p>
             </div>
           </div>
+                )
+              },
+              {
+                key: 'analytics',
+                label: 'Analytics',
+                content: (
+                  <div className="space-y-4">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-3">Registration Trends</h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Analytics data would display here. This could include charts showing registration trends, 
+                        attendee demographics, and more.
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
+            ]}
+          />
         </div>
       </div>
 
       {/* Create Event Modal */}
-      {showCreateModal && (
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        maxWidth="max-w-4xl"
+        noPadding={true}
+        showCloseButton={false}
+      >
         <CreateEventModal 
           onClose={() => setShowCreateModal(false)}
           onSuccess={handleCreateSuccess}
         />
-      )}
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        title="Delete Event"
+        maxWidth="max-w-md"
+      >
+        <div className="mt-2">
+          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+            <ExclamationTriangleIcon className="w-6 h-6 text-red-600" aria-hidden="true" />
+          </div>
+          <div className="mt-3 text-center sm:mt-5">
+            <p className="text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete the event "{deleteModal.eventTitle}"? This action cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+          <button
+            type="button"
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:col-start-2 sm:text-sm"
+            onClick={handleDeleteEvent}
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+            onClick={closeDeleteModal}
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import EventCard from '../components/EventCard';
 import XPProgressBar from '../components/XPProgressBar';
+import { Tabs } from '../components/common';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -182,155 +183,179 @@ const UserDashboard = () => {
         </div>
       )}
       
-      {/* Search and Filters Section */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Find Events</h2>
-        
-        <form onSubmit={handleSearch} className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-grow">
-              <input
-                type="text"
-                placeholder="Search events, tags or cities..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-              />
-            </div>
-            
-            <div>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <select
-                value={tag}
-                onChange={(e) => setTag(e.target.value)}
-                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-              >
-                <option value="">All Tags</option>
-                {popularTags.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm"
-            >
-              Search
-            </button>
-            
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md shadow-sm"
-            >
-              Reset Filters
-            </button>
-          </div>
-        </form>
-      </div>
-      
-      {/* Recommended Events Section */}
-      {recommendedEvents.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Recommended For You</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recommendedEvents.slice(0, 3).map((event) => (
-              <EventCard 
-                key={event._id} 
-                event={event} 
-                onSaveToggle={handleSaveToggle}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* All Events Section */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Discover Events</h2>
-        
-        {events.length === 0 ? (
-          <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No events found</h3>
-            <p className="text-gray-600 dark:text-gray-400">Try adjusting your search filters or check back later!</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {events.map((event) => (
-                <EventCard 
-                  key={event._id} 
-                  event={event} 
-                  onSaveToggle={handleSaveToggle}
-                />
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-8">
-                <nav className="flex items-center">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-l-md border ${
-                      currentPage === 1 
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
-                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    } border-gray-300 dark:border-gray-600`}
-                  >
-                    Previous
-                  </button>
+      {/* Events Section with Tabs */}
+      <Tabs 
+        tabs={[
+          {
+            key: 'all',
+            label: 'All Events',
+            content: (
+              <>
+                {/* Search and Filters Section */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Find Events</h2>
                   
-                  {[...Array(totalPages).keys()].map((number) => (
-                    <button
-                      key={number + 1}
-                      onClick={() => handlePageChange(number + 1)}
-                      className={`px-3 py-1 border-t border-b border-gray-300 dark:border-gray-600 ${
-                        currentPage === number + 1
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {number + 1}
-                    </button>
-                  ))}
+                  <form onSubmit={handleSearch} className="space-y-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-grow">
+                        <input
+                          type="text"
+                          placeholder="Search events, tags or cities..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                        />
+                      </div>
+                      
+                      <button 
+                        type="submit" 
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
+                      >
+                        Search
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                      >
+                        <option value="">All Categories</option>
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                      
+                      <input
+                        type="text"
+                        placeholder="Filter by city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                      />
+                      
+                      <select
+                        value={tag}
+                        onChange={(e) => setTag(e.target.value)}
+                        className="p-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                      >
+                        <option value="">All Tags</option>
+                        {popularTags.map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={handleResetFilters}
+                        className="text-blue-500 hover:text-blue-600 transition mr-4"
+                      >
+                        Reset Filters
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                
+                {/* Events Grid */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Available Events</h2>
                   
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded-r-md border ${
-                      currentPage === totalPages
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    } border-gray-300 dark:border-gray-600`}
-                  >
-                    Next
-                  </button>
-                </nav>
+                  {events.length === 0 ? (
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center">
+                      <p className="text-gray-600 dark:text-gray-400">No events found matching your criteria.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {events.map((event) => (
+                          <EventCard 
+                            key={event._id} 
+                            event={event} 
+                            onSaveToggle={handleSaveToggle}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div className="flex justify-center mt-8">
+                          <nav className="flex items-center">
+                            <button
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
+                              className={`px-3 py-1 rounded-l-md border border-gray-300 dark:border-gray-600 ${
+                                currentPage === 1 
+                                  ? 'text-gray-400 cursor-not-allowed' 
+                                  : 'text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              Previous
+                            </button>
+                            
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`px-3 py-1 border-t border-b border-gray-300 dark:border-gray-600 ${
+                                  currentPage === page
+                                    ? 'bg-blue-500 text-white'
+                                    : 'text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            ))}
+                            
+                            <button
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === totalPages}
+                              className={`px-3 py-1 rounded-r-md border border-gray-300 dark:border-gray-600 ${
+                                currentPage === totalPages
+                                  ? 'text-gray-400 cursor-not-allowed'
+                                  : 'text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              Next
+                            </button>
+                          </nav>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
+            )
+          },
+          {
+            key: 'recommended',
+            label: 'Recommended for You',
+            content: (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Recommended Events</h2>
+                
+                {recommendedEvents.length === 0 ? (
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center">
+                    <p className="text-gray-600 dark:text-gray-400">No recommended events available yet. Attend more events to get personalized recommendations!</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {recommendedEvents.map((event) => (
+                      <EventCard 
+                        key={event._id} 
+                        event={event} 
+                        onSaveToggle={handleSaveToggle}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </>
-        )}
-      </div>
+            )
+          }
+        ]}
+      />
     </div>
   );
 };

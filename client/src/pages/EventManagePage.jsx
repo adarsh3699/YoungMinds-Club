@@ -16,13 +16,13 @@ import {
   QrCodeIcon
 } from '@heroicons/react/24/outline';
 import CreateEventModal from '../components/organizer/CreateEventModal';
+import { Modal, Tabs } from '../components/common';
 
 const EventManagePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [attendees, setAttendees] = useState([]);
-  const [activeTab, setActiveTab] = useState('attendees');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -151,6 +151,136 @@ const EventManagePage = () => {
       </div>
     );
   }
+  
+  // Prepare the content for attendees tab
+  const attendeesTabContent = (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Registered Attendees ({attendees.length})</h3>
+        {attendees.length > 0 && (
+          <button
+            onClick={downloadCSV}
+            className="flex items-center px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 transition"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
+            Download CSV
+          </button>
+        )}
+      </div>
+      
+      {attendees.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No attendees have registered for this event yet.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Registered On
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Feedback
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {attendees.map((attendee) => (
+                <tr key={attendee.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                        {attendee.profilePicture ? (
+                          <img src={attendee.profilePicture} alt={attendee.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-medium text-gray-700">
+                            {attendee.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{attendee.name}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{attendee.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {format(new Date(attendee.registrationDate), 'MMM d, yyyy')}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      attendee.status === 'attended' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {attendee.status === 'attended' ? 'Attended' : 'Registered'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {attendee.hasFeedback ? (
+                      <span className="text-green-600 text-sm">Submitted</span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">None</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+  
+  // Prepare the content for analytics tab
+  const analyticsTabContent = (
+    <div>
+      <h3 className="text-lg font-semibold mb-4">Registration Analytics</h3>
+      
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <p className="text-center text-gray-500">
+          Registration analytics visualization will be available in a future update.
+        </p>
+        
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Total Registrations</h4>
+            <p className="text-3xl font-bold text-blue-600">{event.registrationCount}</p>
+          </div>
+          
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Capacity Filled</h4>
+            <p className="text-3xl font-bold text-green-600">
+              {Math.round((event.registrationCount / event.capacity) * 100)}%
+            </p>
+          </div>
+          
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Feedback Rate</h4>
+            <p className="text-3xl font-bold text-purple-600">
+              {attendees.length > 0 
+                ? Math.round((attendees.filter(a => a.hasFeedback).length / attendees.length) * 100)
+                : 0}%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
   
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -301,199 +431,57 @@ const EventManagePage = () => {
       
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="border-b">
-          <nav className="flex">
-            <button
-              onClick={() => setActiveTab('attendees')}
-              className={`px-4 py-3 text-center w-1/2 md:w-auto ${
-                activeTab === 'attendees'
-                  ? 'border-b-2 border-blue-500 font-medium text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
+        <Tabs
+          tabs={[
+            {
+              key: 'attendees',
+              label: (
               <span className="flex items-center">
                 <UsersIcon className="h-5 w-5 mr-2" />
                 Attendees
               </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`px-4 py-3 text-center w-1/2 md:w-auto ${
-                activeTab === 'analytics'
-                  ? 'border-b-2 border-blue-500 font-medium text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
+              ),
+              content: attendeesTabContent
+            },
+            {
+              key: 'analytics',
+              label: (
               <span className="flex items-center">
                 <ChartBarIcon className="h-5 w-5 mr-2" />
                 Analytics
               </span>
-            </button>
-            
-          </nav>
-        </div>
-        
-        <div className="p-6">
-          {/* Attendees Tab */}
-          {activeTab === 'attendees' && (
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Registered Attendees ({attendees.length})</h3>
-                {attendees.length > 0 && (
-                  <button
-                    onClick={downloadCSV}
-                    className="flex items-center px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                  >
-                    <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
-                    Download CSV
-                  </button>
-                )}
-              </div>
-              
-              {attendees.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No attendees have registered for this event yet.</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Registered On
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Feedback
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {attendees.map((attendee) => (
-                        <tr key={attendee.id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                {attendee.profilePicture ? (
-                                  <img src={attendee.profilePicture} alt={attendee.name} className="h-full w-full object-cover" />
-                                ) : (
-                                  <span className="text-sm font-medium text-gray-700">
-                                    {attendee.name.charAt(0).toUpperCase()}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{attendee.name}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{attendee.email}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {format(new Date(attendee.registrationDate), 'MMM d, yyyy')}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              attendee.status === 'attended' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-blue-100 text-blue-800'
-                            }`}>
-                              {attendee.status === 'attended' ? 'Attended' : 'Registered'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {attendee.hasFeedback ? (
-                              <span className="text-green-600 text-sm">Submitted</span>
-                            ) : (
-                              <span className="text-gray-400 text-sm">None</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {/* Analytics Tab */}
-          {activeTab === 'analytics' && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Registration Analytics</h3>
-              
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <p className="text-center text-gray-500">
-                  Registration analytics visualization will be available in a future update.
-                </p>
-                
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Total Registrations</h4>
-                    <p className="text-3xl font-bold text-blue-600">{event.registrationCount}</p>
-                  </div>
-                  
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Capacity Filled</h4>
-                    <p className="text-3xl font-bold text-green-600">
-                      {Math.round((event.registrationCount / event.capacity) * 100)}%
-                    </p>
-                  </div>
-                  
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Feedback Rate</h4>
-                    <p className="text-3xl font-bold text-purple-600">
-                      {attendees.length > 0 
-                        ? Math.round((attendees.filter(a => a.hasFeedback).length / attendees.length) * 100)
-                        : 0}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+              ),
+              content: analyticsTabContent
+            }
+          ]}
+        />
       </div>
       
       {/* Edit Event Modal */}
-      {showEditModal && (
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        maxWidth="max-w-4xl"
+        noPadding={true}
+        showCloseButton={false}
+      >
         <CreateEventModal 
           onClose={() => setShowEditModal(false)}
           onSuccess={handleEditSuccess}
           eventToEdit={event}
           isEditing={true}
         />
-      )}
+      </Modal>
       
       {/* QR Code Modal */}
-      {showQrCode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Event QR Code</h3>
-              <button
-                onClick={() => setShowQrCode(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
+      <Modal
+        isOpen={showQrCode}
+        onClose={() => setShowQrCode(false)}
+        title="Event QR Code"
+        maxWidth="max-w-md"
+      >
             <div className="flex flex-col items-center">
-              <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Scan this QR code to view event details
               </p>
               
@@ -515,9 +503,7 @@ const EventManagePage = () => {
                 Download QR Code
               </button>
             </div>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

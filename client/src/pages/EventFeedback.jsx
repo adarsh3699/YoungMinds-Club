@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { RadioGroup } from '@headlessui/react';
+import { StarIcon } from '@heroicons/react/24/solid';
+import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
 
 const EventFeedback = () => {
   const { id } = useParams();
@@ -17,8 +20,10 @@ const EventFeedback = () => {
   
   // Form state
   const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
+  
+  // Rating options for RadioGroup
+  const ratingOptions = [1, 2, 3, 4, 5];
   
   // Check if user is authenticated and has registered for this event
   useEffect(() => {
@@ -92,19 +97,6 @@ const EventFeedback = () => {
       setSubmitting(false);
     }
   };
-  
-  // Handle star rating hover
-  const handleRatingHover = (hoveredRating) => {
-    setHoverRating(hoveredRating);
-  };
-  
-  // Handle star rating click
-  const handleRatingClick = (selectedRating) => {
-    setRating(selectedRating);
-  };
-  
-  // Get final rating to display (hover rating or selected rating)
-  const displayRating = hoverRating || rating;
   
   // Show loading state
   if (loading) {
@@ -200,98 +192,81 @@ const EventFeedback = () => {
             <div className="w-16 h-16 rounded overflow-hidden mr-4 flex-shrink-0">
               <img 
                 src={event.poster} 
-                alt={event.title} 
+                alt={event.title}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-800">{event.title}</h2>
-              <p className="text-sm text-gray-600">
-                {new Date(event.date).toLocaleDateString()} • {event.location.venue}, {event.location.city}
+              <h2 className="font-semibold text-gray-700">{event.title}</h2>
+              <p className="text-sm text-gray-500">
+                {event.organizer.name} • {new Date(event.date).toLocaleDateString()}
               </p>
             </div>
           </div>
           
-          {/* Star Rating */}
+          {/* Rating */}
           <div className="mb-8">
-            <label className="block text-gray-700 font-medium mb-3">
-              How would you rate this event? <span className="text-red-500">*</span>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Rate this event (required)
             </label>
-            <div className="flex items-center">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onMouseEnter={() => handleRatingHover(star)}
-                    onMouseLeave={() => handleRatingHover(0)}
-                    onClick={() => handleRatingClick(star)}
-                    className="text-4xl focus:outline-none px-1"
+            
+            <RadioGroup value={rating} onChange={setRating} className="mt-2">
+              <RadioGroup.Label className="sr-only">Rating</RadioGroup.Label>
+              <div className="flex items-center space-x-3">
+                {ratingOptions.map((option) => (
+                  <RadioGroup.Option
+                    key={option}
+                    value={option}
+                    className={({ active }) => `
+                      ${active ? 'ring-2 ring-offset-2 ring-blue-500' : ''}
+                      relative rounded-md p-1 cursor-pointer focus:outline-none
+                    `}
                   >
-                    <span className={star <= displayRating ? 'text-yellow-400' : 'text-gray-300'}>
-                      ★
-                    </span>
-                  </button>
+                    {({ checked }) => (
+                      <>
+                        <div className="flex items-center justify-center">
+                          {checked ? (
+                            <StarIcon className="w-8 h-8 text-yellow-400" />
+                          ) : (
+                            <StarOutlineIcon className="w-8 h-8 text-gray-400 hover:text-yellow-400" />
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </RadioGroup.Option>
                 ))}
               </div>
-              <div className="ml-4 text-gray-600">
-                {displayRating === 1 && 'Poor'}
-                {displayRating === 2 && 'Fair'}
-                {displayRating === 3 && 'Good'}
-                {displayRating === 4 && 'Very Good'}
-                {displayRating === 5 && 'Excellent'}
+              <div className="flex justify-between mt-1 text-xs text-gray-500">
+                <span>Poor</span>
+                <span>Excellent</span>
               </div>
-            </div>
-            {rating === 0 && (
-              <p className="text-sm text-gray-500 mt-1">Please select a rating</p>
-            )}
+            </RadioGroup>
           </div>
           
           {/* Comment */}
           <div className="mb-8">
-            <label htmlFor="comment" className="block text-gray-700 font-medium mb-2">
-              Share your experience (optional)
+            <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">
+              Additional comments (optional)
             </label>
             <textarea
               id="comment"
+              name="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              rows={5}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="What did you like or dislike? What could be improved?"
+              rows={4}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="What did you like or dislike about this event?"
             ></textarea>
           </div>
           
-          {/* XP Information */}
-          <div className="mb-8 bg-blue-50 p-4 rounded-lg">
-            <div className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-full mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-blue-800 font-medium">Earn XP for giving feedback!</p>
-                <p className="text-blue-600 text-sm">You'll receive 5 XP points when you submit your feedback.</p>
-              </div>
-            </div>
-          </div>
-          
           {/* Submit Button */}
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => navigate(`/event/${id}`)}
-              className="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
-              disabled={submitting}
-            >
-              Cancel
-            </button>
-            
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
               disabled={submitting || rating === 0}
+              className={`bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors ${
+                (submitting || rating === 0) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               {submitting ? 'Submitting...' : 'Submit Feedback'}
             </button>

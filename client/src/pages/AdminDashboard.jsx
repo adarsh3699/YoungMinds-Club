@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import { Switch, Modal, SelectInput } from "../components/common";
+import { Dialog, Transition } from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null, userName: '' });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -46,22 +50,33 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) {
-      return;
-    }
+  const confirmDeleteUser = (userId, userName) => {
+    setDeleteModal({ isOpen: true, userId, userName });
+  };
 
+  const handleDeleteUser = async () => {
     try {
-      const response = await axios.delete(`/admin/users/${userId}`);
+      const response = await axios.delete(`/admin/users/${deleteModal.userId}`);
       if (response.data.success) {
         // Remove the user from the list
-        setUsers(users.filter((user) => user._id !== userId));
+        setUsers(users.filter((user) => user._id !== deleteModal.userId));
+        setDeleteModal({ isOpen: false, userId: null, userName: '' });
       }
     } catch (error) {
       console.error("Error deleting user:", error);
       setError("Failed to delete user. Please try again.");
     }
   };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, userId: null, userName: '' });
+  };
+
+  const roleOptions = [
+    { value: 'user', label: 'User' },
+    { value: 'organizer', label: 'Organizer' },
+    { value: 'admin', label: 'Admin' }
+  ];
 
   return (
     <div className="max-w-6xl mx-auto p-6 dark:bg-gray-900">
@@ -118,29 +133,23 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{user.name}</td>
-                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{user.email}</td>
+                  {users.map((userData) => (
+                    <tr key={userData._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{userData.name}</td>
+                      <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">{userData.email}</td>
                       <td className="py-2 px-4 border dark:border-gray-700 text-gray-800 dark:text-gray-200">
-                        <select
-                          value={user.role}
-                          onChange={(e) =>
-                            handleRoleChange(user._id, e.target.value)
-                          }
-                          className="p-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                          disabled={user._id === user?._id} // Can't change your own role
-                        >
-                          <option value="user">User</option>
-                          <option value="organizer">Organizer</option>
-                          <option value="admin">Admin</option>
-                        </select>
+                        <SelectInput
+                          value={userData.role}
+                          onChange={(e) => handleRoleChange(userData._id, e.target.value)}
+                          options={roleOptions}
+                          className="py-1 px-2 text-sm"
+                        />
                       </td>
                       <td className="py-2 px-4 border dark:border-gray-700">
                         <button
-                          onClick={() => handleDeleteUser(user._id)}
+                          onClick={() => confirmDeleteUser(userData._id, userData.name)}
                           className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                          disabled={user._id === user?._id} // Can't delete yourself
+                          disabled={userData._id === user?._id} // Can't delete yourself
                         >
                           Delete
                         </button>
@@ -182,6 +191,41 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        title="Delete User"
+        maxWidth="max-w-md"
+      >
+        <div className="mt-2">
+          <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+            <ExclamationTriangleIcon className="w-6 h-6 text-red-600" aria-hidden="true" />
+          </div>
+          <div className="mt-3 text-center sm:mt-5">
+            <p className="text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete the user "{deleteModal.userName}"? This action cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+          <button
+            type="button"
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:col-start-2 sm:text-sm"
+            onClick={handleDeleteUser}
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+            onClick={closeDeleteModal}
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
