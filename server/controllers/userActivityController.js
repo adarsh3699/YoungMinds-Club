@@ -13,6 +13,24 @@ exports.getUserProfile = async (req, res) => {
             userActivity = await UserActivity.create({ user: userId });
         }
         
+        // Ensure badge is correctly set based on current XP
+        let currentBadge = 'Newbie';
+        if (userActivity.xp >= 500) {
+            currentBadge = 'Master';
+        } else if (userActivity.xp >= 300) {
+            currentBadge = 'Veteran';
+        } else if (userActivity.xp >= 150) {
+            currentBadge = 'Champ';
+        } else if (userActivity.xp >= 50) {
+            currentBadge = 'Regular';
+        }
+        
+        // Update badge if it's not correctly set
+        if (userActivity.badge !== currentBadge) {
+            userActivity.badge = currentBadge;
+            await userActivity.save();
+        }
+        
         res.status(200).json({
             success: true,
             profile: {
