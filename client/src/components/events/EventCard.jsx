@@ -10,6 +10,7 @@ import {
   VideoCameraIcon
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const EventCard = ({ 
   event, 
@@ -51,26 +52,27 @@ const EventCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Event Image */}
-      <div className="relative h-48 overflow-hidden">
-        <img 
-          src={event.poster || 'https://via.placeholder.com/400x200?text=No+Image'} 
-          alt={event.title} 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-2 right-2">
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${capacityStatus.bg} ${capacityStatus.color}`}>
-            {event.registrationCount} / {event.capacity}
-          </span>
+      <Link to={`/event/${event._id}`}>
+        <div className="relative h-48 overflow-hidden">
+          <img 
+            src={event.poster || 'https://via.placeholder.com/400x200?text=No+Image'} 
+            alt={event.title} 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-2 right-2">
+            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${capacityStatus.bg} ${capacityStatus.color}`}>
+              {event.registrationCount} / {event.capacity}
+            </span>
+          </div>
+          
+          {/* Event category tag */}
+          <div className="absolute top-2 left-2">
+            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
+              {event.category}
+            </span>
+          </div>
         </div>
-        
-        {/* Event category tag */}
-        <div className="absolute top-2 left-2">
-          <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
-            {event.category}
-          </span>
-        </div>
-      </div>
+      </Link>
       
       {/* Event Details */}
       <div className="p-4">

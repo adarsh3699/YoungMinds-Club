@@ -91,6 +91,13 @@ const eventSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isFlagged: {
+        type: Boolean,
+        default: false
+    },
+    flagReason: {
+        type: String
+    },
     analytics: {
         views: {
             type: Number,

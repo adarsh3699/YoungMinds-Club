@@ -27,6 +27,18 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'organizer', 'admin'],
         default: 'user'
     },
+    status: {
+        type: String,
+        enum: ['active', 'suspended'],
+        default: 'active'
+    },
+    isFlagged: {
+        type: Boolean,
+        default: false
+    },
+    flagReason: {
+        type: String
+    },
     googleId: {
         type: String
     },
@@ -74,6 +86,11 @@ userSchema.methods.isAdmin = function () {
 // Method to check if user is organizer
 userSchema.methods.isOrganizer = function () {
     return this.role === 'organizer' || this.role === 'admin';
+};
+
+// Method to check if user account is active
+userSchema.methods.isActive = function () {
+    return this.status === 'active';
 };
 
 const User = mongoose.model('User', userSchema);

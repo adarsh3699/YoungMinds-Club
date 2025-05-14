@@ -11,6 +11,7 @@ const EventCard = ({ event, onSaveToggle }) => {
   const [isEventSaved, setIsEventSaved] = useState(isSaved);
   const [isRegistering, setIsRegistering] = useState(false);
   const [registrationError, setRegistrationError] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Handle saving/unsaving event
   const handleSaveEvent = async (e) => {
@@ -63,12 +64,16 @@ const EventCard = ({ event, onSaveToggle }) => {
   const formattedDate = formatDate(date);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full">
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Link to={`/event/${id}`} className="block h-48 overflow-hidden relative">
-        <img 
-          src={poster} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+        <img
+          src={poster}
+          alt={title}
+          className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'}`}
         />
         <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
           {type}

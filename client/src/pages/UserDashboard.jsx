@@ -4,6 +4,7 @@ import axios from 'axios';
 import EventCard from '../components/EventCard';
 import XPProgressBar from '../components/XPProgressBar';
 import { Tabs } from '../components/common';
+import { Link } from 'react-router-dom';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -12,6 +13,7 @@ const UserDashboard = () => {
   const [events, setEvents] = useState([]);
   const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
   
   // Filters and search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,6 +45,12 @@ const UserDashboard = () => {
         
         // Get all events with default filters
         await fetchEvents();
+        
+        // Fetch active announcements
+        const announcementsResponse = await axios.get('/user/announcements');
+        if (announcementsResponse.data.success) {
+          setAnnouncements(announcementsResponse.data.announcements);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         setError('Failed to load dashboard. Please try again.');
@@ -120,6 +128,40 @@ const UserDashboard = () => {
     ));
   };
 
+  // Badge mapping for badge icons and colors
+  const getBadgeInfo = (badgeName) => {
+    switch (badgeName) {
+      case 'Newbie':
+        return { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', icon: '🌱' };
+      case 'Regular':
+        return { color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', icon: '🌟' };
+      case 'Champ':
+        return { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300', icon: '🏆' };
+      case 'Veteran':
+        return { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', icon: '🔥' };
+      case 'Master':
+        return { color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300', icon: '👑' };
+      default:
+        return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300', icon: '❓' };
+    }
+  };
+
+  // Announcement type styling
+  const getAnnouncementStyle = (type) => {
+    switch (type) {
+      case 'info':
+        return 'bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-300';
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-300';
+      case 'success':
+        return 'bg-green-50 border-green-300 text-green-800 dark:bg-green-900/50 dark:border-green-700 dark:text-green-300';
+      case 'error':
+        return 'bg-red-50 border-red-300 text-red-800 dark:bg-red-900/50 dark:border-red-700 dark:text-red-300';
+      default:
+        return 'bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-900/50 dark:border-blue-700 dark:text-blue-300';
+    }
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -146,6 +188,26 @@ const UserDashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Announcements Section */}
+      {announcements.length > 0 && (
+        <div className="mb-6">
+          {announcements.map((announcement) => (
+            <div 
+              key={announcement._id} 
+              className={`mb-4 p-4 border-l-4 rounded-md shadow-sm ${getAnnouncementStyle(announcement.type)}`}
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="font-bold text-lg">{announcement.title}</h3>
+                <span className="text-xs opacity-70">
+                  {new Date(announcement.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="mt-2">{announcement.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      
       {/* User Profile Section */}
       {userProfile && (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">

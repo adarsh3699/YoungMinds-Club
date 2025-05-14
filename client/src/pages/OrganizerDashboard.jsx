@@ -161,7 +161,7 @@ const OrganizerDashboard = () => {
             <div>
               <h3 className="text-lg font-semibold mb-1 text-gray-800 dark:text-gray-200">Revenue</h3>
               <p className="text-3xl font-bold text-purple-700 dark:text-purple-400">
-                ${dashboardData?.stats?.revenue || 0}
+                ₹{dashboardData?.stats?.revenue || 0}
               </p>
             </div>
           </div>

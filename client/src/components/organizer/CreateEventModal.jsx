@@ -40,7 +40,7 @@ const TextareaField = ({ label, name, value, onChange, placeholder, rows = 3, ma
       onChange={onChange}
       rows={rows}
       maxLength={maxLength}
-      className={`w-full p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
+      className={`w-full p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white custom-scrollbar`}
       placeholder={placeholder}
     ></textarea>
     {error && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{error}</p>}
@@ -351,7 +351,7 @@ const CreateEventModal = ({
         </button>
       </div>
       
-      <div className="custom-scrollbar overflow-y-auto bg-slate-800 dark:bg-slate-800" style={{ maxHeight: 'calc(85vh - 70px)' }}>
+      <div className="overflow-y-auto bg-slate-800 dark:bg-slate-800" style={{ maxHeight: 'calc(85vh - 70px)' }}>
         <form onSubmit={handleSubmit} className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-6 md:col-span-1">

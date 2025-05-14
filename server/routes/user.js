@@ -2,6 +2,7 @@ const express = require('express');
 const { isAuthenticated } = require('../middlewares/auth');
 const userController = require('../controllers/userController');
 const userActivityController = require('../controllers/userActivityController');
+const announcementController = require('../controllers/announcementController');
 
 const router = express.Router();
 
@@ -15,5 +16,8 @@ router.get('/events', isAuthenticated, userActivityController.getUserEvents);
 router.get('/events/saved', isAuthenticated, userActivityController.getSavedEvents);
 router.get('/events/registered', isAuthenticated, userActivityController.getRegisteredEvents);
 router.get('/leaderboard', isAuthenticated, userActivityController.getLeaderboard);
+
+// User announcements route
+router.get('/announcements', isAuthenticated, announcementController.getActiveAnnouncements);
 
 module.exports = router; 

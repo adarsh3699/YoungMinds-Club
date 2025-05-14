@@ -172,7 +172,7 @@ const EventManagePage = () => {
 					<p className="text-gray-400">No attendees have registered for this event yet.</p>
 				</div>
 			) : (
-				<div className="overflow-x-auto">
+				<div className="table-scroll overflow-x-auto">
 					<table className="min-w-full divide-y divide-gray-700">
 						<thead className="bg-gray-800">
 							<tr>
@@ -420,12 +420,12 @@ const EventManagePage = () => {
 						<div className="grid grid-cols-2 gap-4">
 							<div className="bg-gray-700 p-4 rounded-lg">
 								<p className="text-sm text-gray-300">Price</p>
-								<p className="text-2xl font-bold text-green-400">${event.price || 0}</p>
+								<p className="text-2xl font-bold text-green-400">₹{event.price || 0}</p>
 							</div>
 							<div className="bg-gray-700 p-4 rounded-lg">
 								<p className="text-sm text-gray-300">Revenue</p>
 								<p className="text-2xl font-bold text-purple-400">
-									${(event.price || 0) * event.registrationCount}
+									₹{(event.price || 0) * event.registrationCount}
 								</p>
 							</div>
 						</div>

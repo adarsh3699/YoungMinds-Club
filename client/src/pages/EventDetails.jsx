@@ -253,7 +253,7 @@ const EventDetails = () => {
               
               {event.price > 0 ? (
                 <span className="bg-green-100 text-green-800 text-lg font-semibold rounded-lg py-1 px-3">
-                  ${event.price}
+                  ₹{event.price}
                 </span>
               ) : (
                 <span className="bg-green-100 text-green-800 text-sm font-semibold rounded-lg py-1 px-3">

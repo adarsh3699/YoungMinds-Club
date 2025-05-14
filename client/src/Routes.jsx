@@ -13,6 +13,12 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const UserDashboard = lazy(() => import('./pages/UserDashboard'));
 const OrganizerDashboard = lazy(() => import('./pages/OrganizerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminUsers = lazy(() => import('./pages/admin/UsersPage'));
+const AdminOrganizers = lazy(() => import('./pages/admin/OrganizersPage'));
+const AdminEvents = lazy(() => import('./pages/admin/EventsPage'));
+const AdminAnalytics = lazy(() => import('./pages/admin/AnalyticsPage'));
+const AdminModeration = lazy(() => import('./pages/admin/ModerationPage'));
+const AdminAnnouncements = lazy(() => import('./pages/admin/AnnouncementsPage'));
 const EventDetails = lazy(() => import('./pages/EventDetails'));
 const MyEvents = lazy(() => import('./pages/MyEvents'));
 const EventFeedback = lazy(() => import('./pages/EventFeedback'));
@@ -50,44 +56,52 @@ function AppRoutes() {
 			<Router>
 				<div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
 					<Navigation />
-					<main className="flex-grow pt-16">
+					<main className="flex-grow pt-16 flex flex-col min-h-screen">
 						<Suspense fallback={
 							<div className="flex flex-col justify-center items-center h-[70vh]">
 								<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
 								<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
 							</div>
 						}>
-							<Routes>
-								{/* Public routes */}
-								<Route path="/" element={<HomePage />} />
-								<Route path="/login" element={<LoginPage />} />
-								<Route path="/register" element={<RegisterPage />} />
-								<Route path="/event/:id" element={<EventDetails />} />
+							<div className="min-h-[calc(100vh-80px)]">
+								<Routes>
+									{/* Public routes */}
+									<Route path="/" element={<HomePage />} />
+									<Route path="/login" element={<LoginPage />} />
+									<Route path="/register" element={<RegisterPage />} />
+									<Route path="/event/:id" element={<EventDetails />} />
 
-								{/* Protected routes */}
-								<Route path="/dashboard" element={<DashboardRouter />} />
-								
-								{/* User routes */}
-								<Route element={<ProtectedRoute />}>
-									<Route path="/user/profile" element={<UserDashboard />} />
-									<Route path="/my-events" element={<MyEvents />} />
-									<Route path="/event/:id/feedback" element={<EventFeedback />} />
-								</Route>
+									{/* Protected routes */}
+									<Route path="/dashboard" element={<DashboardRouter />} />
+									
+									{/* User routes */}
+									<Route element={<ProtectedRoute />}>
+										<Route path="/user/profile" element={<UserDashboard />} />
+										<Route path="/my-events" element={<MyEvents />} />
+										<Route path="/event/:id/feedback" element={<EventFeedback />} />
+									</Route>
 
-								{/* Admin routes */}
-								<Route element={<ProtectedRoute requiredRole="admin" />}>
-									<Route path="/admin/users" element={<AdminDashboard />} />
-								</Route>
+									{/* Admin routes */}
+									<Route element={<ProtectedRoute requiredRole="admin" />}>
+										<Route path="/admin/dashboard" element={<AdminDashboard />} />
+										<Route path="/admin/users" element={<AdminUsers />} />
+										<Route path="/admin/organizers" element={<AdminOrganizers />} />
+										<Route path="/admin/events" element={<AdminEvents />} />
+										<Route path="/admin/analytics" element={<AdminAnalytics />} />
+										<Route path="/admin/moderation" element={<AdminModeration />} />
+										<Route path="/admin/announcements" element={<AdminAnnouncements />} />
+									</Route>
 
-								{/* Organizer routes */}
-								<Route element={<ProtectedRoute requiredRole={['organizer', 'admin']} />}>
-									<Route path="/organizer/events" element={<OrganizerDashboard />} />
-									<Route path="/organizer/event/:id" element={<EventManagePage />} />
-								</Route>
+									{/* Organizer routes */}
+									<Route element={<ProtectedRoute requiredRole={['organizer', 'admin']} />}>
+										<Route path="/organizer/events" element={<OrganizerDashboard />} />
+										<Route path="/organizer/event/:id" element={<EventManagePage />} />
+									</Route>
 
-								{/* Fallback route */}
-								<Route path="*" element={<Navigate to="/" />} />
-							</Routes>
+									{/* Fallback route */}
+									<Route path="*" element={<Navigate to="/" />} />
+								</Routes>
+							</div>
 						</Suspense>
 					</main>
 					<Footer />

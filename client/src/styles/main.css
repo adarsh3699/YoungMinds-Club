@@ -39,7 +39,6 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow-x: hidden;
 }
 
 body {
@@ -60,6 +59,22 @@ html.dark body {
     margin: 0 auto;
     margin-top: 50px;
     padding: 0 1rem;
+}
+
+/* Ensure all page content has min-height to push footer to bottom */
+main {
+    min-height: calc(100vh - 144px); /* Full viewport height minus footer height */
+    display: flex;
+    flex-direction: column;
+}
+
+main > div {
+    min-height: calc(100vh - 144px); /* Full viewport height to ensure footer is off-screen */
+}
+
+/* Force footer to be below viewport */
+footer {
+    margin-top: 5rem; /* Extra margin to ensure it's below the fold */
 }
 
 /* UI Components */
@@ -109,22 +124,55 @@ html.dark .auth-page {
     background-color: var(--dark-bg);
 }
 
-/* Global scrollbar styling */
-body::-webkit-scrollbar {
-    width: 10px;
+/* Table layout with horizontal scroll */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
 }
 
-body::-webkit-scrollbar-track {
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(17, 24, 39, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+    border: 2px solid rgba(17, 24, 39, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(59, 130, 246, 0.7);
+}
+
+/* Dark theme scrollbar modifications */
+html.dark ::-webkit-scrollbar-track {
+    background: rgba(30, 41, 59, 0.4);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(30, 41, 59, 0.4);
+}
+
+/* Firefox scrollbar styling */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(17, 24, 39, 0.1);
+}
+
+html.dark * {
+    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(30, 41, 59, 0.4);
+}
+
+/* Fix to ensure scrollbar doesn't break rounded corners */
+::-webkit-scrollbar-corner {
     background: transparent;
-}
-
-body::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.5);
-    border-radius: 20px;
-}
-
-html.dark body::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.3);
 }
 
 /* For browsers that support it */
@@ -133,3 +181,27 @@ html.dark body::-webkit-scrollbar-thumb {
         scrollbar-gutter: stable;
     }
 }
+
+/* Add a utility class for tables with horizontal scroll */
+.table-scroll {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Make sure the horizontal scrollbar is visible and consistent with the vertical one */
+.table-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+/* Override overflow hidden in specific components to allow horizontal scrolling */
+.overflow-x-auto {
+    overflow-x: auto !important;
+}
+
+.overflow-x-scroll {
+    overflow-x: scroll !important;
+}
+
+/* Custom-scrollbar class is now redundant since we're applying styles globally */
