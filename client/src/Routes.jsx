@@ -56,7 +56,7 @@ function AppRoutes() {
 			<Router>
 				<div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
 					<Navigation />
-					<main className="flex-grow pt-16 flex flex-col min-h-screen">
+					<main className="flex-grow flex flex-col min-h-screen">
 						<Suspense fallback={
 							<div className="flex flex-col justify-center items-center h-[70vh]">
 								<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>

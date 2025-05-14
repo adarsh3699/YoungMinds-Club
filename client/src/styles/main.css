@@ -37,8 +37,9 @@
 
 html, body {
     margin: 0;
-    padding: 0;
+    padding: 0 !important;
     height: 100%;
+    overflow: auto !important;
 }
 
 body {
@@ -59,6 +60,12 @@ html.dark body {
     margin: 0 auto;
     margin-top: 50px;
     padding: 0 1rem;
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    left: 0;
 }
 
 /* Ensure all page content has min-height to push footer to bottom */
