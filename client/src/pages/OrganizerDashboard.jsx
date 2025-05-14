@@ -210,7 +210,7 @@ const OrganizerDashboard = () => {
                   event={event} 
                   isOrganizer={true}
                   onManage={() => navigate(`/organizer/event/${event._id}`)}
-                  onEdit={() => navigate(`/organizer/event/${event._id}/edit`)}
+                  onEdit={() => navigate(`/organizer/event/${event._id}`)}
                   onDelete={() => confirmDeleteEvent(event._id, event.title)}
                 />
               ))}
