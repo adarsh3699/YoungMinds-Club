@@ -58,7 +58,7 @@ function Navigation() {
 	// Public navigation items
 	const publicNavigation = [
 		{ name: 'Home', href: '/' },
-		{ name: 'Events', href: '/dashboard' },
+		{ name: 'Events', href: '/events' },
 	];
 
 	const isActiveRoute = (path) => {

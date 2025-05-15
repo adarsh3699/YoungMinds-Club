@@ -23,6 +23,7 @@ const EventDetails = lazy(() => import('./pages/EventDetails'));
 const MyEvents = lazy(() => import('./pages/MyEvents'));
 const EventFeedback = lazy(() => import('./pages/EventFeedback'));
 const EventManagePage = lazy(() => import('./pages/EventManagePage'));
+const EventsPage = lazy(() => import('./pages/EventsPage'));
 
 // Dashboard router component that routes to the appropriate dashboard based on user role
 const DashboardRouter = () => {
@@ -79,6 +80,7 @@ function AppRoutes() {
 										<Route path="/user/profile" element={<UserDashboard />} />
 										<Route path="/my-events" element={<MyEvents />} />
 										<Route path="/event/:id/feedback" element={<EventFeedback />} />
+										<Route path="/events" element={<EventsPage />} />
 									</Route>
 
 									{/* Admin routes */}

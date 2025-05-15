@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import EventCard from '../components/EventCard';
+import EventCard from '../components/events/EventCard';
 import XPProgressBar from '../components/XPProgressBar';
 import { Tabs } from '../components/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
