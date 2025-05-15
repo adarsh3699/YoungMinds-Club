@@ -148,7 +148,7 @@ const EventCard = ({
           
           {/* Featured Badge */}
           {isFeatured && (
-            <div className="absolute top-3 left-3 z-10">
+            <div className="absolute top-3 left-3 z-5">
               <span className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center">
                 <span className="mr-1">⭐</span> FEATURED
               </span>
@@ -156,7 +156,7 @@ const EventCard = ({
           )}
           
           {/* Organizer Badge */}
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-3 left-3 z-5">
             <div className="flex items-center bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-white text-xs px-2 py-1 rounded-full">
               <UserIcon className="h-3 w-3 mr-1" />
               <span>By {event.organizer?.name || 'Organizer'}</span>
@@ -164,14 +164,14 @@ const EventCard = ({
           </div>
           
           {/* Category Badge */}
-          <div className="absolute top-3 right-3 z-10">
+          <div className="absolute top-3 right-3 z-5">
             <span className={`bg-gradient-to-r ${categoryColorGradient} text-white text-xs font-semibold px-3 py-1.5 rounded-full`}>
               {event.type}
             </span>
           </div>
           
           {/* Price Tag */}
-          <div className="absolute bottom-3 right-3 z-10">
+          <div className="absolute bottom-3 right-3 z-5">
             <span className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-white text-sm font-bold px-3 py-1 rounded-lg">
               {formatPrice()}
             </span>

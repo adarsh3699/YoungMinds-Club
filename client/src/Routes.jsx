@@ -20,7 +20,6 @@ const AdminAnalytics = lazy(() => import('./pages/admin/AnalyticsPage'));
 const AdminModeration = lazy(() => import('./pages/admin/ModerationPage'));
 const AdminAnnouncements = lazy(() => import('./pages/admin/AnnouncementsPage'));
 const EventDetails = lazy(() => import('./pages/EventDetails'));
-const MyEvents = lazy(() => import('./pages/MyEvents'));
 const EventFeedback = lazy(() => import('./pages/EventFeedback'));
 const EventManagePage = lazy(() => import('./pages/EventManagePage'));
 const EventsPage = lazy(() => import('./pages/EventsPage'));
@@ -78,7 +77,6 @@ function AppRoutes() {
 									{/* User routes */}
 									<Route element={<ProtectedRoute />}>
 										<Route path="/user/profile" element={<UserDashboard />} />
-										<Route path="/my-events" element={<MyEvents />} />
 										<Route path="/event/:id/feedback" element={<EventFeedback />} />
 										<Route path="/events" element={<EventsPage />} />
 									</Route>

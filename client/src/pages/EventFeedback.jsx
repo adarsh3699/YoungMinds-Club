@@ -139,10 +139,10 @@ const EventFeedback = () => {
               </button>
               
               <button
-                onClick={() => navigate('/my-events')}
+                onClick={() => navigate('/dashboard')}
                 className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
-                View My Events
+                View Dashboard
               </button>
             </div>
           </div>
@@ -167,10 +167,10 @@ const EventFeedback = () => {
             </button>
             
             <button
-              onClick={() => navigate('/my-events')}
+              onClick={() => navigate('/dashboard')}
               className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              My Events
+              Dashboard
             </button>
           </div>
         </div>

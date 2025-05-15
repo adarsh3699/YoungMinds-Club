@@ -44,7 +44,6 @@ function Navigation() {
 
 	const userNavigation = [
 		{ name: 'Dashboard', href: '/dashboard' },
-		{ name: 'My Events', href: '/my-events' },
 		{ name: 'Profile', href: '/user/profile' },
 	];
 
