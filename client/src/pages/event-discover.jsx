@@ -12,9 +12,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Fragment } from 'react';
-import EventCard from '../components/events/EventCard';
+import EventCard from '../components/organizer/EventCard';
 import { SelectInput, Switch } from '../components/common';
-import EventCardSkeleton from '../components/events/EventCardSkeleton';
+import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Categories
 const EVENT_CATEGORIES = [
@@ -47,11 +49,14 @@ const SORT_OPTIONS = [
 ];
 
 const EventsPage = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   // State for events data
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savedEventIds, setSavedEventIds] = useState([]);
 
   // State for filters and search
   const [searchQuery, setSearchQuery] = useState('');
@@ -203,6 +208,32 @@ const EventsPage = () => {
     
     // Update the date range
     setDateRange(newDateRange);
+  };
+
+  // Handle saving/unsaving event
+  const handleSaveToggle = async (eventId, isSaved) => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Always use POST method, as the server endpoint handles both save and unsave
+      const response = await axios.post(`/events/${eventId}/save`);
+      
+      // Get updated saved status from server response
+      const { isSaved: newSavedStatus } = response.data;
+      
+      // Update saved events list
+      if (newSavedStatus) {
+        setSavedEventIds(prev => [...prev, eventId]);
+      } else {
+        setSavedEventIds(prev => prev.filter(id => id !== eventId));
+      }
+    } catch (error) {
+      console.error('Error toggling saved event:', error);
+    }
   };
 
   // Error state
@@ -563,7 +594,12 @@ const EventsPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => (
-              <EventCard key={event._id} event={event} />
+              <EventCard 
+                key={event._id} 
+                event={event}
+                onSaveToggle={isAuthenticated ? handleSaveToggle : undefined}
+                isSaved={savedEventIds.includes(event._id)}
+              />
             ))}
           </div>
         )}

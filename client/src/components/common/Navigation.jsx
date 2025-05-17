@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
@@ -18,7 +18,7 @@ function Navigation() {
 
 	// Fetch user profile data if logged in
 	useEffect(() => {
-		if (isAuthenticated) {
+		if (isAuthenticated && !isOrganizer) {
 			const fetchUserProfile = async () => {
 				try {
 					const response = await axios.get('/user/dashboard');
@@ -35,23 +35,27 @@ function Navigation() {
 			
 			fetchUserProfile();
 		}
-	}, [isAuthenticated]);
+	}, [isAuthenticated, isOrganizer]);
 
 	const handleLogout = async () => {
 		await logout();
 		navigate('/login');
 	};
 
-	const userNavigation = [
-		{ name: 'Dashboard', href: '/dashboard' },
-		{ name: 'Profile', href: '/user/profile' },
-	];
+	// Generate user navigation items based on role
+	let userNavigation = [];
 
-	// Admin and organizer see additional items
+	// Add role-specific profile link and items
 	if (isAdmin) {
+		userNavigation.push({ name: 'Dashboard', href: '/dashboard' });
+		userNavigation.push({ name: 'Profile', href: '/admin/profile' });
 		userNavigation.push({ name: 'Admin Panel', href: '/admin/users' });
 	} else if (isOrganizer) {
-		userNavigation.push({ name: 'Organizer Panel', href: '/organizer/events' });
+		userNavigation.push({ name: 'Profile', href: '/organizer/profile' });
+		userNavigation.push({ name: 'Settings', href: '/organizer/settings' });
+	} else {
+		userNavigation.push({ name: 'Dashboard', href: '/dashboard' });
+		userNavigation.push({ name: 'Profile', href: '/user/profile' });
 	}
 
 	// Public navigation items
@@ -59,6 +63,13 @@ function Navigation() {
 		{ name: 'Home', href: '/' },
 		{ name: 'Events', href: '/events' },
 	];
+
+	// Add Dashboard to navbar for organizers and admins
+	if (isAdmin) {
+		publicNavigation.push({ name: 'Dashboard', href: '/admin/dashboard' });
+	} else if (isOrganizer) {
+		publicNavigation.push({ name: 'Dashboard', href: '/organizer/dashboard' });
+	}
 
 	const isActiveRoute = (path) => {
 		if (path === '/') {
@@ -113,7 +124,7 @@ function Navigation() {
 								{isAuthenticated ? (
 									<div className="flex items-center">
 										{/* XP Badge (desktop) */}
-										{userXP !== null && userBadge && (
+										{userXP !== null && userBadge && !isOrganizer && (
 											<div className="mr-4 hidden md:flex items-center bg-indigo-50 dark:bg-indigo-900 px-3 py-1 rounded-full">
 												<svg 
 													xmlns="http://www.w3.org/2000/svg" 
@@ -161,7 +172,7 @@ function Navigation() {
 													</div>
 													
 													{/* XP and Badge (mobile) */}
-													{userXP !== null && userBadge && (
+													{userXP !== null && userBadge && !isOrganizer && (
 														<div className="px-4 py-2 border-b md:hidden dark:border-gray-700">
 															<div className="flex items-center">
 																<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-500 dark:text-indigo-400 mr-1" viewBox="0 0 20 20" fill="currentColor">

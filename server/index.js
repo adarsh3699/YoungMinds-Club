@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const path = require('path');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -26,6 +27,9 @@ app.use(cors({
 app.use(cookieParser());
 app.use(morgan('dev'));
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eventplatform')
     .then(() => console.log('Connected to MongoDB'))
@@ -37,6 +41,9 @@ app.use('/admin', adminRoutes);
 app.use('/organizer', organizerRoutes);
 app.use('/user', userRoutes);
 app.use('/events', eventRoutes);
+
+// Additional public routes
+app.get('/leaderboard', require('./controllers/userActivityController').getLeaderboard);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

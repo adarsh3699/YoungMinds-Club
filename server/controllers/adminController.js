@@ -93,6 +93,64 @@ exports.getAllOrganizers = async (req, res) => {
     }
 };
 
+// Get top organizers by event count or registrations
+exports.getTopOrganizers = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        
+        // Get all organizers
+        const organizers = await User.find({ role: 'organizer' }).select('-password');
+        const organizerIds = organizers.map(org => org._id);
+        
+        // Aggregate event counts and registration counts for each organizer
+        const eventData = await Event.aggregate([
+            { $match: { organizer: { $in: organizerIds } } },
+            { $lookup: { from: 'eventregistrations', localField: '_id', foreignField: 'event', as: 'registrations' } },
+            { $addFields: { registrationCount: { $size: '$registrations' } } },
+            { $group: { 
+                _id: '$organizer', 
+                eventCount: { $sum: 1 },
+                totalRegistrations: { $sum: '$registrationCount' }
+            } },
+            { $sort: { eventCount: -1, totalRegistrations: -1 } },
+            { $limit: limit }
+        ]);
+        
+        // Create a map of organizer details
+        const organizerMap = {};
+        organizers.forEach(org => {
+            organizerMap[org._id.toString()] = {
+                name: org.name,
+                email: org.email,
+                profilePicture: org.profilePicture,
+                organizationName: org.organizationName
+            };
+        });
+        
+        // Combine organizer details with event data
+        const topOrganizers = eventData.map(item => ({
+            _id: item._id,
+            eventCount: item.eventCount,
+            totalRegistrations: item.totalRegistrations,
+            ...organizerMap[item._id.toString()],
+            // Default rating between 3-5 (temporary, replace with actual rating logic)
+            rating: Math.floor(Math.random() * 2) + 3
+        }));
+        
+        res.status(200).json({
+            success: true,
+            organizers: topOrganizers
+        });
+    } catch (error) {
+        console.error('Get top organizers error:', error);
+        res.status(500).json({
+            success: false, 
+            message: 'Failed to fetch top organizers',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
 // Get single user
 exports.getUser = async (req, res) => {
     try {
@@ -417,7 +475,7 @@ exports.getAnalytics = async (req, res) => {
         ]);
         
         // Populate event details
-        const eventIds = topEvents.map(item => item._id);
+        const eventIds = topEvents.map(item => new mongoose.Types.ObjectId(item._id));
         const events = await Event.find({ _id: { $in: eventIds } }).select('title shortDescription');
         
         // Create a map of event ID to event details
@@ -433,7 +491,8 @@ exports.getAnalytics = async (req, res) => {
         const topEventDetails = topEvents.map(item => ({
             _id: item._id,
             count: item.count,
-            ...eventMap[item._id.toString()]
+            title: eventMap[item._id.toString()]?.title || 'Unknown Event',
+            shortDescription: eventMap[item._id.toString()]?.shortDescription || 'No description available'
         }));
         
         // Top organizers based on total registrations for their events
@@ -446,7 +505,7 @@ exports.getAnalytics = async (req, res) => {
         ]);
         
         // Populate organizer details
-        const organizerIds = topOrganizers.map(item => mongoose.Types.ObjectId(item._id));
+        const organizerIds = topOrganizers.map(item => new mongoose.Types.ObjectId(item._id));
         const organizers = await User.find({ _id: { $in: organizerIds } }).select('name email');
         
         // Create a map of organizer ID to organizer details
@@ -463,15 +522,25 @@ exports.getAnalytics = async (req, res) => {
             _id: item._id,
             totalRegistrations: item.totalRegistrations,
             eventCount: item.eventCount,
-            ...organizerMap[item._id.toString()]
+            name: organizerMap[item._id.toString()]?.name || 'Unknown Organizer',
+            email: organizerMap[item._id.toString()]?.email || 'No email available'
         }));
         
         // Top users based on XP
-        const topUsers = await UserActivity.find()
+        const topUserActivities = await UserActivity.find()
             .sort({ xp: -1 })
             .limit(10)
             .populate('user', 'name email')
-            .select('xp badges streak');
+            .select('xp badge streakCount');
+
+        // Format user data
+        const topUsers = topUserActivities.map(activity => ({
+            _id: activity._id,
+            user: activity.user,
+            xp: activity.xp,
+            badges: [activity.badge], // Convert to array for frontend compatibility
+            streak: activity.streakCount
+        }));
 
         res.status(200).json({
             success: true,
@@ -517,12 +586,13 @@ exports.getFlaggedItems = async (req, res) => {
 // Create announcement
 exports.createAnnouncement = async (req, res) => {
     try {
-        const { title, message, type, expiresAt } = req.body;
+        const { title, message, type, expiresAt, link } = req.body;
 
         const announcement = await Announcement.create({
             title,
             message,
             type: type || 'info',
+            link,
             expiresAt,
             createdBy: req.user._id
         });
@@ -618,6 +688,373 @@ exports.deleteAnnouncement = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to delete announcement',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get active users based on event attendance and XP
+exports.getActiveUsers = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        
+        // Find regular users (excluding admins and organizers)
+        const regularUsers = await User.find({ role: 'user' }).select('_id');
+        const regularUserIds = regularUsers.map(user => user._id);
+        
+        // Find user activity with highest XP (only for regular users)
+        const userActivities = await UserActivity.find({ user: { $in: regularUserIds } })
+            .sort({ xp: -1 })
+            .limit(limit)
+            .populate('user', 'name email profilePicture');
+        
+        const activeUsers = userActivities.map(activity => ({
+            _id: activity.user._id,
+            name: activity.user.name,
+            email: activity.user.email,
+            profilePicture: activity.user.profilePicture,
+            xp: activity.xp,
+            badge: activity.badge,
+            streakCount: activity.streakCount,
+            registeredEvents: activity.registeredEvents?.length || 0,
+            attendedEvents: activity.registeredEvents?.filter(reg => reg.attended).length || 0
+        }));
+        
+        res.status(200).json({
+            success: true,
+            users: activeUsers
+        });
+    } catch (error) {
+        console.error('Get active users error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch active users',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get flagged content (users, events, etc.)
+exports.getFlaggedContent = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        
+        // Get flagged users
+        const flaggedUsers = await User.find({ isFlagged: true })
+            .select('name email profilePicture role flagReason flaggedAt')
+            .limit(limit);
+            
+        // Get flagged events
+        const flaggedEvents = await Event.find({ isFlagged: true })
+            .select('title shortDescription poster organizer flagReason flaggedAt')
+            .populate('organizer', 'name email')
+            .limit(limit);
+            
+        // Combine all flagged items and sort by flagged date
+        const allFlaggedItems = [
+            ...flaggedUsers.map(user => ({
+                _id: user._id,
+                type: 'user',
+                name: user.name,
+                email: user.email,
+                profilePicture: user.profilePicture,
+                role: user.role,
+                reason: user.flagReason,
+                flaggedAt: user.flaggedAt || new Date()
+            })),
+            ...flaggedEvents.map(event => ({
+                _id: event._id,
+                type: 'event',
+                title: event.title,
+                description: event.shortDescription,
+                poster: event.poster,
+                organizer: {
+                    id: event.organizer._id,
+                    name: event.organizer.name,
+                    email: event.organizer.email
+                },
+                reason: event.flagReason,
+                flaggedAt: event.flaggedAt || new Date()
+            }))
+        ].sort((a, b) => new Date(b.flaggedAt) - new Date(a.flaggedAt)).slice(0, limit);
+        
+        res.status(200).json({
+            success: true,
+            items: allFlaggedItems
+        });
+    } catch (error) {
+        console.error('Get flagged content error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch flagged content',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get admin profile data
+exports.getAdminProfile = async (req, res) => {
+    try {
+        // Find the admin by ID (req.user._id contains the logged-in user's ID)
+        const admin = await User.findById(req.user._id).select('-password');
+        
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin profile not found'
+            });
+        }
+
+        // Get additional stats that might be useful for admin profile
+        const totalUsers = await User.countDocuments();
+        const totalOrganizers = await User.countDocuments({ role: 'organizer' });
+        const totalEvents = await Event.countDocuments();
+        
+        // Format the response in a simpler structure
+        res.status(200).json({
+            success: true,
+            profile: {
+                _id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                profilePicture: admin.profilePicture,
+                bio: admin.bio || '',
+                role: admin.role,
+                status: admin.status || 'active',
+                createdAt: admin.createdAt,
+                stats: {
+                    totalUsers,
+                    totalOrganizers,
+                    totalEvents
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Get admin profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch admin profile',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get admin activity logs
+exports.getAdminLogs = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const page = parseInt(req.query.page) || 1;
+        const skip = (page - 1) * limit;
+        
+        // For now, we'll create mock logs as placeholder data
+        // In a real implementation, you would retrieve this from a database
+        const mockLogs = [
+            {
+                id: 1,
+                action: 'update',
+                targetType: 'User',
+                description: 'Changed user role from user to organizer',
+                timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+                ipAddress: '192.168.1.1',
+                adminId: req.user._id,
+                status: 'success'
+            },
+            {
+                id: 2,
+                action: 'update',
+                targetType: 'Event',
+                description: 'Flagged event for inappropriate content',
+                timestamp: new Date(Date.now() - 7200000), // 2 hours ago
+                ipAddress: '192.168.1.1',
+                adminId: req.user._id,
+                status: 'success'
+            },
+            {
+                id: 3,
+                action: 'create',
+                targetType: 'Announcement',
+                description: 'New platform-wide announcement',
+                timestamp: new Date(Date.now() - 86400000), // 1 day ago
+                ipAddress: '192.168.1.1',
+                adminId: req.user._id,
+                status: 'success'
+            },
+            {
+                id: 4,
+                action: 'update',
+                targetType: 'User',
+                description: 'Suspended user for violating community guidelines',
+                timestamp: new Date(Date.now() - 172800000), // 2 days ago
+                ipAddress: '192.168.1.1',
+                adminId: req.user._id,
+                status: 'success'
+            },
+            {
+                id: 5,
+                action: 'login',
+                targetType: 'System',
+                description: 'Admin login from new device',
+                timestamp: new Date(Date.now() - 259200000), // 3 days ago
+                ipAddress: '192.168.1.1',
+                adminId: req.user._id,
+                status: 'success'
+            }
+        ];
+        
+        // Get the total count for pagination
+        const totalCount = mockLogs.length;
+        
+        // Paginate the logs
+        const paginatedLogs = mockLogs.slice(skip, skip + limit);
+        
+        res.status(200).json({
+            success: true,
+            logs: paginatedLogs,
+            pagination: {
+                total: totalCount,
+                page,
+                limit,
+                pages: Math.ceil(totalCount / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get admin logs error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch admin logs',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get admin team members
+exports.getAdminTeam = async (req, res) => {
+    try {
+        // Fetch all admins from the database
+        const adminTeam = await User.find({ role: 'admin' })
+            .select('name email profilePicture bio createdAt lastLogin')
+            .sort({ createdAt: 1 }); // Sort by creation date (oldest/senior admins first)
+        
+        // Enhance the data with additional fields
+        const enrichedTeam = adminTeam.map(admin => {
+            const adminObj = admin.toObject();
+            
+            // Add additional information
+            // In a real implementation, this might come from a separate AdminProfile model
+            return {
+                ...adminObj,
+                department: admin._id.equals(req.user._id) ? 'Lead Administrator' : 'Platform Management',
+                joinDate: admin.createdAt,
+                status: 'Active',
+                permissions: admin._id.equals(req.user._id) ? 'Full Access' : 'Standard Admin',
+                activityCount: Math.floor(Math.random() * 100) + 50, // Mock activity count between 50-150
+                isCurrentUser: admin._id.equals(req.user._id)
+            };
+        });
+        
+        res.status(200).json({
+            success: true,
+            team: enrichedTeam
+        });
+    } catch (error) {
+        console.error('Get admin team error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch admin team information',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Handle admin profile picture upload
+exports.uploadProfilePicture = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded'
+            });
+        }
+        
+        // The picture URL should be in req.file.path thanks to multer-cloudinary
+        const profilePicture = req.file.path;
+
+        // Update user with new profile picture URL
+        const admin = await User.findByIdAndUpdate(
+            req.user._id,
+            { profilePicture },
+            { new: true }
+        ).select('-password');
+        
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: 'Profile picture uploaded successfully',
+            profilePicture: admin.profilePicture
+        });
+    } catch (error) {
+        console.error('Upload profile picture error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload profile picture',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Update admin profile
+exports.updateAdminProfile = async (req, res) => {
+    try {
+        const { name, email, bio } = req.body;
+
+        // Create object with allowed fields
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (bio !== undefined) updateData.bio = bio;
+
+        // Update user
+        const admin = await User.findByIdAndUpdate(
+            req.user._id,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+
+        // Format the profile data similar to getAdminProfile
+        const profile = {
+            _id: admin._id,
+            name: admin.name,
+            email: admin.email,
+            profilePicture: admin.profilePicture || '',
+            bio: admin.bio || '',
+            role: admin.role,
+            status: admin.status || 'active',
+            createdAt: admin.createdAt
+        };
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            profile
+        });
+    } catch (error) {
+        console.error('Update admin profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update profile',
             error: process.env.NODE_ENV === 'development' ? error.message : null
         });
     }

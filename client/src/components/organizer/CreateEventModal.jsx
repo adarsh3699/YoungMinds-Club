@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { XMarkIcon, CalendarIcon, MapPinIcon, TagIcon, UsersIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
 import { SelectInput } from '../common';
 
-const InputField = ({ label, name, value, onChange, placeholder, type = 'text', error, className = '', required = false, icon = null }) => (
+const InputField = ({ label, name, value, onChange, placeholder, type = 'text', error, className = '', required = false, icon = null, min, max }) => (
   <div className={className}>
     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
       {label}{required && '*'}
@@ -23,6 +23,8 @@ const InputField = ({ label, name, value, onChange, placeholder, type = 'text', 
         onChange={onChange}
         className={`w-full ${icon ? 'pl-10' : 'pl-3'} p-2.5 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${error ? 'border-red-500 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-700 text-gray-800 dark:text-white`}
         placeholder={placeholder}
+        min={min}
+        max={max}
       />
     </div>
     {error && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{error}</p>}
@@ -107,19 +109,23 @@ const CreateEventModal = ({
   
   // If editing, populate form with event data
   useEffect(() => {
-    if (isEditing && eventToEdit) {
-      const formattedEvent = {
-        ...eventToEdit,
-        date: formatDateForInput(eventToEdit.date),
-        endDate: eventToEdit.endDate ? formatDateForInput(eventToEdit.endDate) : '',
-        registrationDeadline: eventToEdit.registrationDeadline ? 
-          formatDateForInput(eventToEdit.registrationDeadline) : ''
-      };
+    if (!isEditing || !eventToEdit) return;
+    
+    // Format date fields correctly for the datetime-local input
+    const formatDatesForForm = (event) => ({
+      ...event,
+      date: formatDateForInput(event.date),
+      endDate: event.endDate ? formatDateForInput(event.endDate) : '',
+      registrationDeadline: event.registrationDeadline ? 
+        formatDateForInput(event.registrationDeadline) : ''
+    });
       
+    const formattedEvent = formatDatesForForm(eventToEdit);
       setFormData(formattedEvent);
+    
+    // Set poster preview if one exists
       if (eventToEdit.poster) {
         setPosterPreview(eventToEdit.poster);
-      }
     }
   }, [isEditing, eventToEdit]);
   
@@ -179,14 +185,17 @@ const CreateEventModal = ({
     }
   }, []);
   
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  // Memoize dropzone configuration
+  const dropzoneConfig = useMemo(() => ({
     onDrop,
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
     maxSize: 5242880, // 5MB
     multiple: false
-  });
+  }), [onDrop]);
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneConfig);
   
   const handleTagInputChange = (e) => {
     setTagInput(e.target.value);
@@ -215,19 +224,55 @@ const CreateEventModal = ({
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.title) newErrors.title = 'Title is required';
-    if (!formData.shortDescription) newErrors.shortDescription = 'Short description is required';
-    if (!formData.description) newErrors.description = 'Description is required';
-    if (!formData.date) newErrors.date = 'Date is required';
-    if (!formData.capacity) newErrors.capacity = 'Capacity is required';
+    // Required field validation
+    const requiredFields = {
+      title: 'Title is required',
+      shortDescription: 'Short description is required',
+      description: 'Description is required',
+      date: 'Date is required',
+      capacity: 'Capacity is required',
+      registrationDeadline: 'Registration deadline is required'
+    };
+    
+    // Check all required fields at once
+    Object.entries(requiredFields).forEach(([field, message]) => {
+      if (!formData[field]) newErrors[field] = message;
+    });
+    
+    // Date validation checks
+    if (formData.date && formData.registrationDeadline) {
+      const eventDate = new Date(formData.date);
+      const deadlineDate = new Date(formData.registrationDeadline);
+      
+      if (deadlineDate > eventDate) {
+        newErrors.registrationDeadline = 'Registration deadline must be on or before the event start date';
+      }
+    }
+    
+    // Check if end date is after start date
+    if (formData.date && formData.endDate) {
+      const startDate = new Date(formData.date);
+      const endDate = new Date(formData.endDate);
+      
+      if (endDate < startDate) {
+        newErrors.endDate = 'End date must be on or after the start date';
+      }
+    }
     
     // Location validation based on type
     if (formData.location.type === 'offline') {
-      if (!formData.location.city) newErrors['location.city'] = 'City is required';
-      if (!formData.location.venue) newErrors['location.venue'] = 'Venue is required';
-      if (!formData.location.address) newErrors['location.address'] = 'Address is required';
-    } else {
-      if (!formData.location.onlineUrl) newErrors['location.onlineUrl'] = 'Online URL is required';
+      const requiredLocationFields = {
+        'location.city': 'City is required',
+        'location.venue': 'Venue is required',
+        'location.address': 'Address is required'
+      };
+      
+      Object.entries(requiredLocationFields).forEach(([field, message]) => {
+        const [parent, child] = field.split('.');
+        if (!formData[parent][child]) newErrors[field] = message;
+      });
+    } else if (!formData.location.onlineUrl) {
+      newErrors['location.onlineUrl'] = 'Online URL is required';
     }
     
     // Poster validation only for new events
@@ -249,61 +294,63 @@ const CreateEventModal = ({
     setLoading(true);
     
     try {
-      // Create FormData object for file upload
       const eventFormData = new FormData();
       
-      // Add all form data fields
-      Object.keys(formData).forEach(key => {
-        if (key === 'location') {
-          // Handle nested location object
-          Object.keys(formData.location).forEach(locationKey => {
-            eventFormData.append(`location[${locationKey}]`, formData.location[locationKey]);
-          });
-        } else if (key === 'tags') {
-          // Handle array of tags
-          formData.tags.forEach(tag => {
-            eventFormData.append('tags[]', tag);
+      // Process form data for submission
+      const appendToFormData = (obj, prefix = '') => {
+        Object.entries(obj).forEach(([key, value]) => {
+          const formKey = prefix ? `${prefix}[${key}]` : key;
+          
+          if (value !== null && typeof value === 'object' && !(value instanceof File)) {
+            if (Array.isArray(value)) {
+              // Handle arrays
+              value.forEach(item => {
+                eventFormData.append(`${formKey}[]`, item);
           });
         } else {
-          eventFormData.append(key, formData[key]);
+              // Handle nested objects
+              appendToFormData(value, formKey);
+            }
+          } else {
+            // Handle primitive values
+            eventFormData.append(formKey, value);
         }
       });
+      };
+      
+      // Add form data
+      appendToFormData(formData);
       
       // Add poster file if available
       if (posterFile) {
         eventFormData.append('poster', posterFile);
       }
       
-      let response;
-      if (isEditing) {
-        response = await axios.put(
-          `/organizer/events/${eventToEdit._id}`,
-          eventFormData,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        );
-      } else {
-        response = await axios.post(
-          '/organizer/events',
-          eventFormData,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        );
-      }
+      // Send request
+      const url = isEditing 
+        ? `/organizer/events/${eventToEdit._id}`
+        : '/organizer/events';
       
-      setLoading(false);
+      const method = isEditing ? 'put' : 'post';
+      
+      const response = await axios[method](url, eventFormData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       
       if (response.data.success) {
         onSuccess(response.data.event);
       }
     } catch (error) {
       console.error('Error submitting event:', error);
-      setLoading(false);
       
       // Handle validation errors from the server
-      if (error.response && error.response.data && error.response.data.errors) {
+      if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
         alert('Failed to save event. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -496,6 +543,19 @@ const CreateEventModal = ({
                   onChange={handleChange}
                   error={errors.endDate}
                   className="flex-1"
+                  min={formData.date}
+                />
+                
+                <InputField
+                  label="Registration Deadline"
+                  name="registrationDeadline"
+                  type="datetime-local"
+                  value={formData.registrationDeadline}
+                  onChange={handleChange}
+                  error={errors.registrationDeadline}
+                  className="flex-1"
+                  required
+                  max={formData.date}
                 />
               </div>
               

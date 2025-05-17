@@ -32,6 +32,37 @@ const userSchema = new mongoose.Schema({
         enum: ['active', 'suspended'],
         default: 'active'
     },
+    college: {
+        type: String,
+        trim: true
+    },
+    // Fields for organizer profile
+    organizationName: {
+        type: String,
+        trim: true
+    },
+    bio: {
+        type: String,
+        trim: true
+    },
+    socialLinks: {
+        website: {
+            type: String,
+            trim: true
+        },
+        linkedin: {
+            type: String,
+            trim: true
+        },
+        twitter: {
+            type: String,
+            trim: true
+        },
+        instagram: {
+            type: String,
+            trim: true
+        }
+    },
     isFlagged: {
         type: Boolean,
         default: false

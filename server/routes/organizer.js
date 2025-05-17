@@ -8,8 +8,14 @@ const router = express.Router();
 // Apply authentication and organizer role check to all routes
 router.use(isAuthenticated, authorizeRoles('organizer', 'admin'));
 
+// Profile routes
+router.get('/profile', organizerController.getProfile);
+router.put('/profile', organizerController.updateProfile);
+router.post('/profile/picture', upload.single('profilePicture'), organizerController.uploadProfilePicture);
+
 // Dashboard routes
 router.get('/dashboard', organizerController.getDashboard);
+router.get('/feedback/summary', organizerController.getFeedbackSummary);
 
 // Event management routes
 router.get('/events', organizerController.getEvents);

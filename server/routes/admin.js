@@ -2,18 +2,32 @@ const express = require('express');
 const { body } = require('express-validator');
 const adminController = require('../controllers/adminController');
 const { isAuthenticated, authorizeRoles } = require('../middlewares/auth');
+const { upload } = require('../config/cloudinary');
 
 const router = express.Router();
 
 // Apply authentication and admin role check to all routes
 router.use(isAuthenticated, authorizeRoles('admin'));
 
+// Admin profile routes
+router.get('/profile', adminController.getAdminProfile);
+router.post('/profile/picture', upload.single('profilePicture'), adminController.uploadProfilePicture);
+router.put('/profile', adminController.updateAdminProfile);
+
+// Admin logs route
+router.get('/logs', adminController.getAdminLogs);
+
+// Admin team route
+router.get('/team', adminController.getAdminTeam);
+
 // Dashboard and analytics routes
 router.get('/dashboard/stats', adminController.getDashboardStats);
 router.get('/analytics', adminController.getAnalytics);
+router.get('/flagged-content', adminController.getFlaggedContent);
 
 // User management routes
 router.get('/users', adminController.getAllUsers);
+router.get('/active-users', adminController.getActiveUsers);
 router.get('/users/:id', adminController.getUser);
 router.put('/users/:id/role', 
     [body('role').notEmpty().withMessage('Role is required')], 
@@ -31,6 +45,7 @@ router.delete('/users/:id', adminController.deleteUser);
 
 // Organizer management routes
 router.get('/organizers', adminController.getAllOrganizers);
+router.get('/top-organizers', adminController.getTopOrganizers);
 
 // Event management routes
 router.get('/events', adminController.getAllEvents);

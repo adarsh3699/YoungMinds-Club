@@ -14,8 +14,12 @@ const announcementSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['info', 'warning', 'success', 'error'],
+        enum: ['info', 'warning', 'success', 'error', 'event'],
         default: 'info'
+    },
+    link: {
+        type: String,
+        trim: true
     },
     isActive: {
         type: Boolean,

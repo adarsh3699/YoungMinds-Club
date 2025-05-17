@@ -3,6 +3,149 @@ const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
 const { cloudinary } = require('../config/cloudinary');
 
+// Get organizer profile
+exports.getProfile = async (req, res) => {
+    try {
+        // Get organizer info without password
+        const user = await User.findById(req.user._id).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Format the profile data
+        const profile = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            organizationName: user.organizationName || '',
+            bio: user.bio || '',
+            profilePicture: user.profilePicture || '',
+            socialLinks: user.socialLinks || {
+                website: '',
+                linkedin: '',
+                twitter: '',
+                instagram: ''
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            profile
+        });
+    } catch (error) {
+        console.error('Get organizer profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch profile data',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Update organizer profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, email, organizationName, bio, socialLinks } = req.body;
+
+        // Create object with allowed fields
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (organizationName !== undefined) updateData.organizationName = organizationName;
+        if (bio !== undefined) updateData.bio = bio;
+        if (socialLinks) updateData.socialLinks = socialLinks;
+
+        // Update user
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            updateData,
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Format the profile data
+        const profile = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            organizationName: user.organizationName || '',
+            bio: user.bio || '',
+            profilePicture: user.profilePicture || '',
+            socialLinks: user.socialLinks || {
+                website: '',
+                linkedin: '',
+                twitter: '',
+                instagram: ''
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            profile
+        });
+    } catch (error) {
+        console.error('Update organizer profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update profile',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Upload profile picture
+exports.uploadProfilePicture = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded'
+            });
+        }
+
+        // The picture URL should be in req.file.path thanks to multer-cloudinary
+        const profilePicture = req.file.path;
+
+        // Update user with new profile picture URL
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            { profilePicture },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile picture updated successfully',
+            profilePicture: user.profilePicture
+        });
+    } catch (error) {
+        console.error('Upload profile picture error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload profile picture',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
 // Get organizer dashboard data
 exports.getDashboard = async (req, res) => {
     try {
@@ -299,6 +442,74 @@ exports.getEventAttendees = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to fetch attendees',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get feedback summary for organizer's events
+exports.getFeedbackSummary = async (req, res) => {
+    try {
+        // Get all events by this organizer
+        const events = await Event.find({ organizer: req.user._id }).select('_id title');
+        
+        // Get feedback for these events
+        const feedback = await EventRegistration.aggregate([
+            {
+                $match: {
+                    event: { $in: events.map(event => event._id) },
+                    feedback: { $exists: true, $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: '$event',
+                    averageRating: { $avg: '$feedback.rating' },
+                    totalFeedback: { $sum: 1 },
+                    feedback: {
+                        $push: {
+                            rating: '$feedback.rating',
+                            comment: '$feedback.comment',
+                            date: '$feedback.date'
+                        }
+                    }
+                }
+            }
+        ]);
+
+        // Format the response
+        const summary = events.map(event => {
+            const eventFeedback = feedback.find(f => f._id.toString() === event._id.toString());
+            return {
+                eventId: event._id,
+                eventTitle: event.title,
+                averageRating: eventFeedback ? eventFeedback.averageRating : 0,
+                totalFeedback: eventFeedback ? eventFeedback.totalFeedback : 0,
+                feedback: eventFeedback ? eventFeedback.feedback : []
+            };
+        });
+
+        // Calculate overall statistics
+        const overallStats = {
+            totalEvents: events.length,
+            totalFeedback: feedback.reduce((sum, f) => sum + f.totalFeedback, 0),
+            averageRating: feedback.length > 0 
+                ? feedback.reduce((sum, f) => sum + f.averageRating, 0) / feedback.length 
+                : 0
+        };
+
+        res.status(200).json({
+            success: true,
+            data: {
+                summary,
+                overallStats
+            }
+        });
+    } catch (error) {
+        console.error('Get feedback summary error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch feedback summary',
             error: process.env.NODE_ENV === 'development' ? error.message : null
         });
     }

@@ -212,3 +212,24 @@ html.dark * {
 }
 
 /* Custom-scrollbar class is now redundant since we're applying styles globally */
+
+/* Settings page toggle switches */
+.toggle-checkbox {
+  right: 0;
+  z-index: 5;
+  border-color: #ccc;
+  transition: all 0.3s;
+}
+
+.toggle-checkbox:checked {
+  right: 0;
+  border-color: #3b82f6;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #3b82f6;
+}
+
+.toggle-label {
+  transition: background-color 0.2s ease;
+}

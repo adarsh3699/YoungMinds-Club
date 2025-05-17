@@ -19,6 +19,7 @@ const EventDetails = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [xpEarned, setXpEarned] = useState(null);
   const [registrationError, setRegistrationError] = useState(null);
+  const [activeTab, setActiveTab] = useState('details');
   
   // Check for registration success from URL query
   useEffect(() => {
@@ -44,16 +45,16 @@ const EventDetails = () => {
           const userEventsResponse = await axios.get('/user/events');
           
           // Check if event is saved
-          const eventIsSaved = userEventsResponse.data.savedEvents.some(
+          const eventIsSaved = userEventsResponse.data.savedEvents?.some(
             savedEvent => savedEvent.id === id
           );
-          setIsSaved(eventIsSaved);
+          setIsSaved(eventIsSaved || false);
           
           // Check if event is registered
-          const eventIsRegistered = userEventsResponse.data.registeredEvents.some(
+          const eventIsRegistered = userEventsResponse.data.events?.some(
             regEvent => regEvent.id === id
           );
-          setIsRegistered(eventIsRegistered);
+          setIsRegistered(eventIsRegistered || false);
         }
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -328,7 +329,7 @@ const EventDetails = () => {
           <Tabs
             tabs={[
               {
-                key: 'details',
+                id: 'details',
                 label: 'Event Details',
                 content: (
                   <div className="space-y-6">
@@ -398,7 +399,7 @@ const EventDetails = () => {
                 )
               },
               {
-                key: 'organizer',
+                id: 'organizer',
                 label: 'Organizer',
                 content: (
                   <div className="space-y-6">
@@ -441,7 +442,7 @@ const EventDetails = () => {
                 )
               },
               {
-                key: 'share',
+                id: 'share',
                 label: 'Share',
                 content: (
                   <div className="space-y-6">
@@ -499,6 +500,8 @@ const EventDetails = () => {
                 )
               }
             ]}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
           />
           
           {/* Registration Status */}

@@ -12,8 +12,8 @@ import {
 	ChartBarIcon,
 	QrCodeIcon,
 } from '@heroicons/react/24/outline';
-import CreateEventModal from '../components/organizer/CreateEventModal';
-import { Modal, Tabs } from '../components/common';
+import CreateEventModal from '../../components/organizer/CreateEventModal';
+import { Modal, Tabs } from '../../components/common';
 
 const EventManagePage = () => {
 	const { id } = useParams();
