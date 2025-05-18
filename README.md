@@ -1,14 +1,15 @@
-# Event Booking Platform
+# YoungMinds Club
 
-A comprehensive event booking and hosting platform with role-based access control (RBAC), built using the MERN stack.
+A comprehensive platform for youth engagement activities and events with role-based access control (RBAC), built using the MERN stack.
 
 ## Features
 
 - User registration and authentication (JWT + Google OAuth)
 - Role-based access control (User, Organizer, Admin)
 - Dashboard views for different user roles
-- Event creation and management (coming soon)
-- Event discovery and booking (coming soon)
+- Event creation and management
+- Event discovery and booking
+- Profile management with picture uploads (Cloudinary integration)
 
 ## Tech Stack
 
@@ -28,27 +29,41 @@ A comprehensive event booking and hosting platform with role-based access contro
 - Passport.js for Google OAuth
 - Bcrypt for password hashing
 - Express Validator for request validation
+- Cloudinary for image uploads
 
 ## Project Structure
 
 ```
-event-platform/
+YoungMinds Club/
 ├── client/                 # Frontend - React application
 │   ├── public/             # Static files
 │   └── src/                # Source files
-│       ├── components/     # React components
-│       ├── context/        # Context providers (Auth)
 │       ├── assets/         # Images, fonts, etc.
-│       └── App.jsx         # Main application component
+│       ├── components/     # React components
+│       │   ├── admin/      # Admin components
+│       │   ├── auth/       # Authentication components
+│       │   ├── common/     # Shared components
+│       │   ├── organizer/  # Organizer components
+│       │   └── user/       # User components
+│       ├── context/        # Context providers (Auth)
+│       ├── lib/            # Library files
+│       ├── pages/          # Page components
+│       │   ├── admin/      # Admin pages
+│       │   ├── organizer/  # Organizer pages
+│       │   └── user/       # User pages
+│       ├── styles/         # CSS files
+│       └── utils/          # Utility functions
 │
 └── server/                 # Backend - Express application
     ├── config/             # Configuration files
     ├── controllers/        # Route controllers
+    ├── docs/               # Documentation
     ├── middlewares/        # Custom middlewares
     ├── models/             # Mongoose models
+    ├── public/uploads/     # Uploaded files
     ├── routes/             # Express routes
-    ├── utils/              # Utility functions
-    └── index.js            # Entry point
+    ├── services/           # Service layer
+    └── utils/              # Utility functions
 ```
 
 ## Getting Started
@@ -65,7 +80,7 @@ event-platform/
 
 ```bash
 git clone <repository-url>
-cd event-platform
+cd YoungMinds-Club
 ```
 
 2. Install backend dependencies
@@ -81,7 +96,7 @@ npm install
 ```
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/eventplatform
+MONGODB_URI=mongodb://localhost:27017/youngmindsclub
 CLIENT_URL=http://localhost:5173
 
 # JWT Secret
@@ -92,6 +107,11 @@ JWT_EXPIRES_IN=7d
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+
+# Cloudinary (for image uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 4. Install frontend dependencies
@@ -142,6 +162,9 @@ npm run dev
 
 - `GET /api/organizer/dashboard` - Get organizer dashboard data
 - `GET /api/organizer/events` - Get events created by the organizer
+- `POST /api/organizer/events` - Create a new event
+- `PUT /api/organizer/events/:id` - Update an event
+- `DELETE /api/organizer/events/:id` - Delete an event
 
 ### Admin
 
@@ -149,6 +172,8 @@ npm run dev
 - `GET /api/admin/users/:id` - Get a specific user
 - `PUT /api/admin/users/:id/role` - Update user role
 - `DELETE /api/admin/users/:id` - Delete a user
+- `GET /api/admin/events` - Get all events
+- `PUT /api/admin/events/:id` - Update event status
 
 ## License
 
