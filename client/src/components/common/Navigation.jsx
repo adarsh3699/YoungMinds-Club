@@ -99,7 +99,7 @@ function Navigation() {
 												clipRule="evenodd"
 											/>
 										</svg>
-										<span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">YMC Events</span>
+										<span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">YMs Club</span>
 									</Link>
 								</div>
 								<div className="hidden sm:ml-6 sm:flex sm:space-x-8">
