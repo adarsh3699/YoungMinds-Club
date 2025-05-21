@@ -4,13 +4,13 @@ This is the frontend application for the YoungMinds Club platform, built with Re
 
 ## Features
 
-- Modern React application with functional components and hooks
-- Complete authentication flow (register, login, profile management)
-- Role-based dashboards (user, organizer, admin)
-- Event browsing and booking for users
-- Event management for organizers
-- User management for admins
-- Responsive design with Tailwind CSS
+-   Modern React application with functional components and hooks
+-   Complete authentication flow (register, login, profile management)
+-   Role-based dashboards (user, organizer, admin)
+-   Event browsing and booking for users
+-   Event management for organizers
+-   User management for admins
+-   Responsive design with Tailwind CSS
 
 ## Project Structure
 
@@ -37,8 +37,8 @@ src/
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn
+-   Node.js (v14 or higher)
+-   npm or yarn
 
 ### Installation
 
@@ -62,17 +62,17 @@ npm run build
 
 ## Available Scripts
 
-- `npm run dev` - Start the development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview the production build locally
+-   `npm run dev` - Start the development server
+-   `npm run build` - Build for production
+-   `npm run lint` - Run ESLint
+-   `npm run preview` - Preview the production build locally
 
 ## Environment Variables
 
 Create a `.env` file in the root directory with the following variables:
 
 ```
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:4000
 ```
 
 # React + Vite
@@ -81,8 +81,8 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+-   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 ## Expanding the ESLint configuration
 

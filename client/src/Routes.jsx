@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Navigation from './components/common/Navigation';
 import Footer from './components/common/Footer';
+import { GoogleCallback } from './components/auth';
 import './styles/main.css';
 
 // Lazy load page components
@@ -62,12 +63,14 @@ function AppRoutes() {
 				<div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
 					<Navigation />
 					<main className="flex-grow flex flex-col min-h-screen">
-						<Suspense fallback={
-							<div className="flex flex-col justify-center items-center h-[70vh]">
-								<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-								<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
-							</div>
-						}>
+						<Suspense
+							fallback={
+								<div className="flex flex-col justify-center items-center h-[70vh]">
+									<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
+									<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
+								</div>
+							}
+						>
 							<div className="min-h-[calc(100vh-80px)]">
 								<Routes>
 									{/* Public routes */}
@@ -77,9 +80,13 @@ function AppRoutes() {
 									<Route path="/event/:id" element={<EventDetails />} />
 									<Route path="/events" element={<EventsPage />} />
 
+									{/* Google OAuth routes */}
+									<Route path="/auth/success" element={<GoogleCallback />} />
+									<Route path="/auth/error" element={<NotFound />} />
+
 									{/* Dashboard redirector route */}
 									<Route path="/dashboard" element={<DashboardRouter />} />
-									
+
 									{/* User routes */}
 									<Route element={<ProtectedRoute requiredRole="user" />}>
 										<Route path="/user/dashboard" element={<UserDashboard />} />

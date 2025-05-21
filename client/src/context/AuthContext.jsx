@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 const AuthContext = createContext();
 
 // API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
@@ -60,9 +60,9 @@ export const AuthProvider = ({ children }) => {
 				// Don't immediately remove token on network errors
 				// This prevents logout on temporary server issues or connectivity problems
 				if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-				localStorage.removeItem('token');
-				setToken(null);
-				setUser(null);
+					localStorage.removeItem('token');
+					setToken(null);
+					setUser(null);
 				}
 			}
 
@@ -148,6 +148,8 @@ export const AuthProvider = ({ children }) => {
 		register,
 		login,
 		logout,
+		setToken,
+		setUser,
 		isAuthenticated: !!user,
 		isAdmin: user?.role === 'admin',
 		isOrganizer: user?.role === 'organizer',
