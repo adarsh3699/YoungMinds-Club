@@ -21,7 +21,7 @@ const SocialLogin = () => {
 
 			<div className="mt-6">
 				<a
-					href="http://localhost:4000/api/auth/google"
+					href="http://localhost:4000/auth/google"
 					onClick={handleSocialLogin}
 					className={`w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${isLoading ? 'opacity-70 cursor-wait' : ''}`}
 					disabled={isLoading}

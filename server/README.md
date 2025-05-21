@@ -58,7 +58,7 @@ JWT_EXPIRES_IN=7d
 # Google OAuth
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
 
 # Cloudinary (for image uploads)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -76,34 +76,34 @@ npm run dev
 
 ### Authentication
 
-- `POST /api/auth/signup` - Register a new user
-- `POST /api/auth/login` - Login a user
-- `GET /api/auth/logout` - Logout a user
-- `GET /api/auth/me` - Get current user data
-- `GET /api/auth/google` - Google OAuth login
-- `GET /api/auth/google/callback` - Google OAuth callback
+- `POST /auth/signup` - Register a new user
+- `POST /auth/login` - Login a user
+- `GET /auth/logout` - Logout a user
+- `GET /auth/me` - Get current user data
+- `GET /auth/google` - Google OAuth login
+- `GET /auth/google/callback` - Google OAuth callback
 
 ### Users
 
-- `GET /api/users/profile` - Get user profile
-- `PUT /api/users/profile` - Update user profile
-- `POST /api/users/profile/picture` - Upload profile picture
+- `GET /users/profile` - Get user profile
+- `PUT /users/profile` - Update user profile
+- `POST /users/profile/picture` - Upload profile picture
 
 ### Events
 
-- `GET /api/events` - Get all events
-- `GET /api/events/:id` - Get event by ID
-- `POST /api/events` - Create event (organizer only)
-- `PUT /api/events/:id` - Update event (organizer only)
-- `DELETE /api/events/:id` - Delete event (organizer only)
+- `GET /events` - Get all events
+- `GET pi/events/:id` - Get event by ID
+- `POST /events` - Create event (organizer only)
+- `PUT /events/:id` - Update event (organizer only)
+- `DELETE /events/:id` - Delete event (organizer only)
 
 ### Admin
 
-- `GET /api/admin/users` - Get all users
-- `PUT /api/admin/users/:id/role` - Update user role
-- `DELETE /api/admin/users/:id` - Delete user
-- `GET /api/admin/events` - Get all events with admin data
-- `PUT /api/admin/events/:id` - Update event status
+- `GET /admin/users` - Get all users
+- `PUT /admin/users/:id/role` - Update user role
+- `DELETE /admin/users/:id` - Delete user
+- `GET /admin/events` - Get all events with admin data
+- `PUT /admin/events/:id` - Update event status
 
 ## Available Scripts
 

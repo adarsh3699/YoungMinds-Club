@@ -146,34 +146,34 @@ npm run dev
 
 ### Authentication
 
-- `POST /api/auth/signup` - Register a new user
-- `POST /api/auth/login` - Login a user
-- `GET /api/auth/logout` - Logout a user
-- `GET /api/auth/me` - Get current user
-- `GET /api/auth/google` - Google OAuth login
-- `GET /api/auth/google/callback` - Google OAuth callback
+- `POST /auth/signup` - Register a new user
+- `POST /auth/login` - Login a user
+- `GET /auth/logout` - Logout a user
+- `GET /auth/me` - Get current user
+- `GET /auth/google` - Google OAuth login
+- `GET /auth/google/callback` - Google OAuth callback
 
 ### User
 
-- `GET /api/user/dashboard` - Get user dashboard data
-- `PUT /api/user/profile` - Update user profile
+- `GET /user/dashboard` - Get user dashboard data
+- `PUT /user/profile` - Update user profile
 
 ### Organizer
 
-- `GET /api/organizer/dashboard` - Get organizer dashboard data
-- `GET /api/organizer/events` - Get events created by the organizer
-- `POST /api/organizer/events` - Create a new event
-- `PUT /api/organizer/events/:id` - Update an event
-- `DELETE /api/organizer/events/:id` - Delete an event
+- `GET /organizer/dashboard` - Get organizer dashboard data
+- `GET /organizer/events` - Get events created by the organizer
+- `POST /organizer/events` - Create a new event
+- `PUT /organizer/events/:id` - Update an event
+- `DELETE /organizer/events/:id` - Delete an event
 
 ### Admin
 
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/users/:id` - Get a specific user
-- `PUT /api/admin/users/:id/role` - Update user role
-- `DELETE /api/admin/users/:id` - Delete a user
-- `GET /api/admin/events` - Get all events
-- `PUT /api/admin/events/:id` - Update event status
+- `GET /admin/users` - Get all users
+- `GET /admin/users/:id` - Get a specific user
+- `PUT /admin/users/:id/role` - Update user role
+- `DELETE /admin/users/:id` - Delete a user
+- `GET /admin/events` - Get all events
+- `PUT /admin/events/:id` - Update event status
 
 ## License
 
