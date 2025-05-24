@@ -9,6 +9,8 @@ import './styles/main.css';
 
 // Lazy load page components
 const HomePage = lazy(() => import('./pages/home'));
+const AboutPage = lazy(() => import('./pages/About'));
+const ContactPage = lazy(() => import('./pages/Contact'));
 const LoginPage = lazy(() => import('./pages/login'));
 const RegisterPage = lazy(() => import('./pages/register'));
 const UserDashboard = lazy(() => import('./pages/user/dashboard'));
@@ -75,6 +77,8 @@ function AppRoutes() {
 								<Routes>
 									{/* Public routes */}
 									<Route path="/" element={<HomePage />} />
+									<Route path="/about" element={<AboutPage />} />
+									<Route path="/contact" element={<ContactPage />} />
 									<Route path="/login" element={<LoginPage />} />
 									<Route path="/register" element={<RegisterPage />} />
 									<Route path="/event/:id" element={<EventDetails />} />

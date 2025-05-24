@@ -16,6 +16,7 @@ server/node_modules
 server/dist
 server/dist-ssr
 server/*.local
+youngminds_new_UI
 
 # Editor directories and files
 .vscode/*

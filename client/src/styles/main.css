@@ -1,38 +1,198 @@
-/* Main styles - consolidated from global.css, index.css, and Routes.css */
+/* Main styles - Tailwind CSS v4 compatible */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
+/* Tailwind v4 theme configuration */
+@theme {
+  --font-inter: 'Inter', sans-serif;
+  
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* CSS Custom Properties for theming - YoungMinds Color System */
 :root {
-    /* Color variables */
-    --primary-color: #4a69bd;
-    --secondary-color: #6a89cc;
-    --accent-color: #f7b731;
-    --text-color: #2c3e50;
-    --light-bg: #f5f6fa;
-    --dark-bg: #121212;
-    --dark-surface: #1e1e1e;
-    --dark-text: #e0e0e0;
-    --success-color: #44bd32;
-    --error-color: #e84118;
-    --auth-bg-color: #f0f2f5;
+  /* Core Theme Colors */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
 
-    /* UI variables */
-    --border-radius: 4px;
-    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
 
-    /* Font settings */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
 
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+
+  --radius: 0.5rem;
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+
+  /* YoungMinds Brand Colors */
+  --ym-hero-bg-from: #fef3c7; /* amber-50 */
+  --ym-hero-bg-via: #fefce8; /* yellow-50 */
+  --ym-hero-bg-to: #fff7ed; /* orange-50 */
+  
+  --ym-features-bg: #ffffff; /* white */
+  --ym-events-bg: #f9fafb; /* gray-50 */
+  --ym-faq-bg: #ffffff; /* white */
+  
+  --ym-gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --ym-gradient-text: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  
+  --ym-yellow-100: #fef3c7;
+  --ym-yellow-200: #fde047; /* yellow-200 */
+  --ym-yellow-600: #d97706;
+  --ym-yellow-700: #b45309;
+  --ym-amber-100: #fef3c7;
+  --ym-amber-200: #fde68a; /* amber-200 */
+  --ym-amber-400: #fbbf24;
+  --ym-amber-600: #d97706;
+  --ym-orange-400: #fb923c;
+  
+  /* Hero Image Colors */
+  --ym-hero-image-bg-from: #fde047; /* yellow-200 */
+  --ym-hero-image-bg-to: #fde68a; /* amber-200 */
+  
+  /* Footer Colors */
+  --ym-footer-bg: #111827; /* gray-900 */
+  --ym-footer-text: #ffffff; /* white */
+  --ym-footer-text-muted: #9ca3af; /* gray-400 */
+  --ym-footer-border: #1f2937; /* gray-800 */
+  
+  /* Text Colors */
+  --ym-text-primary: #111827; /* gray-900 */
+  --ym-text-secondary: #4b5563; /* gray-600 */
+  --ym-text-muted: #6b7280; /* gray-500 */
+}
+
+.dark {
+  /* Core Theme Colors - Dark Mode */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+
+  /* YoungMinds Brand Colors - Dark Mode */
+  --ym-hero-bg-from: #1f2937; /* gray-800 */
+  --ym-hero-bg-via: #111827; /* gray-900 */
+  --ym-hero-bg-to: #0f172a; /* slate-900 */
+  
+  --ym-features-bg: #111827; /* gray-900 */
+  --ym-events-bg: #1f2937; /* gray-800 */
+  --ym-faq-bg: #111827; /* gray-900 */
+  
+  --ym-yellow-100: #451a03; /* yellow-900 */
+  --ym-yellow-200: #fde047; /* yellow-300 for dark mode */
+  --ym-yellow-600: #fbbf24; /* yellow-400 */
+  --ym-yellow-700: #fde047; /* yellow-300 */
+  --ym-amber-100: #451a03; /* amber-900 */
+  --ym-amber-200: #fde68a; /* amber-300 for dark mode */
+  --ym-amber-400: #fbbf24;
+  --ym-amber-600: #fde047;
+  --ym-orange-400: #fb923c;
+  
+  /* Hero Image Colors - Dark Mode */
+  --ym-hero-image-bg-from: #b45309; /* yellow-800 */
+  --ym-hero-image-bg-to: #92400e; /* amber-800 */
+  
+  /* Text Colors - Dark Mode */
+  --ym-text-primary: #f9fafb; /* gray-50 */
+  --ym-text-secondary: #d1d5db; /* gray-300 */
+  --ym-text-muted: #9ca3af; /* gray-400 */
+  
+  /* Footer Colors */
+  --ym-footer-bg: #111827; /* gray-900 */
+  --ym-footer-text: #ffffff; /* white */
+  --ym-footer-text-muted: #9ca3af; /* gray-400 */
+  --ym-footer-border: #1f2937; /* gray-800 */
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0 !important;
+  height: 100%;
+  overflow: auto !important;
+  min-height: 100vh;
 }
 
 html, body {
@@ -42,16 +202,266 @@ html, body {
     overflow: auto !important;
 }
 
-body {
-    background-color: var(--light-bg);
-    color: var(--text-color);
-    min-height: 100vh;
-    overflow-y: auto;
+/* Custom utilities */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
-html.dark body {
-    background-color: var(--dark-bg);
-    color: var(--dark-text);
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+  100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* YoungMinds Brand Utility Classes */
+.gradient-bg {
+  background: var(--ym-gradient-primary);
+}
+
+.gradient-text {
+  background: var(--ym-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.yellow-gradient-text {
+  background: var(--ym-gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section Background Classes */
+.ym-hero-bg {
+  background: linear-gradient(135deg, var(--ym-hero-bg-from) 0%, var(--ym-hero-bg-via) 50%, var(--ym-hero-bg-to) 100%);
+}
+
+.ym-hero-image-bg {
+  background: linear-gradient(135deg, var(--ym-hero-image-bg-from) 0%, var(--ym-hero-image-bg-to) 100%);
+}
+
+.ym-hero-image-overlay {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2));
+}
+
+.ym-features-bg {
+  background-color: var(--ym-features-bg);
+}
+
+.ym-events-bg {
+  background-color: var(--ym-events-bg);
+}
+
+.ym-faq-bg {
+  background-color: var(--ym-faq-bg);
+}
+
+/* Color Utility Classes */
+.ym-text-primary {
+  color: var(--ym-text-primary);
+}
+
+.ym-text-secondary {
+  color: var(--ym-text-secondary);
+}
+
+.ym-text-muted {
+  color: var(--ym-text-muted);
+}
+
+.ym-bg-yellow-100 {
+  background-color: var(--ym-yellow-100);
+}
+
+.ym-text-yellow-600 {
+  color: var(--ym-yellow-600);
+}
+
+.ym-text-yellow-700 {
+  color: var(--ym-yellow-700);
+}
+
+.ym-bg-amber-100 {
+  background-color: var(--ym-amber-100);
+}
+
+.ym-bg-amber-400 {
+  background-color: var(--ym-amber-400);
+}
+
+.ym-bg-orange-400 {
+  background-color: var(--ym-orange-400);
+}
+
+/* Card and Surface Colors */
+.ym-bg-card {
+  background-color: hsl(var(--card));
+}
+
+.ym-bg-card-hover {
+  background-color: hsl(var(--muted));
+}
+
+.ym-border-card {
+  border-color: hsl(var(--border));
+}
+
+.ym-text-card {
+  color: hsl(var(--card-foreground));
+}
+
+/* Interactive Elements */
+.ym-text-white {
+  color: #ffffff !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.ym-text-white-bold {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ym-bg-white-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.ym-bg-white-90 {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.ym-text-white-80 {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ym-text-white-90 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Button Colors */
+.ym-btn-secondary {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.ym-btn-secondary:hover {
+  background-color: hsl(var(--muted));
+}
+
+.hover\:ym-bg-card-hover:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Status Colors */
+.ym-bg-success {
+  background-color: #10b981; /* green-500 */
+}
+
+.ym-text-success {
+  color: #10b981;
+}
+
+/* Footer Utility Classes */
+.ym-footer-bg {
+  background-color: var(--ym-footer-bg);
+}
+
+.ym-footer-text {
+  color: var(--ym-footer-text);
+}
+
+.ym-footer-text-muted {
+  color: var(--ym-footer-text-muted);
+}
+
+.ym-footer-text-muted:hover {
+  color: var(--ym-footer-text);
+}
+
+.ym-footer-border {
+  border-color: var(--ym-footer-border);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Layout components */
@@ -70,49 +480,48 @@ nav {
 
 /* Ensure all page content has min-height to push footer to bottom */
 main {
-    min-height: calc(100vh - 144px); /* Full viewport height minus footer height */
+  min-height: calc(100vh - 144px);
     display: flex;
     flex-direction: column;
 }
 
 main > div {
-    min-height: calc(100vh - 144px); /* Full viewport height to ensure footer is off-screen */
+  min-height: calc(100vh - 144px);
 }
 
 /* Force footer to be below viewport */
 footer {
-    margin-top: 5rem; /* Extra margin to ensure it's below the fold */
+  margin-top: 5rem;
 }
 
 /* UI Components */
 .btn {
     display: inline-block;
     padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    background-color: var(--primary-color);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     color: white;
     text-decoration: none;
     border: none;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .btn:hover {
-    background-color: var(--secondary-color);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
 }
 
 .card {
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     margin: 1rem 0;
-}
-
-html.dark .card {
-    background: var(--dark-surface);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid hsl(var(--border));
 }
 
 /* Links */
@@ -123,12 +532,8 @@ a {
 
 /* Auth pages */
 .auth-page {
-    background-color: var(--auth-bg-color);
+  background: hsl(var(--background));
     min-height: 100vh;
-}
-
-html.dark .auth-page {
-    background-color: var(--dark-bg);
 }
 
 /* Table layout with horizontal scroll */
@@ -144,37 +549,24 @@ html.dark .auth-page {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(17, 24, 39, 0.1);
+  background: hsl(var(--muted));
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     border-radius: 10px;
-    border: 2px solid rgba(17, 24, 39, 0.1);
+  border: 2px solid hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(59, 130, 246, 0.7);
-}
-
-/* Dark theme scrollbar modifications */
-html.dark ::-webkit-scrollbar-track {
-    background: rgba(30, 41, 59, 0.4);
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-    border: 2px solid rgba(30, 41, 59, 0.4);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 /* Firefox scrollbar styling */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(17, 24, 39, 0.1);
-}
-
-html.dark * {
-    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(30, 41, 59, 0.4);
+  scrollbar-color: #fbbf24 hsl(var(--muted));
 }
 
 /* Fix to ensure scrollbar doesn't break rounded corners */
@@ -197,39 +589,102 @@ html.dark * {
     white-space: nowrap;
 }
 
-/* Make sure the horizontal scrollbar is visible and consistent with the vertical one */
-.table-scroll::-webkit-scrollbar {
-    height: 8px;
-}
-
-/* Override overflow hidden in specific components to allow horizontal scrolling */
 .overflow-x-auto {
-    overflow-x: auto !important;
+  overflow-x: auto;
 }
 
 .overflow-x-scroll {
-    overflow-x: scroll !important;
+  overflow-x: scroll;
 }
 
-/* Custom-scrollbar class is now redundant since we're applying styles globally */
-
-/* Settings page toggle switches */
+/* Dark mode toggle styles (keeping existing toggle functionality) */
 .toggle-checkbox {
-  right: 0;
-  z-index: 5;
-  border-color: #ccc;
-  transition: all 0.3s;
+  opacity: 0;
+  position: absolute;
 }
 
 .toggle-checkbox:checked {
-  right: 0;
-  border-color: #3b82f6;
+  right: 0px;
 }
 
 .toggle-checkbox:checked + .toggle-label {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
 }
 
 .toggle-label {
   transition: background-color 0.2s ease;
+}
+
+/* Utility classes for line clamping */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Animation utility classes */
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* FAQ Accordion Animations */
+.faq-accordion-content {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-accordion-enter {
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+.faq-accordion-exit {
+  animation: slideUp 0.3s ease-in forwards;
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    max-height: 200px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    max-height: 200px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
