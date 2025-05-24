@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Listbox, Disclosure, Transition } from '@headlessui/react';
+import { Disclosure, Transition } from '@headlessui/react';
 import {
 	MagnifyingGlassIcon,
 	FunnelIcon,
@@ -10,8 +10,6 @@ import {
 	AdjustmentsHorizontalIcon,
 	XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
-import { Fragment } from 'react';
 import EventCard from '../components/organizer/EventCard';
 import { SelectInput, Switch } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
@@ -65,7 +63,7 @@ const EventsPage = () => {
 	const [isOnlineOnly, setIsOnlineOnly] = useState(false);
 	const [dateRange, setDateRange] = useState({ start: '', end: '' });
 	const [dateError, setDateError] = useState('');
-	const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
+	const [sortBy, setSortBy] = useState('newest');
 
 	// Mobile filters visibility
 	const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -142,7 +140,7 @@ const EventsPage = () => {
 		}
 
 		// Apply sorting
-		switch (sortBy.value) {
+		switch (sortBy) {
 			case 'newest':
 				result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 				break;
@@ -169,7 +167,7 @@ const EventsPage = () => {
 		setIsOnlineOnly(false);
 		setDateRange({ start: '', end: '' });
 		setDateError('');
-		setSortBy(SORT_OPTIONS[0]);
+		setSortBy('newest');
 	};
 
 	const handleSearchChange = (e) => {
@@ -186,6 +184,10 @@ const EventsPage = () => {
 
 	const handleOnlineToggle = (e) => {
 		setIsOnlineOnly(e.target.checked);
+	};
+
+	const handleSortChange = (e) => {
+		setSortBy(e.target.value);
 	};
 
 	const handleDateChange = (field, value) => {
@@ -282,63 +284,15 @@ const EventsPage = () => {
 
 							{/* Sort Dropdown */}
 							<div className="w-full lg:w-56">
-								<Listbox value={sortBy} onChange={setSortBy}>
-									<div className="relative">
-										<Listbox.Button className="relative w-full py-3 pl-4 pr-10 text-left ym-bg-card border ym-border-card rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-base transition-all shadow-sm hover:shadow-md">
-											<span className="block truncate ym-text-card font-medium">
-												{sortBy.label}
-											</span>
-											<span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-												<ChevronUpDownIcon
-													className="h-5 w-5 ym-text-yellow-600"
-													aria-hidden="true"
-												/>
-											</span>
-										</Listbox.Button>
-										<Transition
-											as={Fragment}
-											leave="transition ease-in duration-100"
-											leaveFrom="opacity-100"
-											leaveTo="opacity-0"
-										>
-											<Listbox.Options className="absolute z-20 mt-2 w-full ym-bg-card shadow-xl max-h-60 rounded-lg py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none border ym-border-card">
-												{SORT_OPTIONS.map((option) => (
-													<Listbox.Option
-														key={option.value}
-														className={({ active }) =>
-															`${
-																active
-																	? 'ym-text-white ym-bg-amber-400'
-																	: 'ym-text-card'
-															} cursor-pointer select-none relative py-3 pl-4 pr-10 transition-colors hover:ym-bg-yellow-100`
-														}
-														value={option}
-													>
-														{({ selected, active }) => (
-															<>
-																<span
-																	className={`${
-																		selected ? 'font-semibold' : 'font-normal'
-																	} block truncate`}
-																>
-																	{option.label}
-																</span>
-																{selected ? (
-																	<span className="absolute inset-y-0 right-0 flex items-center pr-4 ym-text-yellow-600">
-																		<CheckIcon
-																			className="h-5 w-5"
-																			aria-hidden="true"
-																		/>
-																	</span>
-																) : null}
-															</>
-														)}
-													</Listbox.Option>
-												))}
-											</Listbox.Options>
-										</Transition>
-									</div>
-								</Listbox>
+								<SelectInput
+									id="sort"
+									name="sort"
+									value={sortBy}
+									onChange={handleSortChange}
+									options={SORT_OPTIONS}
+									className="ym-bg-card"
+									placeholder="Sort by"
+								/>
 							</div>
 
 							{/* Mobile Filter Button */}
