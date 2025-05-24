@@ -58,8 +58,8 @@ const GoogleCallback = () => {
 	}, [searchParams, setToken, setUser, navigate]);
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
-			<div className="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-center">
+		<div className="min-h-screen flex flex-col items-center justify-center ym-bg-yellow-100">
+			<div className="w-full max-w-md p-8 ym-bg-card rounded-xl shadow-lg text-center border ym-border-card">
 				{error ? (
 					<>
 						<div className="text-red-500 text-xl mb-4">
@@ -79,16 +79,16 @@ const GoogleCallback = () => {
 							</svg>
 							Authentication Error
 						</div>
-						<p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
-						<p className="text-gray-500 dark:text-gray-400">Redirecting to login...</p>
+						<p className="ym-text-secondary mb-4">{error}</p>
+						<p className="ym-text-muted">Redirecting to login...</p>
 					</>
 				) : (
 					<>
-						<div className="text-blue-500 mb-4">
-							<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto mb-2"></div>
+						<div className="ym-text-yellow-600 mb-4">
+							<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mx-auto mb-2"></div>
 							<p className="text-xl font-semibold">Logging you in...</p>
 						</div>
-						<p className="text-gray-600 dark:text-gray-300">Please wait while we set up your session.</p>
+						<p className="ym-text-secondary">Please wait while we set up your session.</p>
 					</>
 				)}
 			</div>

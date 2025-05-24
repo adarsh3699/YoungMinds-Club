@@ -13,12 +13,10 @@ const SocialLogin = () => {
 		<div className="mt-8">
 			<div className="relative">
 				<div className="absolute inset-0 flex items-center">
-					<div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+					<div className="w-full border-t ym-border-card"></div>
 				</div>
 				<div className="relative flex justify-center text-sm">
-					<span className="px-3 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-						Or continue with
-					</span>
+					<span className="px-3 ym-bg-card ym-text-muted">Or continue with</span>
 				</div>
 			</div>
 
@@ -26,7 +24,7 @@ const SocialLogin = () => {
 				<a
 					href={`${API_URL}/auth/google`}
 					onClick={handleSocialLogin}
-					className={`w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+					className={`w-full flex items-center justify-center px-4 py-3 border ym-border-card rounded-lg shadow-sm ym-text-card ym-bg-card hover:ym-bg-card-hover transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 ${
 						isLoading ? 'opacity-70 cursor-wait' : ''
 					}`}
 					disabled={isLoading}
@@ -34,7 +32,7 @@ const SocialLogin = () => {
 					{isLoading ? (
 						<div className="flex items-center">
 							<svg
-								className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700 dark:text-gray-300"
+								className="animate-spin -ml-1 mr-3 h-5 w-5 ym-text-card"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
 								viewBox="0 0 24 24"

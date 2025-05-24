@@ -22,7 +22,7 @@ function Navigation() {
 			const fetchUserProfile = async () => {
 				try {
 					const response = await axios.get('/user/dashboard');
-					
+
 					if (response.data.success && response.data.profile) {
 						setUserXP(response.data.profile.xp);
 						setUserBadge(response.data.profile.badge);
@@ -32,7 +32,7 @@ function Navigation() {
 					// Don't log out on network errors
 				}
 			};
-			
+
 			fetchUserProfile();
 		}
 	}, [isAuthenticated, isOrganizer]);
@@ -79,7 +79,7 @@ function Navigation() {
 	};
 
 	return (
-		<Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-sm fixed w-full top-0 z-50">
+		<Disclosure as="nav" className="ym-bg-card shadow-sm fixed w-full top-0 z-50 border-b ym-border-card">
 			{({ open }) => (
 				<>
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,7 +89,7 @@ function Navigation() {
 									<Link to="/" className="flex items-center">
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											className="h-8 w-8 text-indigo-600"
+											className="h-8 w-8 ym-text-yellow-600"
 											viewBox="0 0 20 20"
 											fill="currentColor"
 										>
@@ -99,7 +99,7 @@ function Navigation() {
 												clipRule="evenodd"
 											/>
 										</svg>
-										<span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">YMs Club</span>
+										<span className="ml-2 text-xl font-bold ym-text-primary">YMs Club</span>
 									</Link>
 								</div>
 								<div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -109,9 +109,9 @@ function Navigation() {
 											to={item.href}
 											className={classNames(
 												isActiveRoute(item.href)
-													? 'border-indigo-500 text-gray-900 dark:text-white'
-													: 'border-transparent text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-white',
-												'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
+													? 'border-amber-500 ym-text-primary'
+													: 'border-transparent ym-text-secondary hover:border-amber-300 hover:ym-text-primary',
+												'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors'
 											)}
 										>
 											{item.name}
@@ -125,32 +125,32 @@ function Navigation() {
 									<div className="flex items-center">
 										{/* XP Badge (desktop) */}
 										{userXP !== null && userBadge && !isOrganizer && (
-											<div className="mr-4 hidden md:flex items-center bg-indigo-50 dark:bg-indigo-900 px-3 py-1 rounded-full">
-												<svg 
-													xmlns="http://www.w3.org/2000/svg" 
-													className="h-5 w-5 text-indigo-500 dark:text-indigo-300 mr-1" 
+											<div className="mr-4 hidden md:flex items-center ym-bg-yellow-100 px-3 py-1 rounded-full">
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													className="h-5 w-5 ym-text-yellow-600 mr-1"
 													viewBox="0 0 20 20"
 													fill="currentColor"
 												>
-													<path 
-														fillRule="evenodd" 
+													<path
+														fillRule="evenodd"
 														d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
 														clipRule="evenodd"
 													/>
 												</svg>
-												<span className="text-sm font-medium text-indigo-800 dark:text-indigo-200">
+												<span className="text-sm font-medium ym-text-yellow-700">
 													{userXP} XP • {userBadge}
 												</span>
 											</div>
 										)}
-										
+
 										{/* Profile dropdown */}
 										<Menu as="div" className="ml-3 relative">
 											<div>
-												<Menu.Button className="bg-white dark:bg-gray-700 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+												<Menu.Button className="ym-bg-card flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 border ym-border-card">
 													<span className="sr-only">Open user menu</span>
-													<div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center">
-														<span className="font-medium text-indigo-800 dark:text-indigo-200">
+													<div className="h-8 w-8 rounded-full ym-bg-yellow-100 flex items-center justify-center">
+														<span className="font-medium ym-text-yellow-700">
 															{user?.name?.charAt(0).toUpperCase() || 'U'}
 														</span>
 													</div>
@@ -165,40 +165,58 @@ function Navigation() {
 												leaveFrom="transform opacity-100 scale-100"
 												leaveTo="transform opacity-0 scale-95"
 											>
-												<Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none">
-													<div className="px-4 py-2 border-b dark:border-gray-700">
-														<p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.name}</p>
-														<p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+												<Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ym-bg-card ring-1 ring-black ring-opacity-5 focus:outline-none border ym-border-card">
+													<div className="px-4 py-2 border-b ym-border-card">
+														<p className="text-sm font-medium ym-text-primary truncate">
+															{user?.name}
+														</p>
+														<p className="text-xs ym-text-muted truncate">{user?.email}</p>
 													</div>
-													
+
 													{/* XP and Badge (mobile) */}
 													{userXP !== null && userBadge && !isOrganizer && (
-														<div className="px-4 py-2 border-b md:hidden dark:border-gray-700">
+														<div className="px-4 py-2 border-b md:hidden ym-border-card">
 															<div className="flex items-center">
-																<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-500 dark:text-indigo-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	className="h-4 w-4 ym-text-yellow-600 mr-1"
+																	viewBox="0 0 20 20"
+																	fill="currentColor"
+																>
 																	<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
 																</svg>
-																<span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+																<span className="text-xs font-medium ym-text-secondary">
 																	{userXP} XP
 																</span>
 															</div>
 															<div className="flex items-center mt-1">
-																<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-500 dark:text-indigo-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
-																	<path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	className="h-4 w-4 ym-text-yellow-600 mr-1"
+																	viewBox="0 0 20 20"
+																	fill="currentColor"
+																>
+																	<path
+																		fillRule="evenodd"
+																		d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+																		clipRule="evenodd"
+																	/>
 																</svg>
-																<span className="text-xs font-medium text-gray-600 dark:text-gray-300">{userBadge}</span>
+																<span className="text-xs font-medium ym-text-secondary">
+																	{userBadge}
+																</span>
 															</div>
 														</div>
 													)}
-													
+
 													{userNavigation.map((item) => (
 														<Menu.Item key={item.name}>
 															{({ active }) => (
 																<Link
 																	to={item.href}
 																	className={classNames(
-																		active ? 'bg-gray-100 dark:bg-gray-700' : '',
-																		'block px-4 py-2 text-sm text-gray-700 dark:text-gray-300'
+																		active ? 'ym-bg-card-hover' : '',
+																		'block px-4 py-2 text-sm ym-text-card transition-colors'
 																	)}
 																>
 																	{item.name}
@@ -211,8 +229,8 @@ function Navigation() {
 															<button
 																onClick={handleLogout}
 																className={classNames(
-																	active ? 'bg-gray-100 dark:bg-gray-700' : '',
-																	'block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300'
+																	active ? 'ym-bg-card-hover' : '',
+																	'block w-full text-left px-4 py-2 text-sm ym-text-card transition-colors'
 																)}
 															>
 																Logout
@@ -227,13 +245,13 @@ function Navigation() {
 									<div className="space-x-4 flex items-center">
 										<Link
 											to="/login"
-											className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+											className="inline-flex items-center px-4 py-2 border ym-border-card rounded-md shadow-sm text-sm font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover transition-colors"
 										>
 											Login
 										</Link>
 										<Link
 											to="/register"
-											className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+											className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium ym-text-white gradient-bg hover:shadow-lg transition-all"
 										>
 											Sign up
 										</Link>
@@ -242,7 +260,7 @@ function Navigation() {
 							</div>
 							<div className="-mr-2 flex items-center sm:hidden">
 								{/* Mobile menu button */}
-								<Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+								<Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md ym-text-muted hover:ym-text-primary hover:ym-bg-card-hover focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500 transition-colors">
 									<span className="sr-only">Open main menu</span>
 									{open ? (
 										<XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -264,9 +282,9 @@ function Navigation() {
 									to={item.href}
 									className={classNames(
 										isActiveRoute(item.href)
-											? 'bg-indigo-50 dark:bg-indigo-900 border-indigo-500 text-indigo-700 dark:text-indigo-100'
-											: 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white',
-										'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+											? 'ym-bg-yellow-100 border-amber-500 ym-text-yellow-700'
+											: 'border-transparent ym-text-secondary hover:ym-bg-card-hover hover:border-amber-300 hover:ym-text-primary',
+										'block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors'
 									)}
 								>
 									{item.name}
@@ -274,18 +292,18 @@ function Navigation() {
 							))}
 						</div>
 						{isAuthenticated ? (
-							<div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+							<div className="pt-4 pb-3 border-t ym-border-card">
 								<div className="flex items-center px-4">
 									<div className="flex-shrink-0">
-										<div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-800 flex items-center justify-center">
-											<span className="font-medium text-indigo-800 dark:text-indigo-200">
+										<div className="h-10 w-10 rounded-full ym-bg-yellow-100 flex items-center justify-center">
+											<span className="font-medium ym-text-yellow-700">
 												{user?.name?.charAt(0).toUpperCase() || 'U'}
 											</span>
 										</div>
 									</div>
 									<div className="ml-3">
-										<div className="text-base font-medium text-gray-800 dark:text-white">{user?.name}</div>
-										<div className="text-sm font-medium text-gray-500 dark:text-gray-400">{user?.email}</div>
+										<div className="text-base font-medium ym-text-primary">{user?.name}</div>
+										<div className="text-sm font-medium ym-text-muted">{user?.email}</div>
 									</div>
 								</div>
 								<div className="mt-3 space-y-1">
@@ -294,7 +312,7 @@ function Navigation() {
 											key={item.name}
 											as={Link}
 											to={item.href}
-											className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+											className="block px-4 py-2 text-base font-medium ym-text-secondary hover:ym-text-primary hover:ym-bg-card-hover transition-colors"
 										>
 											{item.name}
 										</Disclosure.Button>
@@ -302,24 +320,24 @@ function Navigation() {
 									<Disclosure.Button
 										as="button"
 										onClick={handleLogout}
-										className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+										className="block w-full text-left px-4 py-2 text-base font-medium ym-text-secondary hover:ym-text-primary hover:ym-bg-card-hover transition-colors"
 									>
 										Logout
 									</Disclosure.Button>
 								</div>
 							</div>
 						) : (
-							<div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-								<div className="flex flex-col space-y-2 px-4">
+							<div className="pt-4 pb-3 border-t ym-border-card">
+								<div className="space-y-2 px-4">
 									<Link
 										to="/login"
-										className="w-full text-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+										className="w-full text-center py-2 px-4 border ym-border-card rounded-md shadow-sm text-sm font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover transition-colors"
 									>
 										Login
 									</Link>
 									<Link
 										to="/register"
-										className="w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+										className="w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium ym-text-white gradient-bg hover:shadow-lg transition-all block"
 									>
 										Sign up
 									</Link>

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Listbox, Disclosure, Transition } from '@headlessui/react';
-import { 
-  MagnifyingGlassIcon, 
-  FunnelIcon, 
-  CalendarIcon, 
-  MapPinIcon, 
-  ChevronDownIcon,
-  AdjustmentsHorizontalIcon,
-  XMarkIcon
+import {
+	MagnifyingGlassIcon,
+	FunnelIcon,
+	CalendarIcon,
+	MapPinIcon,
+	ChevronDownIcon,
+	AdjustmentsHorizontalIcon,
+	XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Fragment } from 'react';
@@ -20,592 +20,639 @@ import { useNavigate } from 'react-router-dom';
 
 // Categories
 const EVENT_CATEGORIES = [
-  { label: 'All Categories', value: '' },
-  { label: 'Model United Nations', value: 'MUN' },
-  { label: 'Debate', value: 'Debate' },
-  { label: 'Hackathon', value: 'Hackathon' },
-  { label: 'Workshop', value: 'Workshop' },
-  { label: 'Competition', value: 'Competition' },
-  { label: 'Conference', value: 'Conference' }
+	{ label: 'All Categories', value: '' },
+	{ label: 'Model United Nations', value: 'MUN' },
+	{ label: 'Debate', value: 'Debate' },
+	{ label: 'Hackathon', value: 'Hackathon' },
+	{ label: 'Workshop', value: 'Workshop' },
+	{ label: 'Competition', value: 'Competition' },
+	{ label: 'Conference', value: 'Conference' },
 ];
 
 // Locations
 const LOCATIONS = [
-  { label: 'All Locations', value: '' },
-  { label: 'Mumbai', value: 'Mumbai' },
-  { label: 'Delhi', value: 'Delhi' },
-  { label: 'Bangalore', value: 'Bangalore' },
-  { label: 'Hyderabad', value: 'Hyderabad' },
-  { label: 'Chennai', value: 'Chennai' },
-  { label: 'Online', value: 'Online' }
+	{ label: 'All Locations', value: '' },
+	{ label: 'Mumbai', value: 'Mumbai' },
+	{ label: 'Delhi', value: 'Delhi' },
+	{ label: 'Bangalore', value: 'Bangalore' },
+	{ label: 'Hyderabad', value: 'Hyderabad' },
+	{ label: 'Chennai', value: 'Chennai' },
+	{ label: 'Online', value: 'Online' },
 ];
 
 // Sort options
 const SORT_OPTIONS = [
-  { label: 'Newest', value: 'newest' },
-  { label: 'Most Popular', value: 'popular' },
-  { label: 'Upcoming', value: 'upcoming' },
-  { label: 'Outgoing', value: 'outgoing' }
+	{ label: 'Newest', value: 'newest' },
+	{ label: 'Most Popular', value: 'popular' },
+	{ label: 'Upcoming', value: 'upcoming' },
+	{ label: 'Outgoing', value: 'outgoing' },
 ];
 
 const EventsPage = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  // State for events data
-  const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [savedEventIds, setSavedEventIds] = useState([]);
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+	// State for events data
+	const [events, setEvents] = useState([]);
+	const [filteredEvents, setFilteredEvents] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [savedEventIds, setSavedEventIds] = useState([]);
 
-  // State for filters and search
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [isOnlineOnly, setIsOnlineOnly] = useState(false);
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [dateError, setDateError] = useState('');
-  const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
-  
-  // Mobile filters visibility
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+	// State for filters and search
+	const [searchQuery, setSearchQuery] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('');
+	const [selectedLocation, setSelectedLocation] = useState('');
+	const [isOnlineOnly, setIsOnlineOnly] = useState(false);
+	const [dateRange, setDateRange] = useState({ start: '', end: '' });
+	const [dateError, setDateError] = useState('');
+	const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
 
-  // Fetch events data
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('/events');
-        // Extract events array from response structure
-        const eventsData = response.data.events || [];
-        setEvents(eventsData);
-        setFilteredEvents(eventsData);
-      } catch (err) {
-        console.error('Error fetching events:', err);
-        setError('Failed to load events. Please try again later.');
-        // Initialize with empty array on error
-        setEvents([]);
-        setFilteredEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+	// Mobile filters visibility
+	const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-    fetchEvents();
-  }, []);
+	// Fetch events data
+	useEffect(() => {
+		const fetchEvents = async () => {
+			setLoading(true);
+			try {
+				const response = await axios.get('/events');
+				// Extract events array from response structure
+				const eventsData = response.data.events || [];
+				setEvents(eventsData);
+				setFilteredEvents(eventsData);
+			} catch (err) {
+				console.error('Error fetching events:', err);
+				setError('Failed to load events. Please try again later.');
+				// Initialize with empty array on error
+				setEvents([]);
+				setFilteredEvents([]);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-  // Apply filters and search
-  useEffect(() => {
-    if (!events.length) {
-      setFilteredEvents([]);
-      return;
-    }
+		fetchEvents();
+	}, []);
 
-    let result = [...events];
+	// Apply filters and search
+	useEffect(() => {
+		if (!events.length) {
+			setFilteredEvents([]);
+			return;
+		}
 
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(event => 
-        event.title.toLowerCase().includes(query) || 
-        (event.description && event.description.toLowerCase().includes(query)) ||
-        (event.tags && event.tags.some(tag => tag.toLowerCase().includes(query)))
-      );
-    }
+		let result = [...events];
 
-    // Apply category filter
-    if (selectedCategory) {
-      result = result.filter(event => event.type === selectedCategory);
-    }
+		// Apply search filter
+		if (searchQuery) {
+			const query = searchQuery.toLowerCase();
+			result = result.filter(
+				(event) =>
+					event.title.toLowerCase().includes(query) ||
+					(event.description && event.description.toLowerCase().includes(query)) ||
+					(event.tags && event.tags.some((tag) => tag.toLowerCase().includes(query)))
+			);
+		}
 
-    // Apply location filter
-    if (selectedLocation) {
-      result = result.filter(event => 
-        event.location.city === selectedLocation || 
-        (selectedLocation === 'Online' && event.isOnline)
-      );
-    }
+		// Apply category filter
+		if (selectedCategory) {
+			result = result.filter((event) => event.type === selectedCategory);
+		}
 
-    // Apply online only filter
-    if (isOnlineOnly) {
-      result = result.filter(event => event.isOnline);
-    }
+		// Apply location filter
+		if (selectedLocation) {
+			result = result.filter(
+				(event) => event.location.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
+			);
+		}
 
-    // Apply date range filter
-    if (dateRange.start) {
-      const startDate = new Date(dateRange.start);
-      result = result.filter(event => new Date(event.date) >= startDate);
-    }
-    if (dateRange.end) {
-      const endDate = new Date(dateRange.end);
-      result = result.filter(event => new Date(event.date) <= endDate);
-    }
+		// Apply online only filter
+		if (isOnlineOnly) {
+			result = result.filter((event) => event.isOnline);
+		}
 
-    // Apply sorting
-    switch (sortBy.value) {
-      case 'newest':
-        result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case 'popular':
-        result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
-        break;
-      case 'upcoming':
-        result.sort((a, b) => new Date(a.date) - new Date(b.date));
-        break;
-      case 'outgoing':
-        result.sort((a, b) => new Date(b.date) - new Date(a.date));
-        break;
-      default:
-        break;
-    }
+		// Apply date range filter
+		if (dateRange.start) {
+			const startDate = new Date(dateRange.start);
+			result = result.filter((event) => new Date(event.date) >= startDate);
+		}
+		if (dateRange.end) {
+			const endDate = new Date(dateRange.end);
+			result = result.filter((event) => new Date(event.date) <= endDate);
+		}
 
-    setFilteredEvents(result);
-  }, [events, searchQuery, selectedCategory, selectedLocation, isOnlineOnly, dateRange, sortBy]);
+		// Apply sorting
+		switch (sortBy.value) {
+			case 'newest':
+				result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+				break;
+			case 'popular':
+				result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
+				break;
+			case 'upcoming':
+				result.sort((a, b) => new Date(a.date) - new Date(b.date));
+				break;
+			case 'outgoing':
+				result.sort((a, b) => new Date(b.date) - new Date(a.date));
+				break;
+			default:
+				break;
+		}
 
-  const resetFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
-    setSelectedLocation('');
-    setIsOnlineOnly(false);
-    setDateRange({ start: '', end: '' });
-    setDateError('');
-    setSortBy(SORT_OPTIONS[0]);
-  };
+		setFilteredEvents(result);
+	}, [events, searchQuery, selectedCategory, selectedLocation, isOnlineOnly, dateRange, sortBy]);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+	const resetFilters = () => {
+		setSearchQuery('');
+		setSelectedCategory('');
+		setSelectedLocation('');
+		setIsOnlineOnly(false);
+		setDateRange({ start: '', end: '' });
+		setDateError('');
+		setSortBy(SORT_OPTIONS[0]);
+	};
 
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-  };
+	const handleSearchChange = (e) => {
+		setSearchQuery(e.target.value);
+	};
 
-  const handleLocationChange = (e) => {
-    setSelectedLocation(e.target.value);
-  };
+	const handleCategoryChange = (e) => {
+		setSelectedCategory(e.target.value);
+	};
 
-  const handleOnlineToggle = (e) => {
-    setIsOnlineOnly(e.target.checked);
-  };
+	const handleLocationChange = (e) => {
+		setSelectedLocation(e.target.value);
+	};
 
-  const handleDateChange = (field, value) => {
-    // Create a new date range object
-    const newDateRange = { ...dateRange, [field]: value };
-    
-    // Clear previous errors
-    setDateError('');
-    
-    // Validate that end date is not before start date
-    if (newDateRange.start && newDateRange.end) {
-      const startDate = new Date(newDateRange.start);
-      const endDate = new Date(newDateRange.end);
-      
-      if (endDate < startDate) {
-        setDateError('To Date cannot be earlier than From Date');
-        // Still update the date but show error
-      }
-    }
-    
-    // Update the date range
-    setDateRange(newDateRange);
-  };
+	const handleOnlineToggle = (e) => {
+		setIsOnlineOnly(e.target.checked);
+	};
 
-  // Handle saving/unsaving event
-  const handleSaveToggle = async (eventId, isSaved) => {
-    if (!isAuthenticated) {
-      // Redirect to login if not authenticated
-      navigate('/login');
-      return;
-    }
+	const handleDateChange = (field, value) => {
+		// Create a new date range object
+		const newDateRange = { ...dateRange, [field]: value };
 
-    try {
-      // Always use POST method, as the server endpoint handles both save and unsave
-      const response = await axios.post(`/events/${eventId}/save`);
-      
-      // Get updated saved status from server response
-      const { isSaved: newSavedStatus } = response.data;
-      
-      // Update saved events list
-      if (newSavedStatus) {
-        setSavedEventIds(prev => [...prev, eventId]);
-      } else {
-        setSavedEventIds(prev => prev.filter(id => id !== eventId));
-      }
-    } catch (error) {
-      console.error('Error toggling saved event:', error);
-    }
-  };
+		// Clear previous errors
+		setDateError('');
 
-  // Error state
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="bg-red-50 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 px-4 py-3 rounded relative" role="alert">
-          <strong className="font-bold">Error! </strong>
-          <span className="block sm:inline">{error}</span>
-        </div>
-      </div>
-    );
-  }
+		// Validate that end date is not before start date
+		if (newDateRange.start && newDateRange.end) {
+			const startDate = new Date(newDateRange.start);
+			const endDate = new Date(newDateRange.end);
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Discover Events</h1>
-        <p className="text-gray-600 dark:text-gray-400">Find and register for exciting events in your area or online</p>
-      </div>
+			if (endDate < startDate) {
+				setDateError('To Date cannot be earlier than From Date');
+				// Still update the date but show error
+			}
+		}
 
-      {/* Search and Filter Bar */}
-      <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search Input */}
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Search events..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-          </div>
+		// Update the date range
+		setDateRange(newDateRange);
+	};
 
-          {/* Sort Dropdown */}
-          <div className="w-full md:w-48">
-            <Listbox value={sortBy} onChange={setSortBy}>
-              <div className="relative">
-                <Listbox.Button className="relative w-full py-2 pl-3 pr-10 text-left bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md cursor-default focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm">
-                  <span className="block truncate text-gray-900 dark:text-white">{sortBy.label}</span>
-                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                  </span>
-                </Listbox.Button>
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                    {SORT_OPTIONS.map((option) => (
-                      <Listbox.Option
-                        key={option.value}
-                        className={({ active }) =>
-                          `${
-                            active ? 'text-white bg-blue-600' : 'text-gray-900 dark:text-white'
-                          } cursor-default select-none relative py-2 pl-10 pr-4`
-                        }
-                        value={option}
-                      >
-                        {({ selected, active }) => (
-                          <>
-                            <span className={`${selected ? 'font-medium' : 'font-normal'} block truncate`}>
-                              {option.label}
-                            </span>
-                            {selected ? (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
-              </div>
-            </Listbox>
-          </div>
+	// Handle saving/unsaving event
+	const handleSaveToggle = async (eventId, isSaved) => {
+		if (!isAuthenticated) {
+			// Redirect to login if not authenticated
+			navigate('/login');
+			return;
+		}
 
-          {/* Filter Button (Mobile) */}
-          <button
-            type="button"
-            className="md:hidden inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            onClick={() => setShowMobileFilters(true)}
-          >
-            <FunnelIcon className="h-5 w-5 mr-2" aria-hidden="true" />
-            Filters
-          </button>
-        </div>
+		try {
+			// Always use POST method, as the server endpoint handles both save and unsave
+			const response = await axios.post(`/events/${eventId}/save`);
 
-        {/* Desktop Filters */}
-        <Disclosure as="div" className="hidden md:block mt-4">
-          {({ open }) => (
-            <>
-              <Disclosure.Button className="flex w-full justify-between items-center px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-                <div className="flex items-center">
-                  <AdjustmentsHorizontalIcon className="mr-2 h-5 w-5" />
-                  Advanced Filters
-                </div>
-                <ChevronDownIcon
-                  className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 text-gray-500`}
-                />
-              </Disclosure.Button>
-              <Disclosure.Panel className="px-4 pt-4 pb-2">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Category Filter */}
-                  <div>
-                    <SelectInput
-                      id="category"
-                      name="category"
-                      label="Category"
-                      value={selectedCategory}
-                      onChange={handleCategoryChange}
-                      options={EVENT_CATEGORIES}
-                      className="bg-white dark:bg-gray-700"
-                    />
-                  </div>
+			// Get updated saved status from server response
+			const { isSaved: newSavedStatus } = response.data;
 
-                  {/* Location Filter */}
-                  <div>
-                    <SelectInput
-                      id="location"
-                      name="location"
-                      label="Location"
-                      value={selectedLocation}
-                      onChange={handleLocationChange}
-                      options={LOCATIONS}
-                      className="bg-white dark:bg-gray-700"
-                    />
-                  </div>
+			// Update saved events list
+			if (newSavedStatus) {
+				setSavedEventIds((prev) => [...prev, eventId]);
+			} else {
+				setSavedEventIds((prev) => prev.filter((id) => id !== eventId));
+			}
+		} catch (error) {
+			console.error('Error toggling saved event:', error);
+		}
+	};
 
-                  {/* Date Range */}
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
-                      From Date
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="date"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={dateRange.start}
-                        onChange={(e) => handleDateChange('start', e.target.value)}
-                      />
-                    </div>
-                  </div>
+	// Error state
+	if (error) {
+		return (
+			<div className="container mx-auto px-4 py-12">
+				<div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+					<strong className="font-bold">Error! </strong>
+					<span className="block sm:inline">{error}</span>
+				</div>
+			</div>
+		);
+	}
 
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
-                      To Date
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="date"
-                        className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                          ${dateError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'} 
-                          text-gray-900 dark:text-white`}
-                        value={dateRange.end}
-                        onChange={(e) => handleDateChange('end', e.target.value)}
-                      />
-                    </div>
-                    {dateError && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{dateError}</p>
-                    )}
-                  </div>
-                </div>
+	return (
+		<div className="min-h-screen ym-events-bg">
+			<div className="container mx-auto px-4 py-8">
+				{/* Hero Section */}
+				<div className="mb-8 text-center">
+					<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold ym-text-primary mb-4">
+						Discover <span className="gradient-text">Events</span>
+					</h1>
+					<p className="text-lg md:text-xl ym-text-secondary max-w-2xl mx-auto">
+						Find and register for exciting events in your area or online
+					</p>
+				</div>
 
-                <div className="flex items-center justify-between mt-4">
-                  <div>
-                    <Switch
-                      enabled={isOnlineOnly}
-                      onChange={handleOnlineToggle}
-                      label="Online Events Only"
-                      name="online-only"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={resetFilters}
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-              </Disclosure.Panel>
-            </>
-          )}
-        </Disclosure>
-      </div>
+				{/* Search and Filter Section */}
+				<div className="mb-8">
+					{/* Main Search Bar */}
+					<div className="ym-bg-card rounded-xl shadow-lg border ym-border-card p-6 mb-4">
+						<div className="flex flex-col lg:flex-row gap-4">
+							{/* Search Input */}
+							<div className="relative flex-grow">
+								<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+									<MagnifyingGlassIcon className="h-5 w-5 ym-text-yellow-600" />
+								</div>
+								<input
+									type="text"
+									className="block w-full pl-12 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm text-base"
+									placeholder="Search events by title, description, or tags..."
+									value={searchQuery}
+									onChange={handleSearchChange}
+								/>
+							</div>
 
-      {/* Mobile Filters Modal */}
-      {showMobileFilters && (
-        <div className="fixed inset-0 z-40 overflow-y-auto md:hidden">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-              onClick={() => setShowMobileFilters(false)}
-            ></div>
+							{/* Sort Dropdown */}
+							<div className="w-full lg:w-56">
+								<Listbox value={sortBy} onChange={setSortBy}>
+									<div className="relative">
+										<Listbox.Button className="relative w-full py-3 pl-4 pr-10 text-left ym-bg-card border ym-border-card rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-base transition-all shadow-sm hover:shadow-md">
+											<span className="block truncate ym-text-card font-medium">
+												{sortBy.label}
+											</span>
+											<span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+												<ChevronUpDownIcon
+													className="h-5 w-5 ym-text-yellow-600"
+													aria-hidden="true"
+												/>
+											</span>
+										</Listbox.Button>
+										<Transition
+											as={Fragment}
+											leave="transition ease-in duration-100"
+											leaveFrom="opacity-100"
+											leaveTo="opacity-0"
+										>
+											<Listbox.Options className="absolute z-20 mt-2 w-full ym-bg-card shadow-xl max-h-60 rounded-lg py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none border ym-border-card">
+												{SORT_OPTIONS.map((option) => (
+													<Listbox.Option
+														key={option.value}
+														className={({ active }) =>
+															`${
+																active
+																	? 'ym-text-white ym-bg-amber-400'
+																	: 'ym-text-card'
+															} cursor-pointer select-none relative py-3 pl-4 pr-10 transition-colors hover:ym-bg-yellow-100`
+														}
+														value={option}
+													>
+														{({ selected, active }) => (
+															<>
+																<span
+																	className={`${
+																		selected ? 'font-semibold' : 'font-normal'
+																	} block truncate`}
+																>
+																	{option.label}
+																</span>
+																{selected ? (
+																	<span className="absolute inset-y-0 right-0 flex items-center pr-4 ym-text-yellow-600">
+																		<CheckIcon
+																			className="h-5 w-5"
+																			aria-hidden="true"
+																		/>
+																	</span>
+																) : null}
+															</>
+														)}
+													</Listbox.Option>
+												))}
+											</Listbox.Options>
+										</Transition>
+									</div>
+								</Listbox>
+							</div>
 
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Filters</h3>
-                  <button
-                    type="button"
-                    className="bg-white dark:bg-gray-800 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
-                    onClick={() => setShowMobileFilters(false)}
-                  >
-                    <span className="sr-only">Close</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
-                </div>
+							{/* Mobile Filter Button */}
+							<button
+								type="button"
+								className="lg:hidden inline-flex items-center justify-center px-6 py-3 border ym-border-card rounded-lg shadow-sm text-base font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+								onClick={() => setShowMobileFilters(true)}
+							>
+								<FunnelIcon className="h-5 w-5 mr-2 ym-text-yellow-600" aria-hidden="true" />
+								Filters
+							</button>
+						</div>
+					</div>
 
-                <div className="space-y-4">
-                  {/* Category Filter */}
-                  <SelectInput
-                    id="category-mobile"
-                    name="category"
-                    label="Category"
-                    value={selectedCategory}
-                    onChange={handleCategoryChange}
-                    options={EVENT_CATEGORIES}
-                    className="bg-white dark:bg-gray-700"
-                  />
+					{/* Desktop Advanced Filters */}
+					<Disclosure as="div" className="hidden lg:block">
+						{({ open }) => (
+							<>
+								<Disclosure.Button className="w-full flex justify-between items-center px-6 py-4 text-base font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover rounded-xl transition-all shadow-md hover:shadow-lg border ym-border-card">
+									<div className="flex items-center">
+										<AdjustmentsHorizontalIcon className="mr-3 h-6 w-6 ym-text-yellow-600" />
+										<span>Advanced Filters</span>
+									</div>
+									<ChevronDownIcon
+										className={`${
+											open ? 'rotate-180 transform' : ''
+										} h-5 w-5 ym-text-yellow-600 transition-transform duration-200`}
+									/>
+								</Disclosure.Button>
 
-                  {/* Location Filter */}
-                  <SelectInput
-                    id="location-mobile"
-                    name="location"
-                    label="Location"
-                    value={selectedLocation}
-                    onChange={handleLocationChange}
-                    options={LOCATIONS}
-                    className="bg-white dark:bg-gray-700"
-                  />
+								<Transition
+									enter="transition duration-200 ease-out"
+									enterFrom="transform scale-95 opacity-0"
+									enterTo="transform scale-100 opacity-100"
+									leave="transition duration-150 ease-in"
+									leaveFrom="transform scale-100 opacity-100"
+									leaveTo="transform scale-95 opacity-0"
+								>
+									<Disclosure.Panel className="mt-4 ym-bg-card rounded-xl p-6 shadow-lg border ym-border-card">
+										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+											{/* Category Filter */}
+											<div>
+												<SelectInput
+													id="category"
+													name="category"
+													label="Category"
+													value={selectedCategory}
+													onChange={handleCategoryChange}
+													options={EVENT_CATEGORIES}
+													className="ym-bg-card"
+												/>
+											</div>
 
-                  {/* Date Range */}
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
-                      From Date
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="date"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={dateRange.start}
-                        onChange={(e) => handleDateChange('start', e.target.value)}
-                      />
-                    </div>
-                  </div>
+											{/* Location Filter */}
+											<div>
+												<SelectInput
+													id="location"
+													name="location"
+													label="Location"
+													value={selectedLocation}
+													onChange={handleLocationChange}
+													options={LOCATIONS}
+													className="ym-bg-card"
+												/>
+											</div>
 
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
-                      To Date
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="date"
-                        className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                          ${dateError ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'} 
-                          text-gray-900 dark:text-white`}
-                        value={dateRange.end}
-                        onChange={(e) => handleDateChange('end', e.target.value)}
-                      />
-                    </div>
-                    {dateError && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{dateError}</p>
-                    )}
-                  </div>
+											{/* From Date */}
+											<div>
+												<label className="block ym-text-primary font-semibold mb-3">
+													From Date
+												</label>
+												<div className="relative">
+													<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+														<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
+													</div>
+													<input
+														type="date"
+														className="block w-full pl-10 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
+														value={dateRange.start}
+														onChange={(e) => handleDateChange('start', e.target.value)}
+													/>
+												</div>
+											</div>
 
-                  <div>
-                    <Switch
-                      enabled={isOnlineOnly}
-                      onChange={handleOnlineToggle}
-                      label="Online Events Only"
-                      name="online-only"
-                    />
-                  </div>
-                </div>
-              </div>
+											{/* To Date */}
+											<div>
+												<label className="block ym-text-primary font-semibold mb-3">
+													To Date
+												</label>
+												<div className="relative">
+													<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+														<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
+													</div>
+													<input
+														type="date"
+														className={`block w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm
+														${dateError ? 'border-red-500 ym-bg-card ym-text-card' : 'ym-border-card ym-bg-card'} 
+														ym-text-card`}
+														value={dateRange.end}
+														onChange={(e) => handleDateChange('end', e.target.value)}
+													/>
+												</div>
+												{dateError && (
+													<p className="mt-2 text-sm text-red-600 font-medium">{dateError}</p>
+												)}
+											</div>
+										</div>
 
-              <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => setShowMobileFilters(false)}
-                >
-                  Apply Filters
-                </button>
-                <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={resetFilters}
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+										<div className="flex items-center justify-between mt-8 pt-6 border-t ym-border-card">
+											<div>
+												<Switch
+													enabled={isOnlineOnly}
+													onChange={handleOnlineToggle}
+													label="Online Events Only"
+													name="online-only"
+												/>
+											</div>
+											<button
+												type="button"
+												onClick={resetFilters}
+												className="inline-flex items-center px-6 py-2.5 border border-red-300 rounded-lg text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:text-red-800 transition-all shadow-sm hover:shadow-md"
+											>
+												Reset Filters
+											</button>
+										</div>
+									</Disclosure.Panel>
+								</Transition>
+							</>
+						)}
+					</Disclosure>
+				</div>
 
-      {/* Events Grid */}
-      <div>
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <EventCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : filteredEvents.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">No events found</h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Try adjusting your search or filter criteria to find events.
-            </p>
-            <div className="mt-6">
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                onClick={resetFilters}
-              >
-                Reset all filters
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => (
-              <EventCard 
-                key={event._id} 
-                event={event}
-                onSaveToggle={isAuthenticated ? handleSaveToggle : undefined}
-                isSaved={savedEventIds.includes(event._id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+				{/* Mobile Filters Modal */}
+				{showMobileFilters && (
+					<div className="fixed inset-0 z-40 overflow-y-auto lg:hidden">
+						<div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+							{/* Backdrop */}
+							<div
+								className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+								onClick={() => setShowMobileFilters(false)}
+							></div>
+
+							{/* Modal Content */}
+							<div className="inline-block align-bottom ym-bg-card rounded-t-2xl sm:rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border ym-border-card">
+								{/* Header */}
+								<div className="px-6 pt-6 pb-4 border-b ym-border-card">
+									<div className="flex justify-between items-center">
+										<h3 className="text-xl font-bold ym-text-primary">Filter Events</h3>
+										<button
+											type="button"
+											className="ym-bg-card rounded-lg p-2 ym-text-muted hover:ym-text-secondary hover:ym-bg-card-hover focus:outline-none transition-colors"
+											onClick={() => setShowMobileFilters(false)}
+										>
+											<span className="sr-only">Close</span>
+											<XMarkIcon className="h-6 w-6" aria-hidden="true" />
+										</button>
+									</div>
+								</div>
+
+								{/* Filters */}
+								<div className="px-6 py-6 space-y-6">
+									{/* Category Filter */}
+									<div>
+										<SelectInput
+											id="category-mobile"
+											name="category"
+											label="Category"
+											value={selectedCategory}
+											onChange={handleCategoryChange}
+											options={EVENT_CATEGORIES}
+											className="ym-bg-card"
+										/>
+									</div>
+
+									{/* Location Filter */}
+									<div>
+										<SelectInput
+											id="location-mobile"
+											name="location"
+											label="Location"
+											value={selectedLocation}
+											onChange={handleLocationChange}
+											options={LOCATIONS}
+											className="ym-bg-card"
+										/>
+									</div>
+
+									{/* Date Range */}
+									<div className="space-y-4">
+										<div>
+											<label className="block ym-text-primary font-semibold mb-3">
+												From Date
+											</label>
+											<div className="relative">
+												<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+													<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
+												</div>
+												<input
+													type="date"
+													className="block w-full pl-10 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
+													value={dateRange.start}
+													onChange={(e) => handleDateChange('start', e.target.value)}
+												/>
+											</div>
+										</div>
+
+										<div>
+											<label className="block ym-text-primary font-semibold mb-3">To Date</label>
+											<div className="relative">
+												<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+													<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
+												</div>
+												<input
+													type="date"
+													className={`block w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm
+													${dateError ? 'border-red-500 ym-bg-card ym-text-card' : 'ym-border-card ym-bg-card'} 
+													ym-text-card`}
+													value={dateRange.end}
+													onChange={(e) => handleDateChange('end', e.target.value)}
+												/>
+											</div>
+											{dateError && (
+												<p className="mt-2 text-sm text-red-600 font-medium">{dateError}</p>
+											)}
+										</div>
+									</div>
+
+									{/* Online Events Toggle */}
+									<div className="pt-4 border-t ym-border-card">
+										<Switch
+											enabled={isOnlineOnly}
+											onChange={handleOnlineToggle}
+											label="Online Events Only"
+											name="online-only"
+										/>
+									</div>
+								</div>
+
+								{/* Footer Buttons */}
+								<div className="ym-bg-yellow-100 px-6 py-4 sm:flex sm:flex-row-reverse gap-3">
+									<button
+										type="button"
+										className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-6 py-3 gradient-bg text-base font-semibold ym-text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:w-auto transition-all"
+										onClick={() => setShowMobileFilters(false)}
+									>
+										Apply Filters
+									</button>
+									<button
+										type="button"
+										className="mt-3 w-full inline-flex justify-center rounded-lg border border-red-300 shadow-sm px-6 py-3 bg-red-50 text-base font-medium text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto transition-colors"
+										onClick={resetFilters}
+									>
+										Reset
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{/* Events Grid */}
+				<div>
+					{loading ? (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{[...Array(6)].map((_, i) => (
+								<EventCardSkeleton key={i} />
+							))}
+						</div>
+					) : filteredEvents.length === 0 ? (
+						<div className="ym-bg-card rounded-lg p-8 text-center border ym-border-card shadow-md">
+							<svg
+								className="mx-auto h-12 w-12 ym-text-muted"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								aria-hidden="true"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<h3 className="mt-2 text-lg font-medium ym-text-primary">No events found</h3>
+							<p className="mt-1 text-sm ym-text-secondary">
+								Try adjusting your search or filter criteria to find events.
+							</p>
+							<div className="mt-6">
+								<button
+									type="button"
+									className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium ym-text-white gradient-bg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all"
+									onClick={resetFilters}
+								>
+									Reset all filters
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{filteredEvents.map((event) => (
+								<EventCard
+									key={event._id}
+									event={event}
+									onSaveToggle={isAuthenticated ? handleSaveToggle : undefined}
+									isSaved={savedEventIds.includes(event._id)}
+								/>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 };
 
-export default EventsPage; 
+export default EventsPage;

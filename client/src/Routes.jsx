@@ -40,8 +40,8 @@ const DashboardRouter = () => {
 	if (loading && token) {
 		return (
 			<div className="flex flex-col justify-center items-center h-[70vh]">
-				<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-				<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
+				<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mb-4"></div>
+				<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
 			</div>
 		);
 	}
@@ -62,14 +62,14 @@ function AppRoutes() {
 	return (
 		<AuthProvider>
 			<Router>
-				<div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
+				<div className="min-h-screen flex flex-col ym-bg-card">
 					<Navigation />
 					<main className="flex-grow flex flex-col min-h-screen">
 						<Suspense
 							fallback={
 								<div className="flex flex-col justify-center items-center h-[70vh]">
-									<div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-									<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Loading</h2>
+									<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mb-4"></div>
+									<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
 								</div>
 							}
 						>

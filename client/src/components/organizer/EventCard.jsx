@@ -126,7 +126,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 			onMouseLeave={() => setIsHovered(false)}
 		>
 			{/* Card Container */}
-			<div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+			<div className="ym-bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border ym-border-card">
 				{/* Image Section with Overlay */}
 				<Link to={`/event/${event.id || event._id}`} className="block relative h-52 overflow-hidden">
 					<img
@@ -141,7 +141,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 					{/* Featured Badge */}
 					{isFeatured && (
 						<div className="absolute top-3 left-3 z-5">
-							<span className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center">
+							<span className="gradient-bg ym-text-white text-xs font-bold px-3 py-1 rounded-full flex items-center">
 								<span className="mr-1">⭐</span> FEATURED
 							</span>
 						</div>
@@ -149,7 +149,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 
 					{/* Organizer Badge */}
 					<div className="absolute top-3 left-3 z-5">
-						<div className="flex items-center bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-white text-xs px-2 py-1 rounded-full">
+						<div className="flex items-center ym-bg-white-90 ym-text-primary text-xs px-2 py-1 rounded-full">
 							<UserIcon className="h-3 w-3 mr-1" />
 							<span>By {event.organizer?.name || 'Organizer'}</span>
 						</div>
@@ -158,7 +158,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 					{/* Category Badge */}
 					<div className="absolute top-3 right-3 z-5">
 						<span
-							className={`bg-gradient-to-r ${categoryColorGradient} text-white text-xs font-semibold px-3 py-1.5 rounded-full`}
+							className={`bg-gradient-to-r ${categoryColorGradient} ym-text-white text-xs font-semibold px-3 py-1.5 rounded-full`}
 						>
 							{event.type}
 						</span>
@@ -166,7 +166,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 
 					{/* Price Tag */}
 					<div className="absolute bottom-3 right-3 z-5">
-						<span className="bg-white/90 dark:bg-gray-900/90 text-gray-800 dark:text-white text-sm font-bold px-3 py-1 rounded-lg">
+						<span className="ym-bg-white-90 ym-text-primary text-sm font-bold px-3 py-1 rounded-lg">
 							{formatPrice()}
 						</span>
 					</div>
@@ -177,7 +177,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 					{/* Event Title with Bookmark */}
 					<div className="flex justify-between items-start mb-2">
 						<Link to={`/event/${event.id || event._id}`} className="flex-grow">
-							<h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+							<h3 className="font-bold text-lg ym-text-primary line-clamp-2 hover:ym-text-yellow-700 transition-colors">
 								{event.title}
 							</h3>
 						</Link>
@@ -189,9 +189,9 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 								className="ml-2 p-1 flex-shrink-0 transition-all duration-300"
 							>
 								{isSaved ? (
-									<BookmarkSolidIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+									<BookmarkSolidIcon className="h-5 w-5 ym-text-yellow-600" />
 								) : (
-									<BookmarkIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-300" />
+									<BookmarkIcon className="h-5 w-5 ym-text-muted hover:ym-text-yellow-600" />
 								)}
 							</button>
 						)}
@@ -200,57 +200,47 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 					{/* Countdown Timer */}
 					{new Date(event.date) > new Date() && (
 						<div className="mb-3">
-							<p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Event starts in:</p>
+							<p className="text-xs ym-text-muted mb-1">Event starts in:</p>
 							<div className="flex space-x-2">
-								<div className="bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-center min-w-[40px]">
-									<span className="text-indigo-700 dark:text-indigo-300 text-sm font-bold">
-										{countdown.days}
-									</span>
-									<p className="text-gray-500 dark:text-gray-400 text-xs">days</p>
+								<div className="ym-bg-yellow-100 px-2 py-1 rounded text-center min-w-[40px]">
+									<span className="ym-text-yellow-700 text-sm font-bold">{countdown.days}</span>
+									<p className="ym-text-muted text-xs">days</p>
 								</div>
-								<div className="bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-center min-w-[40px]">
-									<span className="text-indigo-700 dark:text-indigo-300 text-sm font-bold">
-										{countdown.hours}
-									</span>
-									<p className="text-gray-500 dark:text-gray-400 text-xs">hrs</p>
+								<div className="ym-bg-yellow-100 px-2 py-1 rounded text-center min-w-[40px]">
+									<span className="ym-text-yellow-700 text-sm font-bold">{countdown.hours}</span>
+									<p className="ym-text-muted text-xs">hrs</p>
 								</div>
-								<div className="bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-center min-w-[40px]">
-									<span className="text-indigo-700 dark:text-indigo-300 text-sm font-bold">
-										{countdown.minutes}
-									</span>
-									<p className="text-gray-500 dark:text-gray-400 text-xs">mins</p>
+								<div className="ym-bg-yellow-100 px-2 py-1 rounded text-center min-w-[40px]">
+									<span className="ym-text-yellow-700 text-sm font-bold">{countdown.minutes}</span>
+									<p className="ym-text-muted text-xs">mins</p>
 								</div>
-								<div className="bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-center min-w-[40px]">
-									<span className="text-indigo-700 dark:text-indigo-300 text-sm font-bold">
-										{countdown.seconds}
-									</span>
-									<p className="text-gray-500 dark:text-gray-400 text-xs">secs</p>
+								<div className="ym-bg-yellow-100 px-2 py-1 rounded text-center min-w-[40px]">
+									<span className="ym-text-yellow-700 text-sm font-bold">{countdown.seconds}</span>
+									<p className="ym-text-muted text-xs">secs</p>
 								</div>
 							</div>
 						</div>
 					)}
 
 					{/* Event Short Description */}
-					<p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
-						{event.shortDescription}
-					</p>
+					<p className="ym-text-secondary text-sm mb-3 line-clamp-2">{event.shortDescription}</p>
 
 					{/* Meta Information */}
 					<div className="space-y-1.5 mb-4">
-						<div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
-							<CalendarIcon className="h-4 w-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+						<div className="flex items-center ym-text-secondary text-sm">
+							<CalendarIcon className="h-4 w-4 mr-2 ym-text-yellow-600" />
 							<span>{formatEventDate(event.date)}</span>
 						</div>
 
-						<div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
-							<ClockIcon className="h-4 w-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+						<div className="flex items-center ym-text-secondary text-sm">
+							<ClockIcon className="h-4 w-4 mr-2 ym-text-yellow-600" />
 							<span>{formatEventTime(event.date)}</span>
 						</div>
 
-						<div className="flex items-center text-gray-600 dark:text-gray-400 text-sm">
-							<MapPinIcon className="h-4 w-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+						<div className="flex items-center ym-text-secondary text-sm">
+							<MapPinIcon className="h-4 w-4 mr-2 ym-text-yellow-600" />
 							{event.location?.type === 'online' ? (
-								<span className="text-emerald-600 dark:text-emerald-400 font-medium">Fully Online</span>
+								<span className="ym-text-success font-medium">Fully Online</span>
 							) : (
 								<span>
 									{event.location?.city}, {event.location?.venue}
@@ -261,13 +251,13 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 
 					{/* Registration Stats */}
 					<div className="mt-auto">
-						<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+						<div className="w-full ym-bg-yellow-100 rounded-full h-2 mb-2">
 							<div
-								className={`h-2 rounded-full bg-gradient-to-r ${categoryColorGradient}`}
+								className={`h-2 rounded-full gradient-bg`}
 								style={{ width: `${Math.min(100, (event.registrationCount / event.capacity) * 100)}%` }}
 							></div>
 						</div>
-						<div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-3">
+						<div className="flex justify-between text-xs ym-text-muted mb-3">
 							<span>{event.registrationCount} registered</span>
 							<span>{event.capacity - event.registrationCount} spots left</span>
 						</div>
@@ -275,7 +265,7 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 						{/* Register Button */}
 						<Link
 							to={`/event/${event.id || event._id}`}
-							className="block w-full py-2.5 text-center font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md"
+							className="block w-full py-2.5 text-center font-bold ym-text-white gradient-bg hover:shadow-lg rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md"
 						>
 							Register Now
 						</Link>
@@ -285,10 +275,10 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 
 			{/* Action buttons (Only visible for organizers) */}
 			{isOrganizer && (
-				<div className="bg-gray-50 dark:bg-gray-700 p-4 flex justify-between items-center">
+				<div className="ym-bg-yellow-100 p-4 flex justify-between items-center">
 					<button
 						onClick={onManage}
-						className="text-blue-600 dark:text-blue-400 text-sm font-medium flex items-center hover:text-blue-800 dark:hover:text-blue-300"
+						className="ym-text-yellow-700 text-sm font-medium flex items-center hover:ym-text-yellow-700"
 					>
 						View Details
 						<ArrowRightIcon className="ml-1 h-4 w-4" />
@@ -297,14 +287,14 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 					<div className="flex space-x-2">
 						<button
 							onClick={onEdit}
-							className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400"
+							className="p-1.5 rounded-full ym-text-muted hover:ym-bg-card-hover hover:ym-text-yellow-600"
 							aria-label="Edit event"
 						>
 							<PencilIcon className="h-5 w-5" />
 						</button>
 						<button
 							onClick={onDelete}
-							className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-red-600 dark:hover:text-red-400"
+							className="p-1.5 rounded-full ym-text-muted hover:ym-bg-card-hover hover:text-red-600"
 							aria-label="Delete event"
 						>
 							<TrashIcon className="h-5 w-5" />
