@@ -269,7 +269,7 @@ const EventsPage = () => {
 					<div className="ym-bg-card rounded-xl shadow-lg border ym-border-card p-6 mb-4">
 						<div className="flex flex-col lg:flex-row gap-4">
 							{/* Search Input */}
-							<div className="relative flex-grow">
+							<div className="relative flex-grow h-fit">
 								<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
 									<MagnifyingGlassIcon className="h-5 w-5 ym-text-yellow-600" />
 								</div>

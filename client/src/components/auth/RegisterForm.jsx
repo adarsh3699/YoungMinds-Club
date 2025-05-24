@@ -81,8 +81,11 @@ const RegisterForm = () => {
 	return (
 		<div className="p-8">
 			{error && (
-				<div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-					{error}
+				<div className="ym-bg-card border border-red-400 ym-text-card px-4 py-3 rounded-lg mb-6 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+					<div className="flex items-center">
+						<div className="w-1 h-4 bg-red-500 rounded-full mr-3"></div>
+						{error}
+					</div>
 				</div>
 			)}
 
@@ -143,7 +146,7 @@ const RegisterForm = () => {
 					disabled={isSubmitting}
 				/>
 
-				<Button type="submit" fullWidth className="py-3 text-base font-medium mt-4" disabled={isSubmitting}>
+				<Button type="submit" fullWidth className="py-3 text-base font-medium mt-8" disabled={isSubmitting}>
 					{isSubmitting ? (
 						<div className="flex items-center justify-center">
 							<svg
@@ -174,11 +177,14 @@ const RegisterForm = () => {
 				</Button>
 			</form>
 
-			<div className="mt-6 text-center">
+			<div className="mt-8 text-center">
 				<p className="ym-text-secondary">
 					Already have an account?{' '}
-					<Link to="/login" className="ym-text-yellow-600 hover:underline font-medium">
-						Log In
+					<Link
+						to="/login"
+						className="ym-text-yellow-600 hover:ym-text-yellow-700 font-medium transition-colors hover:underline"
+					>
+						Log In here
 					</Link>
 				</p>
 			</div>
