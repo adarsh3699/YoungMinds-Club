@@ -115,7 +115,7 @@
 .dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
+  --card: 217, 28%, 17%;
   --card-foreground: 210 40% 98%;
   --popover: 222.2 84% 4.9%;
   --popover-foreground: 210 40% 98%;
@@ -148,7 +148,7 @@
   --ym-hero-bg-via: #111827;
   --ym-hero-bg-to: #0f172a;
   --ym-features-bg: #111827;
-  --ym-events-bg: #1f2937;
+  --ym-events-bg: #191f35;
   --ym-faq-bg: #111827;
   --ym-yellow-100: #451a03;
   --ym-yellow-200: #fde047;
@@ -374,7 +374,6 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 50px;
   padding: 0 1rem;
 }
 

@@ -254,7 +254,7 @@ const EventsPage = () => {
 		<div className="min-h-screen ym-events-bg">
 			<div className="container mx-auto px-4 py-8">
 				{/* Hero Section */}
-				<div className="mb-8 text-center">
+				<div className="mb-8 text-center p-20">
 					<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold ym-text-primary mb-4">
 						Discover <span className="gradient-text">Events</span>
 					</h1>
