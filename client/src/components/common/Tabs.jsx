@@ -12,7 +12,7 @@ const Tabs = ({ tabs, activeTab, onTabChange }) => {
 				selectedIndex={tabs.findIndex((tab) => tab.id === activeTab)}
 				onChange={(index) => onTabChange && onTabChange(tabs[index].id)}
 			>
-				<Tab.List className="flex space-x-1 ym-bg-card border ym-border-card p-1 rounded-lg">
+				<Tab.List className="flex space-x-1 ym-bg-card border ym-border-card p-1 rounded-lg mb-4">
 					{tabs.map((tab) => (
 						<Tab
 							key={tab.key || tab.id}

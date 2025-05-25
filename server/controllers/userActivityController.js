@@ -237,12 +237,14 @@ exports.getXPHistory = async (req, res) => {
         
         // Generate XP history entries from registered events
         const eventXPHistory = userActivity.registeredEvents
-            .filter(item => item.event && item.attended)
+            .filter(item => item.event)
             .map(item => ({
                 _id: item._id,
                 date: item.registeredAt,
-                description: `Attended event: ${item.event.title || 'Event'}`,
-                amount: 10 // Standard XP for attending events
+                description: item.attended 
+                    ? `Attended event: ${item.event.title || 'Event'}`
+                    : `Registered for event: ${item.event.title || 'Event'}`,
+                amount: 10 // Standard XP for registering for events
             }));
             
         // Add streak bonus entries if available

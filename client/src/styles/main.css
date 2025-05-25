@@ -172,17 +172,17 @@
 }
 
 html, body {
-  margin: 0;
-  padding: 0 !important;
-  height: 100%;
-  overflow: auto !important;
+    margin: 0;
+    padding: 0 !important;
+    height: 100%;
+    overflow: auto !important;
 }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: 'Inter', sans-serif;
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 /* ==============================================
@@ -372,21 +372,21 @@ body {
    LAYOUT COMPONENTS
    ============================================== */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+    max-width: 1200px;
+    margin: initial auto;
+    padding: 0 1rem;
 }
 
 nav {
-  position: sticky;
-  top: 0;
-  left: 0;
+    position: sticky;
+    top: 0;
+    left: 0;
 }
 
 main {
   min-height: calc(100vh - 144px);
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 main > div {
@@ -397,15 +397,15 @@ main > div {
    UI COMPONENTS
    ============================================== */
 .btn {
-  display: inline-block;
-  padding: 0.5rem 1rem;
+    display: inline-block;
+    padding: 0.5rem 1rem;
   border-radius: var(--radius);
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: white;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
+    color: white;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
   transition: all 0.2s ease;
 }
 
@@ -420,8 +420,8 @@ main > div {
   color: hsl(var(--card-foreground));
   border-radius: var(--radius);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin: 1rem 0;
+    padding: 1.5rem;
+    margin: 1rem 0;
   border: 1px solid hsl(var(--border));
 }
 
@@ -436,7 +436,7 @@ main > div {
    ============================================== */
 .auth-page {
   background: hsl(var(--background));
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 .auth-pattern-bg {
@@ -464,18 +464,18 @@ main > div {
    SCROLLBAR STYLING
    ============================================== */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
   background: hsl(var(--muted));
-  border-radius: 10px;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  border-radius: 10px;
+    border-radius: 10px;
   border: 2px solid hsl(var(--muted));
 }
 
@@ -486,7 +486,7 @@ main > div {
 ::-webkit-scrollbar-corner { background: transparent; }
 
 * {
-  scrollbar-width: thin;
+    scrollbar-width: thin;
   scrollbar-color: #fbbf24 hsl(var(--muted));
 }
 
@@ -504,10 +504,10 @@ main > div {
 
 .table-container { width: 100%; overflow-x: auto; }
 .table-scroll {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  white-space: nowrap;
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 /* Line Clamping */
