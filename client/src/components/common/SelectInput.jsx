@@ -79,7 +79,7 @@ const SelectInput = ({
 						${disabled ? 'opacity-60 cursor-not-allowed ym-bg-card' : 'cursor-pointer hover:shadow-md active:scale-[0.99]'}
 						${
 							error
-								? 'bg-red-50/80 dark:bg-red-900/20 text-red-700 dark:text-red-300 ring-2 ring-red-500/30'
+								? 'input-error'
 								: `${
 										isFocused || isOpen
 											? 'ym-bg-card ring-2 ring-amber-400/40 shadow-lg transform scale-[1.01]'

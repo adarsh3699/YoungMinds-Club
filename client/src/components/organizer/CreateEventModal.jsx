@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
-import { FormInput, TextareaField, SelectInput, DateTimePicker } from '../common';
+import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip } from '../common';
 
 const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false }) => {
 	const [formData, setFormData] = useState({
@@ -221,7 +221,9 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			shortDescription: 'Short description is required',
 			description: 'Description is required',
 			date: 'Start date and time is required',
+			endDate: 'End date and time is required',
 			capacity: 'Capacity is required',
+			price: 'Ticket price is required',
 			registrationDeadline: 'Registration deadline is required',
 		};
 
@@ -420,7 +422,7 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 
 			{/* Enhanced Form Container */}
 			<div className="overflow-y-auto ym-features-bg" style={{ maxHeight: 'calc(85vh - 88px)' }}>
-				<form onSubmit={handleSubmit} className="p-8">
+				<form onSubmit={handleSubmit} className="p-8" style={{ backgroundColor: 'var(--background)' }}>
 					{/* Basic Information Section - Left Column */}
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 						{/* Left Column - Basic Information */}
@@ -708,6 +710,7 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 									value={formData.endDate}
 									onChange={handleChange}
 									error={errors.endDate}
+									required
 									minDate={
 										formData.date ? new Date(new Date(formData.date).getTime() + 60000) : new Date()
 									} // Must be after start date
@@ -749,26 +752,20 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 								<div>
 									<FormInput
 										id="tagInput"
-										label={
-											<>
-												Event Tags
-												<span className="ym-text-muted ml-2 font-normal">
-													(Press Enter to add)
-												</span>
-											</>
-										}
+										label="Event Tags (Press Enter to add)"
 										name="tagInput"
 										value={tagInput}
 										onChange={handleTagInputChange}
 										onKeyDown={handleTagInputKeyDown}
 										placeholder="Add relevant tags (e.g., AI, Workshop, Networking)"
 										icon={<TagIcon className="h-5 w-5" />}
+										tooltip="Tags help attendees discover your event. Press Enter to add each tag."
 									/>
 
 									<div className="mt-4">
 										{formData.tags.length === 0 ? (
 											<p className="text-sm ym-text-muted italic p-4 ym-bg-amber-100 rounded-lg text-center">
-												💡 No tags added yet. Tags help attendees discover your event!
+												No tags added yet. Tags help attendees discover your event!
 											</p>
 										) : (
 											<div className="flex flex-wrap gap-3">
@@ -808,10 +805,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 											error={errors.capacity}
 											required
 											icon={<UsersIcon className="h-5 w-5" />}
+											tooltip="Set the maximum number of people who can attend"
 										/>
-										<p className="text-sm ym-text-muted mt-2 ml-1">
-											💡 Set the maximum number of people who can attend
-										</p>
 									</div>
 
 									<div>
@@ -826,13 +821,14 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 											step="1"
 											placeholder="0"
 											error={errors.price}
+											required
 											icon={
 												<span className="text-lg" style={{ color: '#f59e0b' }}>
 													₹
 												</span>
 											}
+											tooltip="Set to 0 for free events"
 										/>
-										<p className="text-sm ym-text-muted mt-2 ml-1">💡 Set to 0 for free events</p>
 									</div>
 								</div>
 							</div>
@@ -840,11 +836,11 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 					</div>
 
 					{/* Enhanced Action Buttons */}
-					<div className="mt-8 pt-6 border-t ym-border-card flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+					<div className="mt-8 pt-6 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
 						<button
 							type="button"
 							onClick={onClose}
-							className="px-6 py-3 ym-btn-secondary rounded-xl font-semibold transition-all duration-200 hover:ym-bg-card-hover focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:ring-offset-2"
+							className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400/30 focus:ring-offset-2 shadow-sm"
 						>
 							Cancel
 						</button>

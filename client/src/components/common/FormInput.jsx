@@ -1,4 +1,5 @@
 import React from 'react';
+import Tooltip from './Tooltip';
 
 const FormInput = ({
 	type = 'text',
@@ -15,13 +16,21 @@ const FormInput = ({
 	max,
 	className = '',
 	step,
+	tooltip = null,
 	...additionalProps
 }) => {
 	return (
 		<div className={className}>
 			<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
-				{label}
-				{required && <span className="text-brand ml-1">*</span>}
+				<span className="flex items-center">
+					{label}
+					{required && <span className="text-brand ml-1">*</span>}
+					{tooltip && (
+						<span className="ml-2">
+							<Tooltip content={tooltip} position="top" />
+						</span>
+					)}
+				</span>
 			</label>
 			<div className="relative">
 				{icon && (

@@ -159,7 +159,7 @@ const DateTimePicker = ({
 					onClick={() => setIsOpen(!isOpen)}
 					className={`w-full pl-10 pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm border cursor-pointer ${
 						error
-							? 'bg-red-50/80 dark:bg-red-900/20 text-red-700 dark:text-red-300 ring-2 ring-red-500/30 border-red-300'
+							? 'input-error'
 							: 'ym-bg-card border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg'
 					} ym-text-card placeholder-gray-400 font-medium`}
 				/>
