@@ -82,7 +82,7 @@ const Dashboard = () => {
 				{/* Create Event Modal */}
 				{showCreateModal && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40">
-						<div className="ym-bg-card rounded-lg shadow-xl w-full max-w-5xl mx-auto overflow-hidden">
+						<div className="ym-bg-card rounded-xl shadow-xl w-full max-w-5xl mx-auto overflow-hidden">
 							<CreateEventModal onClose={toggleCreateModal} onSuccess={handleEventCreated} />
 						</div>
 					</div>

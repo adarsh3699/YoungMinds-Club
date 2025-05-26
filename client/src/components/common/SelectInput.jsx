@@ -136,7 +136,7 @@ const SelectInput = ({
 							border-0
 						"
 						>
-							<div className="py-2 overflow-auto max-h-60 custom-scrollbar">
+							<div className="py-2 overflow-auto max-h-60">
 								{options.map((option, index) => (
 									<div
 										key={option.value}

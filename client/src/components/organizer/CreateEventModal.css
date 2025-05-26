@@ -1,44 +1,76 @@
-/* Custom scrollbar for the create event modal */
-.custom-scrollbar {
-  /* Firefox scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(17, 24, 39, 0.1);
+/* Enhanced animations for modal elements */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Webkit scrollbar styling (Chrome, Safari, Edge) */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(17, 24, 39, 0.1);
-  border-radius: 10px;
+/* Apply animations to modal sections */
+.modal-section {
+  animation: modalSlideIn 0.4s ease-out forwards;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(59, 130, 246, 0.5);
-  border-radius: 10px;
-  border: 2px solid rgba(17, 24, 39, 0.1);
+.modal-section:nth-child(1) { animation-delay: 0.1s; }
+.modal-section:nth-child(2) { animation-delay: 0.2s; }
+.modal-section:nth-child(3) { animation-delay: 0.3s; }
+
+/* Enhanced focus states for better accessibility */
+.custom-focus:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: rgba(251, 191, 36, 0.5);
+  ring-offset: 2px;
+  border-color: #fbbf24;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(59, 130, 246, 0.7);
+/* Smooth transitions for all interactive elements */
+.smooth-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark theme scrollbar modifications */
-.dark .custom-scrollbar {
-  scrollbar-color: rgba(59, 130, 246, 0.5) rgba(30, 41, 59, 0.4);
+/* Enhanced hover effects */
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.15);
 }
 
-.dark .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.4);
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  border: 2px solid rgba(30, 41, 59, 0.4);
+/* Remove arrows from number inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-/* Fix to ensure scrollbar doesn't break rounded corners */
-.custom-scrollbar::-webkit-scrollbar-corner {
-  background: transparent;
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Smaller placeholder text for inputs and textareas */
+input[type="text"]::placeholder,
+textarea::placeholder {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
 } 
