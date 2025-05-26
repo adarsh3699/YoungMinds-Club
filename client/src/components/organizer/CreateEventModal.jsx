@@ -747,21 +747,23 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 								{/* Tags Section */}
 								<div>
-									<label className="block text-sm font-semibold ym-text-primary mb-2">
-										Event Tags
-										<span className="ym-text-muted ml-2 font-normal">(Press Enter to add)</span>
-									</label>
-									<div className="relative">
-										<TagIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ym-text-yellow-600" />
-										<input
-											type="text"
-											value={tagInput}
-											onChange={handleTagInputChange}
-											onKeyDown={handleTagInputKeyDown}
-											className="w-full pl-10 pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm shadow-sm border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg ym-bg-card ym-text-card placeholder-gray-400 font-medium"
-											placeholder="Add relevant tags (e.g., AI, Workshop, Networking)"
-										/>
-									</div>
+									<FormInput
+										id="tagInput"
+										label={
+											<>
+												Event Tags
+												<span className="ym-text-muted ml-2 font-normal">
+													(Press Enter to add)
+												</span>
+											</>
+										}
+										name="tagInput"
+										value={tagInput}
+										onChange={handleTagInputChange}
+										onKeyDown={handleTagInputKeyDown}
+										placeholder="Add relevant tags (e.g., AI, Workshop, Networking)"
+										icon={<TagIcon className="h-5 w-5" />}
+									/>
 
 									<div className="mt-4">
 										{formData.tags.length === 0 ? (
@@ -813,26 +815,23 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 									</div>
 
 									<div>
-										<label className="block text-sm font-semibold ym-text-primary mb-2">
-											Ticket Price
-											<span className="ym-text-muted ml-2 font-normal">(₹ INR)</span>
-										</label>
-										<div className="relative">
-											<CurrencyDollarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ym-text-yellow-600" />
-											<span className="absolute left-10 top-1/2 transform -translate-y-1/2 ym-text-yellow-600 text-sm font-bold">
-												₹
-											</span>
-											<input
-												type="number"
-												name="price"
-												value={formData.price}
-												onChange={handleChange}
-												min="0"
-												step="1"
-												className="w-full pl-16 pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm shadow-sm border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg ym-bg-card ym-text-card font-medium"
-												placeholder="0"
-											/>
-										</div>
+										<FormInput
+											id="price"
+											label="Ticket Price (₹ INR)"
+											name="price"
+											type="number"
+											value={formData.price}
+											onChange={handleChange}
+											min="0"
+											step="1"
+											placeholder="0"
+											error={errors.price}
+											icon={
+												<span className="text-lg" style={{ color: '#f59e0b' }}>
+													₹
+												</span>
+											}
+										/>
 										<p className="text-sm ym-text-muted mt-2 ml-1">💡 Set to 0 for free events</p>
 									</div>
 								</div>

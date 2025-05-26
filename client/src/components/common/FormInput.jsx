@@ -15,6 +15,7 @@ const FormInput = ({
 	max,
 	className = '',
 	step,
+	...additionalProps
 }) => {
 	return (
 		<div className={className}>
@@ -24,7 +25,10 @@ const FormInput = ({
 			</label>
 			<div className="relative">
 				{icon && (
-					<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-brand">
+					<div
+						className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10"
+						style={{ color: '#f59e0b', fontSize: '20px' }}
+					>
 						{icon}
 					</div>
 				)}
@@ -43,6 +47,7 @@ const FormInput = ({
 					} pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm border ${
 						error ? 'input-error' : 'input-base'
 					} ym-text-card placeholder-gray-400 font-medium`}
+					{...additionalProps}
 				/>
 			</div>
 			{error && (
