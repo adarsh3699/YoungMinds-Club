@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { formatDate } from '../utils/formatDate';
-import { Tabs, Modal } from '../components/common';
+import { Tabs } from '../components/common';
 
 const EventDetails = () => {
 	const { id } = useParams();
@@ -138,7 +138,10 @@ const EventDetails = () => {
 		return (
 			<div className="container mx-auto px-4 py-12">
 				<div className="flex flex-col items-center justify-center h-64">
-					<div className="w-12 h-12 border-t-4 border-amber-400 border-solid rounded-full animate-spin mb-4"></div>
+					<div
+						className="w-12 h-12 border-t-4 border-solid rounded-full animate-spin mb-4"
+						style={{ borderTopColor: 'var(--ring)' }}
+					></div>
 					<h2 className="text-xl font-semibold ym-text-secondary">Loading event details...</h2>
 				</div>
 			</div>

@@ -8,7 +8,10 @@ const ProtectedRoute = ({ requiredRole, redirectPath = '/login' }) => {
 	if (loading && token) {
 		return (
 			<div className="flex justify-center items-center h-screen">
-				<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mb-4"></div>
+				<div
+					className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mb-4"
+					style={{ borderTopColor: 'var(--ring)' }}
+				></div>
 				<h2 className="text-xl font-semibold ym-text-primary ml-4">Loading...</h2>
 			</div>
 		);

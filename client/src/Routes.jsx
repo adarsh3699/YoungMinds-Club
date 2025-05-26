@@ -40,7 +40,10 @@ const DashboardRouter = () => {
 	if (loading && token) {
 		return (
 			<div className="flex flex-col justify-center items-center h-[70vh]">
-				<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mb-4"></div>
+				<div
+					className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mb-4"
+					style={{ borderTopColor: 'var(--ring)' }}
+				></div>
 				<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
 			</div>
 		);
@@ -68,7 +71,10 @@ function AppRoutes() {
 						<Suspense
 							fallback={
 								<div className="flex flex-col justify-center items-center h-[70vh]">
-									<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mb-4"></div>
+									<div
+										className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mb-4"
+										style={{ borderTopColor: 'var(--ring)' }}
+									></div>
 									<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
 								</div>
 							}

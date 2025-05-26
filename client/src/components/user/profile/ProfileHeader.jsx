@@ -32,7 +32,8 @@ const ProfileHeader = ({
 					<h1 className="text-2xl font-bold ym-text-primary">Profile Information</h1>
 					<button
 						onClick={onToggleEditMode}
-						className="flex items-center px-4 py-2 text-sm font-medium ym-text-yellow-600 border border-amber-400 rounded-lg hover:ym-bg-amber-100 transition-all duration-300 hover:scale-105"
+						className="flex items-center px-4 py-2 text-sm font-medium text-brand border rounded-lg hover:bg-brand-light transition-all duration-300 hover:scale-105"
+						style={{ borderColor: 'var(--ring)' }}
 					>
 						{editMode ? (
 							'Cancel'

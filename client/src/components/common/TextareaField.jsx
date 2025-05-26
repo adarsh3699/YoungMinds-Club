@@ -17,7 +17,7 @@ const TextareaField = ({
 		<div className={className}>
 			<label htmlFor={id} className="block text-sm font-semibold ym-text-primary mb-2">
 				{label}
-				{required && <span className="ym-text-yellow-600 ml-1">*</span>}
+				{required && <span className="text-brand ml-1">*</span>}
 				{maxLength && <span className="ym-text-muted ml-2 font-normal">(Max {maxLength} chars)</span>}
 			</label>
 			<textarea

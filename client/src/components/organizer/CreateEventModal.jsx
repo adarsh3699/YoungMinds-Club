@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
-import { FormInput, TextareaField, SelectInput } from '../common';
+import { FormInput, TextareaField, SelectInput, DateTimePicker } from '../common';
 
 const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false }) => {
 	const [formData, setFormData] = useState({
@@ -73,23 +73,78 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
+		let newFormData = { ...formData };
 
 		// Handle nested location object
 		if (name.startsWith('location.')) {
 			const locationField = name.split('.')[1];
-			setFormData({
+			newFormData = {
 				...formData,
 				location: {
 					...formData.location,
 					[locationField]: value,
 				},
-			});
+			};
 		} else {
-			setFormData({
+			newFormData = {
 				...formData,
 				[name]: value,
-			});
+			};
 		}
+
+		// Clear dependent fields and errors when start date changes
+		if (name === 'date') {
+			const startDate = new Date(value);
+			const now = new Date();
+
+			// Clear end date if it's now before the new start date
+			if (newFormData.endDate && new Date(newFormData.endDate) <= startDate) {
+				newFormData.endDate = '';
+			}
+
+			// Clear registration deadline if it's now after the new start date
+			if (newFormData.registrationDeadline && new Date(newFormData.registrationDeadline) > startDate) {
+				newFormData.registrationDeadline = '';
+			}
+
+			// Clear related errors
+			const newErrors = { ...errors };
+			if (startDate > now) {
+				delete newErrors.date;
+			}
+			if (!newFormData.endDate) {
+				delete newErrors.endDate;
+			}
+			if (!newFormData.registrationDeadline) {
+				delete newErrors.registrationDeadline;
+			}
+			setErrors(newErrors);
+		}
+
+		// Clear end date error if valid
+		if (name === 'endDate' && value && formData.date) {
+			const startDate = new Date(formData.date);
+			const endDate = new Date(value);
+			if (endDate > startDate) {
+				const newErrors = { ...errors };
+				delete newErrors.endDate;
+				setErrors(newErrors);
+			}
+		}
+
+		// Clear registration deadline error if valid
+		if (name === 'registrationDeadline' && value && formData.date) {
+			const startDate = new Date(formData.date);
+			const deadlineDate = new Date(value);
+			const now = new Date();
+			if (deadlineDate <= startDate && (isEditing || deadlineDate > now)) {
+				const newErrors = { ...errors };
+				delete newErrors.registrationDeadline;
+				setErrors(newErrors);
+			}
+		}
+
+		setFormData(newFormData);
 	};
 
 	const handleLocationTypeChange = (e) => {
@@ -158,13 +213,14 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 
 	const validateForm = () => {
 		const newErrors = {};
+		const now = new Date();
 
 		// Required field validation
 		const requiredFields = {
 			title: 'Title is required',
 			shortDescription: 'Short description is required',
 			description: 'Description is required',
-			date: 'Date is required',
+			date: 'Start date and time is required',
 			capacity: 'Capacity is required',
 			registrationDeadline: 'Registration deadline is required',
 		};
@@ -174,23 +230,35 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			if (!formData[field]) newErrors[field] = message;
 		});
 
-		// Date validation checks
-		if (formData.date && formData.registrationDeadline) {
-			const eventDate = new Date(formData.date);
-			const deadlineDate = new Date(formData.registrationDeadline);
-
-			if (deadlineDate > eventDate) {
-				newErrors.registrationDeadline = 'Registration deadline must be on or before the event start date';
-			}
-		}
-
-		// Check if end date is after start date
-		if (formData.date && formData.endDate) {
+		// Enhanced Date validation checks
+		if (formData.date) {
 			const startDate = new Date(formData.date);
-			const endDate = new Date(formData.endDate);
 
-			if (endDate < startDate) {
-				newErrors.endDate = 'End date must be on or after the start date';
+			// 1. Start Date and Time must be greater than or equal to current date and time
+			if (startDate <= now) {
+				newErrors.date = 'Start date and time must be in the future';
+			}
+
+			// 2. End Date and Time must be greater than Start Date and Time
+			if (formData.endDate) {
+				const endDate = new Date(formData.endDate);
+				if (endDate <= startDate) {
+					newErrors.endDate = 'End date and time must be after the start date and time';
+				}
+			}
+
+			// 3. Registration Deadline must be on or before the Start Date and Time
+			if (formData.registrationDeadline) {
+				const deadlineDate = new Date(formData.registrationDeadline);
+				if (deadlineDate > startDate) {
+					newErrors.registrationDeadline =
+						'Registration deadline must be on or before the start date and time';
+				}
+
+				// Additional check: Registration deadline should also be in the future (unless editing)
+				if (!isEditing && deadlineDate <= now) {
+					newErrors.registrationDeadline = 'Registration deadline must be in the future';
+				}
 			}
 		}
 
@@ -452,11 +520,12 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 									className={`border-2 border-dashed rounded-xl p-8 cursor-pointer transition-all duration-300 hover:shadow-lg
                     ${
 						isDragActive
-							? 'border-yellow-400 ym-bg-amber-100 scale-105'
+							? 'bg-brand-light scale-105'
 							: errors.poster
 							? 'border-red-400 bg-red-50'
-							: 'ym-border-card hover:border-yellow-300 hover:ym-bg-amber-100'
+							: 'ym-border-card hover:bg-brand-light'
 					}`}
+									style={isDragActive ? { borderColor: 'var(--ring)' } : {}}
 								>
 									<input {...getInputProps()} />
 									{posterPreview ? (
@@ -532,7 +601,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 													value="offline"
 													checked={formData.location.type === 'offline'}
 													onChange={handleLocationTypeChange}
-													className="h-4 w-4 text-yellow-600 focus:ring-yellow-400 focus:ring-2 focus:ring-offset-0"
+													className="h-4 w-4 focus:ring-2 focus:ring-offset-0"
+													style={{ color: 'var(--ring)', '--tw-ring-color': 'var(--ring)' }}
 												/>
 												<span className="ml-3 font-semibold ym-text-primary">
 													🏢 Physical Venue
@@ -545,7 +615,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 													value="online"
 													checked={formData.location.type === 'online'}
 													onChange={handleLocationTypeChange}
-													className="h-4 w-4 text-yellow-600 focus:ring-yellow-400 focus:ring-2 focus:ring-offset-0"
+													className="h-4 w-4 focus:ring-2 focus:ring-offset-0"
+													style={{ color: 'var(--ring)', '--tw-ring-color': 'var(--ring)' }}
 												/>
 												<span className="ml-3 font-semibold ym-text-primary">
 													💻 Online Event
@@ -618,41 +689,46 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 							</h3>
 
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-								<FormInput
+								<DateTimePicker
 									id="date"
 									label="Start Date and Time"
 									name="date"
-									type="datetime-local"
 									value={formData.date}
 									onChange={handleChange}
 									error={errors.date}
 									required
-									icon={<CalendarIcon className="h-5 w-5" />}
+									minDate={new Date()} // Cannot be in the past
+									placeholder="Must be in the future"
 								/>
 
-								<FormInput
+								<DateTimePicker
 									id="endDate"
 									label="End Date and Time"
 									name="endDate"
-									type="datetime-local"
 									value={formData.endDate}
 									onChange={handleChange}
 									error={errors.endDate}
-									min={formData.date}
-									icon={<CalendarIcon className="h-5 w-5" />}
+									minDate={
+										formData.date ? new Date(new Date(formData.date).getTime() + 60000) : new Date()
+									} // Must be after start date
+									placeholder={
+										formData.date ? 'Must be after start time' : 'Select end date and time'
+									}
 								/>
 
-								<FormInput
+								<DateTimePicker
 									id="registrationDeadline"
 									label="Registration Deadline"
 									name="registrationDeadline"
-									type="datetime-local"
 									value={formData.registrationDeadline}
 									onChange={handleChange}
 									error={errors.registrationDeadline}
 									required
-									max={formData.date}
-									icon={<CalendarIcon className="h-5 w-5" />}
+									minDate={isEditing ? null : new Date()} // Must be in future for new events
+									maxDate={formData.date ? new Date(formData.date) : null} // Cannot be after start date
+									placeholder={
+										formData.date ? 'Must be before start time' : 'Select registration deadline'
+									}
 								/>
 							</div>
 						</div>

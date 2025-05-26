@@ -62,7 +62,7 @@ const SelectInput = ({
 	return (
 		<div className="mb-6" ref={dropdownRef}>
 			{label && (
-				<label htmlFor={id} className="block ym-text-primary font-medium mb-3 text-sm">
+				<label htmlFor={id} className="block font-medium ym-text-primary mb-2">
 					{label}
 				</label>
 			)}

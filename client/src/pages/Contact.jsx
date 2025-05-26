@@ -175,7 +175,7 @@ const Contact = () => {
 											value={formData.firstName}
 											onChange={handleChange}
 											placeholder="Enter your first name"
-											className="w-full px-4 py-3 border ym-border-card rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ym-bg-card ym-text-card"
+											className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 											required
 										/>
 									</div>
@@ -189,7 +189,7 @@ const Contact = () => {
 											value={formData.lastName}
 											onChange={handleChange}
 											placeholder="Enter your last name"
-											className="w-full px-4 py-3 border ym-border-card rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ym-bg-card ym-text-card"
+											className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 											required
 										/>
 									</div>
@@ -203,7 +203,7 @@ const Contact = () => {
 										value={formData.email}
 										onChange={handleChange}
 										placeholder="Enter your email address"
-										className="w-full px-4 py-3 border ym-border-card rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ym-bg-card ym-text-card"
+										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 										required
 									/>
 								</div>
@@ -216,7 +216,7 @@ const Contact = () => {
 										value={formData.subject}
 										onChange={handleChange}
 										placeholder="Enter the subject"
-										className="w-full px-4 py-3 border ym-border-card rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ym-bg-card ym-text-card"
+										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 										required
 									/>
 								</div>
@@ -228,7 +228,7 @@ const Contact = () => {
 										value={formData.message}
 										onChange={handleChange}
 										placeholder="Enter your message"
-										className="w-full px-4 py-3 border ym-border-card rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ym-bg-card ym-text-card min-h-[150px]"
+										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors min-h-[150px]"
 										required
 									/>
 								</div>

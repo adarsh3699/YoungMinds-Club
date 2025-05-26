@@ -1,5 +1,6 @@
 export { default as FormInput } from './FormInput';
 export { default as TextareaField } from './TextareaField';
+export { default as DateTimePicker } from './DateTimePicker';
 export { default as Button } from './Button';
 export { default as Logo } from './Logo';
 export { default as SelectInput } from './SelectInput';

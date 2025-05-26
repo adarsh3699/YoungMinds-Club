@@ -85,7 +85,10 @@ const GoogleCallback = () => {
 				) : (
 					<>
 						<div className="ym-text-yellow-600 mb-4">
-							<div className="w-16 h-16 border-t-4 border-amber-500 border-solid rounded-full animate-spin mx-auto mb-2"></div>
+							<div
+								className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mx-auto mb-2"
+								style={{ borderTopColor: 'var(--ring)' }}
+							></div>
 							<p className="text-xl font-semibold">Logging you in...</p>
 						</div>
 						<p className="ym-text-secondary">Please wait while we set up your session.</p>
