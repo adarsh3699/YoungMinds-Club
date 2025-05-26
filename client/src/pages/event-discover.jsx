@@ -251,7 +251,7 @@ const EventsPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen ym-events-bg">
+		<div className="min-h-screen ym-events-bg pb-50">
 			<div className="container mx-auto px-4 py-8">
 				{/* Hero Section */}
 				<div className="mb-8 text-center p-20">
