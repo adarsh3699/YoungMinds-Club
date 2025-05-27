@@ -40,6 +40,7 @@
   /* Core Theme Colors */
   --background: #f1f1f1;
   --foreground: #0f172a;
+  --background-secondary: #ffffff;
   --card: #ffffff;
   --card-foreground: #0f172a;
   --primary: #f59e0b;
@@ -636,6 +637,5 @@ main > div {
 
 /* Generic Styles */
 a {
-  font-weight: 500;
   text-decoration: none;
 }
