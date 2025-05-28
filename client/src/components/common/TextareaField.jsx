@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 
 const TextareaField = ({
 	id,
@@ -12,7 +12,82 @@ const TextareaField = ({
 	rows = 3,
 	maxLength,
 	className = '',
+	expandable = true,
+	minRows = 3,
+	maxRows = 10,
 }) => {
+	const textareaRef = useRef(null);
+
+	// Memoized auto-resize function for better performance
+	const autoResize = useCallback(() => {
+		if (!expandable || !textareaRef.current) return;
+
+		const textarea = textareaRef.current;
+		const scrollTop = textarea.scrollTop;
+
+		// Reset and measure
+		textarea.style.height = 'auto';
+		textarea.style.overflowY = 'hidden';
+
+		const { scrollHeight, style } = textarea;
+		const computedStyle = window.getComputedStyle(textarea);
+
+		// Extract dimensions with fallbacks
+		const lineHeight = parseInt(computedStyle.lineHeight) || 20;
+		const paddingY = parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom) || 0;
+		const borderY = parseInt(computedStyle.borderTopWidth) + parseInt(computedStyle.borderBottomWidth) || 0;
+
+		// Calculate optimal dimensions
+		const contentHeight = scrollHeight - paddingY;
+		const lines = Math.ceil(contentHeight / lineHeight);
+		const targetRows = Math.max(minRows, Math.min(maxRows, lines));
+		const targetHeight = targetRows * lineHeight + paddingY + borderY;
+
+		// Apply changes
+		style.height = `${targetHeight}px`;
+		style.overflowY = lines > maxRows ? 'auto' : 'hidden';
+
+		// Restore scroll position if needed
+		if (scrollTop > 0 && lines > maxRows) {
+			textarea.scrollTop = scrollTop;
+		}
+	}, [expandable, minRows, maxRows]);
+
+	// Optimized resize trigger
+	const triggerResize = useCallback(() => {
+		if (expandable) {
+			requestAnimationFrame(autoResize);
+		}
+	}, [autoResize, expandable]);
+
+	// Handle input changes
+	const handleChange = useCallback(
+		(e) => {
+			onChange(e);
+			triggerResize();
+		},
+		[onChange, triggerResize]
+	);
+
+	// Handle real-time input for responsive resizing
+	const handleInput = useCallback(() => {
+		if (expandable) {
+			autoResize();
+		}
+	}, [autoResize, expandable]);
+
+	// Initial setup and value change effects
+	useEffect(() => {
+		if (expandable) {
+			const timer = setTimeout(autoResize, 0);
+			return () => clearTimeout(timer);
+		}
+	}, [autoResize, expandable]);
+
+	useEffect(() => {
+		triggerResize();
+	}, [value, triggerResize]);
+
 	return (
 		<div className={className}>
 			<label htmlFor={id} className="block text-sm font-semibold ym-text-primary mb-2">
@@ -21,11 +96,13 @@ const TextareaField = ({
 				{maxLength && <span className="ym-text-muted ml-2 font-normal">(Max {maxLength} chars)</span>}
 			</label>
 			<textarea
+				ref={textareaRef}
 				id={id}
 				name={name}
 				value={value}
-				onChange={onChange}
-				rows={rows}
+				onChange={handleChange}
+				onInput={handleInput}
+				rows={expandable ? minRows : rows}
 				maxLength={maxLength}
 				className={`w-full px-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm resize-none border ${
 					error
@@ -33,7 +110,16 @@ const TextareaField = ({
 						: 'ym-bg-card border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg'
 				} ym-text-card placeholder-gray-400 font-medium`}
 				placeholder={placeholder}
-			></textarea>
+				style={
+					expandable
+						? {
+								minHeight: `${minRows * 1.5}rem`,
+								overflowY: 'hidden',
+								resize: 'none',
+						  }
+						: {}
+				}
+			/>
 			{error && (
 				<div className="mt-2 flex items-center space-x-2 animate-fade-in">
 					<div className="w-1 h-4 bg-red-500 rounded-full"></div>
@@ -55,7 +141,7 @@ const TextareaField = ({
 									: 'gradient-bg'
 							}`}
 							style={{ width: `${Math.min(100, (value.length / maxLength) * 100)}%` }}
-						></div>
+						/>
 					</div>
 				</div>
 			)}

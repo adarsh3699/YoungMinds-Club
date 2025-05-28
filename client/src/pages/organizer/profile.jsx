@@ -10,7 +10,14 @@ import {
 	EnvelopeIcon,
 	DocumentTextIcon,
 	StarIcon,
+	CheckCircleIcon,
+	SparklesIcon,
+	GlobeAltIcon,
+	BriefcaseIcon,
+	ChatBubbleLeftRightIcon,
+	CameraIcon as InstagramIcon,
 } from '@heroicons/react/24/outline';
+import { FormInput, TextareaField } from '../../components/common';
 
 const Profile = () => {
 	const { updateUserInfo } = useAuth();
@@ -178,10 +185,18 @@ const Profile = () => {
 
 	if (loading) {
 		return (
-			<div className="container mx-auto px-4 py-8 mt-12">
-				<div className="flex justify-center items-center h-64">
-					<div className="w-12 h-12 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
-					<h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 ml-4">Loading profile...</h2>
+			<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
+				<div className="container mx-auto px-4 py-8 mt-12">
+					<div className="flex justify-center items-center h-64">
+						<div className="relative">
+							<div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+							<div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-brand-secondary rounded-full animate-ping"></div>
+						</div>
+						<div className="ml-6">
+							<h2 className="text-2xl font-bold text-primary animate-pulse">Loading Profile</h2>
+							<p className="text-muted-foreground mt-2">Please wait while we fetch your information...</p>
+						</div>
+					</div>
 				</div>
 			</div>
 		);
@@ -189,521 +204,579 @@ const Profile = () => {
 
 	if (!organizerProfile) {
 		return (
-			<div className="container mx-auto px-4 py-8 mt-12">
-				<div className="bg-red-100 dark:bg-red-800 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded relative">
-					<strong className="font-bold">Error!</strong>
-					<span className="block sm:inline"> Failed to load profile data.</span>
+			<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
+				<div className="container mx-auto px-4 py-8 mt-12">
+					<div className="max-w-md mx-auto bg-card rounded-2xl shadow-xl border border-destructive/20 p-8 animate-fade-in">
+						<div className="text-center">
+							<div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+								<span className="text-2xl">⚠️</span>
+							</div>
+							<h3 className="text-xl font-bold text-destructive mb-2">Profile Not Found</h3>
+							<p className="text-muted-foreground">
+								Failed to load profile data. Please try refreshing the page.
+							</p>
+						</div>
+					</div>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8 mt-12">
-			{error && (
-				<div className="bg-red-100 dark:bg-red-800 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded relative mb-6">
-					<strong className="font-bold">Error!</strong>
-					<span className="block sm:inline"> {error}</span>
-				</div>
-			)}
-
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-				{/* Left Column: Profile Info */}
-				<div className="lg:col-span-2">
-					<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-						<div className="p-6">
-							<div className="flex justify-between items-center mb-6">
-								<h1 className="text-2xl font-bold text-gray-800 dark:text-white">Organizer Profile</h1>
-								<button
-									onClick={toggleEditMode}
-									className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
-								>
-									{editMode ? (
-										'Cancel'
-									) : (
-										<>
-											<PencilIcon className="h-4 w-4 mr-1" />
-											Edit Profile
-										</>
-									)}
-								</button>
-							</div>
-
-							<div className="flex flex-col md:flex-row">
-								{/* Profile Picture */}
-								<div className="flex-shrink-0 mb-6 md:mb-0 md:mr-8">
-									<div className="relative group">
-										<div
-											className="h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden cursor-pointer"
-											onClick={handleProfilePictureClick}
-										>
-											{organizerProfile.profilePicture ? (
-												<img
-													src={organizerProfile.profilePicture}
-													alt="Profile"
-													className="h-full w-full object-cover"
-												/>
-											) : (
-												<span className="text-5xl text-gray-400 dark:text-gray-500">
-													{organizerProfile.name ? organizerProfile.name.charAt(0) : '?'}
-												</span>
-											)}
-											<div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-												<CameraIcon className="h-10 w-10 text-white" />
-											</div>
-										</div>
-										<input
-											type="file"
-											ref={fileInputRef}
-											className="hidden"
-											accept="image/*"
-											onChange={handleFileChange}
-										/>
-									</div>
-
-									{feedbackSummary && (
-										<div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-											<h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-												Organizer Rating
-											</h3>
-											<div className="flex items-center space-x-1">
-												{[...Array(5)].map((_, index) => (
-													<StarIcon
-														key={index}
-														className={`h-4 w-4 ${
-															index < Math.floor(feedbackSummary.averageRating || 0)
-																? 'text-yellow-500 fill-current'
-																: 'text-gray-300 dark:text-gray-600'
-														}`}
-													/>
-												))}
-												<span className="ml-1 text-sm text-gray-600 dark:text-gray-400">
-													{feedbackSummary.averageRating
-														? feedbackSummary.averageRating.toFixed(1)
-														: 'N/A'}
-												</span>
-											</div>
-										</div>
-									)}
-								</div>
-
-								{/* Profile Details */}
-								<div className="flex-grow">
-									{editMode ? (
-										<form onSubmit={saveProfile}>
-											<div className="mb-4">
-												<label
-													htmlFor="name"
-													className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-												>
-													<UserIcon className="h-5 w-5 inline mr-1" />
-													Full Name
-												</label>
-												<input
-													type="text"
-													id="name"
-													name="name"
-													value={formValues.name}
-													onChange={handleInputChange}
-													className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-													required
-												/>
-											</div>
-
-											<div className="mb-4">
-												<label
-													htmlFor="organizationName"
-													className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-												>
-													<BuildingOfficeIcon className="h-5 w-5 inline mr-1" />
-													Organization Name
-												</label>
-												<input
-													type="text"
-													id="organizationName"
-													name="organizationName"
-													value={formValues.organizationName}
-													onChange={handleInputChange}
-													className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-												/>
-											</div>
-
-											<div className="mb-4">
-												<label
-													htmlFor="email"
-													className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-												>
-													<EnvelopeIcon className="h-5 w-5 inline mr-1" />
-													Email Address
-												</label>
-												<input
-													type="email"
-													id="email"
-													name="email"
-													value={formValues.email}
-													onChange={handleInputChange}
-													className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-													required
-												/>
-											</div>
-
-											<div className="mb-4">
-												<label
-													htmlFor="bio"
-													className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-												>
-													<DocumentTextIcon className="h-5 w-5 inline mr-1" />
-													Bio / About
-												</label>
-												<textarea
-													id="bio"
-													name="bio"
-													rows={4}
-													value={formValues.bio}
-													onChange={handleInputChange}
-													className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-												/>
-											</div>
-
-											<div className="flex justify-end space-x-3 mt-6">
-												<button
-													type="button"
-													onClick={toggleEditMode}
-													className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-												>
-													Cancel
-												</button>
-												<button
-													type="submit"
-													className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition flex items-center"
-													disabled={saving}
-												>
-													{saving ? (
-														<>
-															<div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-															Saving...
-														</>
-													) : (
-														'Save Changes'
-													)}
-												</button>
-											</div>
-										</form>
-									) : (
-										<>
-											<div className="mb-4">
-												<p className="text-sm text-gray-500 dark:text-gray-400 mb-1 flex items-center">
-													<UserIcon className="h-5 w-5 mr-1" />
-													Full Name
-												</p>
-												<p className="text-lg font-medium text-gray-900 dark:text-white">
-													{organizerProfile.name}
-												</p>
-											</div>
-
-											<div className="mb-4">
-												<p className="text-sm text-gray-500 dark:text-gray-400 mb-1 flex items-center">
-													<BuildingOfficeIcon className="h-5 w-5 mr-1" />
-													Organization
-												</p>
-												<p className="text-lg font-medium text-gray-900 dark:text-white">
-													{organizerProfile.organizationName || 'Not specified'}
-												</p>
-											</div>
-
-											<div className="mb-4">
-												<p className="text-sm text-gray-500 dark:text-gray-400 mb-1 flex items-center">
-													<EnvelopeIcon className="h-5 w-5 mr-1" />
-													Email Address
-												</p>
-												<p className="text-lg font-medium text-gray-900 dark:text-white">
-													{organizerProfile.email}
-												</p>
-											</div>
-
-											{organizerProfile.bio && (
-												<div className="mb-4">
-													<p className="text-sm text-gray-500 dark:text-gray-400 mb-1 flex items-center">
-														<DocumentTextIcon className="h-5 w-5 mr-1" />
-														Bio
-													</p>
-													<p className="text-gray-700 dark:text-gray-300">
-														{organizerProfile.bio}
-													</p>
-												</div>
-											)}
-										</>
-									)}
+		<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
+			<div className="container mx-auto px-4 py-8 mt-12">
+				{error && (
+					<div className="max-w-4xl mx-auto mb-8 animate-fade-in">
+						<div className="bg-destructive/10 border border-destructive/30 text-destructive px-6 py-4 rounded-xl shadow-lg backdrop-blur-sm">
+							<div className="flex items-center">
+								<div className="w-2 h-8 bg-destructive rounded-full mr-4"></div>
+								<div>
+									<strong className="font-bold">Error!</strong>
+									<span className="block sm:inline ml-2">{error}</span>
 								</div>
 							</div>
 						</div>
 					</div>
+				)}
 
-					{/* Social Links */}
-					<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mt-6">
-						<h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Social Links</h2>
-
-						{editMode ? (
-							<form>
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-									<div>
-										<label
-											htmlFor="website"
-											className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+				<div className="max-w-7xl mx-auto">
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+						{/* Left Column: Profile Info */}
+						<div className="lg:col-span-2 space-y-8">
+							{/* Main Profile Card */}
+							<div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden backdrop-blur-sm animate-fade-in">
+								{/* Header with gradient */}
+								<div className="bg-gradient-to-r from-primary/10 via-brand-light to-accent/20 p-8 border-b border-border/30">
+									<div className="flex justify-between items-start">
+										<div className="flex items-center space-x-2">
+											<SparklesIcon className="h-6 w-6 text-primary" />
+											<h1 className="text-3xl font-bold text-card-foreground">
+												Organizer Profile
+											</h1>
+										</div>
+										<button
+											onClick={toggleEditMode}
+											className={`group flex items-center px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${
+												editMode
+													? 'bg-muted text-muted-foreground hover:bg-muted/80'
+													: 'bg-primary text-primary-foreground hover:bg-brand-dark shadow-lg hover:shadow-xl'
+											}`}
 										>
-											Website URL
-										</label>
-										<input
-											type="url"
-											id="website"
-											name="website"
-											value={formValues.socialLinks.website}
-											onChange={handleSocialLinkChange}
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-											placeholder="https://yourwebsite.com"
-										/>
-									</div>
-
-									<div>
-										<label
-											htmlFor="linkedin"
-											className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-										>
-											LinkedIn
-										</label>
-										<input
-											type="url"
-											id="linkedin"
-											name="linkedin"
-											value={formValues.socialLinks.linkedin}
-											onChange={handleSocialLinkChange}
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-											placeholder="https://linkedin.com/in/username"
-										/>
-									</div>
-
-									<div>
-										<label
-											htmlFor="twitter"
-											className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-										>
-											Twitter / X
-										</label>
-										<input
-											type="url"
-											id="twitter"
-											name="twitter"
-											value={formValues.socialLinks.twitter}
-											onChange={handleSocialLinkChange}
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-											placeholder="https://twitter.com/username"
-										/>
-									</div>
-
-									<div>
-										<label
-											htmlFor="instagram"
-											className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-										>
-											Instagram
-										</label>
-										<input
-											type="url"
-											id="instagram"
-											name="instagram"
-											value={formValues.socialLinks.instagram}
-											onChange={handleSocialLinkChange}
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-											placeholder="https://instagram.com/username"
-										/>
+											{editMode ? (
+												<>
+													<span>Cancel</span>
+												</>
+											) : (
+												<>
+													<PencilIcon className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
+													<span>Edit Profile</span>
+												</>
+											)}
+										</button>
 									</div>
 								</div>
-							</form>
-						) : (
-							<div>
-								{Object.values(organizerProfile.socialLinks || {}).some((link) => link) ? (
-									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{organizerProfile.socialLinks?.website && (
-											<a
-												href={organizerProfile.socialLinks.website}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
-											>
-												<LinkIcon className="h-5 w-5 mr-2" />
-												Website
-											</a>
-										)}
 
-										{organizerProfile.socialLinks?.linkedin && (
-											<a
-												href={organizerProfile.socialLinks.linkedin}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
-											>
-												<LinkIcon className="h-5 w-5 mr-2" />
-												LinkedIn
-											</a>
-										)}
+								<div className="p-8">
+									<div className="flex flex-col md:flex-row gap-8">
+										{/* Enhanced Profile Picture */}
+										<div className="flex-shrink-0">
+											<div className="relative group">
+												<div className="relative">
+													<div
+														className="h-40 w-40 rounded-2xl bg-gradient-to-br from-primary/20 to-brand-light flex items-center justify-center overflow-hidden cursor-pointer shadow-xl border-4 border-white/50 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+														onClick={handleProfilePictureClick}
+													>
+														{organizerProfile.profilePicture ? (
+															<img
+																src={organizerProfile.profilePicture}
+																alt="Profile"
+																className="h-full w-full object-cover rounded-xl"
+															/>
+														) : (
+															<span className="text-6xl font-bold text-primary/60">
+																{organizerProfile.name
+																	? organizerProfile.name.charAt(0)
+																	: '?'}
+															</span>
+														)}
+														<div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl backdrop-blur-sm">
+															<div className="text-center text-white">
+																<CameraIcon className="h-8 w-8 mx-auto mb-2" />
+																<span className="text-sm font-medium">
+																	Change Photo
+																</span>
+															</div>
+														</div>
+													</div>
+													{/* Decorative ring */}
+													<div className="absolute -inset-1 bg-gradient-to-r from-primary via-brand-secondary to-brand-tertiary rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-300 -z-10"></div>
+												</div>
+												<input
+													type="file"
+													ref={fileInputRef}
+													className="hidden"
+													accept="image/*"
+													onChange={handleFileChange}
+												/>
+											</div>
 
-										{organizerProfile.socialLinks?.twitter && (
-											<a
-												href={organizerProfile.socialLinks.twitter}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
-											>
-												<LinkIcon className="h-5 w-5 mr-2" />
-												Twitter / X
-											</a>
-										)}
+											{/* Enhanced Rating Display */}
+											{feedbackSummary && (
+												<div className="mt-6 bg-gradient-to-r from-accent/30 to-brand-light/30 p-4 rounded-xl border border-accent/20 backdrop-blur-sm">
+													<div className="flex items-center justify-between mb-2">
+														<h3 className="text-sm font-semibold text-accent-foreground flex items-center">
+															<StarIcon className="h-4 w-4 mr-1 text-brand-primary" />
+															Organizer Rating
+														</h3>
+														<CheckCircleIcon className="h-5 w-5 text-success" />
+													</div>
+													<div className="flex items-center space-x-2">
+														<div className="flex">
+															{[...Array(5)].map((_, index) => (
+																<StarIcon
+																	key={index}
+																	className={`h-5 w-5 transition-colors duration-200 ${
+																		index <
+																		Math.floor(feedbackSummary.averageRating || 0)
+																			? 'text-brand-primary fill-current'
+																			: 'text-muted-foreground/30'
+																	}`}
+																/>
+															))}
+														</div>
+														<span className="text-lg font-bold text-accent-foreground">
+															{feedbackSummary.averageRating
+																? feedbackSummary.averageRating.toFixed(1)
+																: 'N/A'}
+														</span>
+													</div>
+													<p className="text-xs text-muted-foreground mt-1">
+														Based on {feedbackSummary.totalFeedback || 0} reviews
+													</p>
+												</div>
+											)}
+										</div>
 
-										{organizerProfile.socialLinks?.instagram && (
-											<a
-												href={organizerProfile.socialLinks.instagram}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="flex items-center text-blue-600 dark:text-blue-400 hover:underline"
-											>
-												<LinkIcon className="h-5 w-5 mr-2" />
-												Instagram
-											</a>
-										)}
+										{/* Enhanced Profile Details */}
+										<div className="flex-grow">
+											{editMode ? (
+												<form onSubmit={saveProfile} className="space-y-6">
+													<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+														<FormInput
+															type="text"
+															id="name"
+															name="name"
+															value={formValues.name}
+															onChange={handleInputChange}
+															label="Full Name"
+															placeholder="Enter your full name"
+															required
+															icon={<UserIcon className="h-5 w-5" />}
+															className="animate-fade-in"
+														/>
+
+														<FormInput
+															type="text"
+															id="organizationName"
+															name="organizationName"
+															value={formValues.organizationName}
+															onChange={handleInputChange}
+															label="Organization Name"
+															placeholder="Enter your organization name"
+															icon={<BuildingOfficeIcon className="h-5 w-5" />}
+															className="animate-fade-in"
+														/>
+													</div>
+
+													<FormInput
+														type="email"
+														id="email"
+														name="email"
+														value={formValues.email}
+														onChange={handleInputChange}
+														label="Email Address"
+														placeholder="Enter your email address"
+														required
+														icon={<EnvelopeIcon className="h-5 w-5" />}
+														className="animate-fade-in"
+													/>
+
+													<TextareaField
+														id="bio"
+														name="bio"
+														value={formValues.bio}
+														onChange={handleInputChange}
+														label="Bio / About"
+														placeholder="Tell us about yourself and your organization..."
+														rows={4}
+														maxLength={500}
+														className="animate-fade-in"
+													/>
+
+													<div className="flex justify-end space-x-4 pt-6">
+														<button
+															type="button"
+															onClick={toggleEditMode}
+															className="px-6 py-3 text-sm font-medium text-muted-foreground bg-muted rounded-xl hover:bg-muted/80 transition-all duration-200 transform hover:scale-105"
+														>
+															Cancel
+														</button>
+														<button
+															type="submit"
+															className="px-8 py-3 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-brand-dark transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center"
+															disabled={saving}
+														>
+															{saving ? (
+																<>
+																	<div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+																	<span className="text-white font-semibold">
+																		Saving...
+																	</span>
+																</>
+															) : (
+																<>
+																	<CheckCircleIcon className="h-4 w-4 mr-2 text-white" />
+																	<span className="text-white font-semibold">
+																		Save Changes
+																	</span>
+																</>
+															)}
+														</button>
+													</div>
+												</form>
+											) : (
+												<div className="space-y-6">
+													{[
+														{
+															icon: UserIcon,
+															label: 'Full Name',
+															value: organizerProfile.name,
+														},
+														{
+															icon: BuildingOfficeIcon,
+															label: 'Organization',
+															value: organizerProfile.organizationName || 'Not specified',
+														},
+														{
+															icon: EnvelopeIcon,
+															label: 'Email Address',
+															value: organizerProfile.email,
+														},
+													].map((field, index) => (
+														<div
+															key={index}
+															className="group p-4 rounded-xl hover:bg-muted/30 transition-all duration-200"
+														>
+															<div className="flex items-center mb-2">
+																<field.icon className="h-5 w-5 text-primary mr-2" />
+																<p className="text-sm font-medium text-muted-foreground">
+																	{field.label}
+																</p>
+															</div>
+															<p className="text-lg font-semibold text-card-foreground ml-7">
+																{field.value}
+															</p>
+														</div>
+													))}
+
+													{organizerProfile.bio && (
+														<div className="group p-4 rounded-xl hover:bg-muted/30 transition-all duration-200">
+															<div className="flex items-center mb-2">
+																<DocumentTextIcon className="h-5 w-5 text-primary mr-2" />
+																<p className="text-sm font-medium text-muted-foreground">
+																	Bio
+																</p>
+															</div>
+															<p className="text-secondary ml-7 leading-relaxed">
+																{organizerProfile.bio}
+															</p>
+														</div>
+													)}
+												</div>
+											)}
+										</div>
 									</div>
-								) : (
-									<p className="text-gray-500 dark:text-gray-400">
-										No social links added yet. Click edit to add your social profiles.
-									</p>
-								)}
+								</div>
 							</div>
-						)}
-					</div>
-				</div>
 
-				{/* Right Column: Feedback Summary */}
-				<div>
-					<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-						<h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Feedback Summary</h2>
+							{/* Enhanced Social Links Card */}
+							<div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden backdrop-blur-sm animate-fade-in">
+								<div className="bg-gradient-to-r from-accent/10 to-brand-light/10 p-6 border-b border-border/30">
+									<h2 className="text-2xl font-bold text-card-foreground flex items-center">
+										<LinkIcon className="h-6 w-6 text-primary mr-3" />
+										Social Links
+									</h2>
+									<p className="text-muted-foreground mt-1">
+										Connect with your audience across platforms
+									</p>
+								</div>
 
-						{feedbackSummary ? (
-							<div>
-								<div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
-									<h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-										Overall Rating
-									</h3>
-									<div className="flex items-center mb-1">
-										<div className="flex mr-2">
-											{[...Array(5)].map((_, index) => (
-												<StarIcon
-													key={index}
-													className={`h-5 w-5 ${
-														index < Math.floor(feedbackSummary.averageRating || 0)
-															? 'text-yellow-500 fill-current'
-															: 'text-gray-300 dark:text-gray-600'
-													}`}
+								<div className="p-6">
+									{editMode ? (
+										<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+											{[
+												{
+													name: 'website',
+													label: 'Website URL',
+													placeholder: 'https://yourwebsite.com',
+												},
+												{
+													name: 'linkedin',
+													label: 'LinkedIn',
+													placeholder: 'https://linkedin.com/in/username',
+												},
+												{
+													name: 'twitter',
+													label: 'Twitter / X',
+													placeholder: 'https://twitter.com/username',
+												},
+												{
+													name: 'instagram',
+													label: 'Instagram',
+													placeholder: 'https://instagram.com/username',
+												},
+											].map((social, index) => (
+												<FormInput
+													key={social.name}
+													type="url"
+													id={social.name}
+													name={social.name}
+													value={formValues.socialLinks[social.name]}
+													onChange={handleSocialLinkChange}
+													label={social.label}
+													placeholder={social.placeholder}
+													className="animate-fade-in"
+													style={{ animationDelay: `${index * 100}ms` }}
 												/>
 											))}
 										</div>
-										<span className="text-xl font-bold text-gray-800 dark:text-gray-200">
-											{feedbackSummary.averageRating
-												? feedbackSummary.averageRating.toFixed(1)
-												: 'N/A'}
-										</span>
-										<span className="text-gray-500 dark:text-gray-400 ml-1">/ 5</span>
-									</div>
-									<p className="text-sm text-gray-600 dark:text-gray-400">
-										Based on {feedbackSummary.totalFeedback || 0} feedback submissions
-									</p>
-								</div>
-
-								<div className="space-y-4">
-									<div>
-										<h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-											Feedback Breakdown
-										</h3>
-										<div className="space-y-2">
-											{[5, 4, 3, 2, 1].map((rating) => {
-												const count = feedbackSummary.ratingCounts?.[rating] || 0;
-												const percentage = feedbackSummary.totalFeedback
-													? Math.round((count / feedbackSummary.totalFeedback) * 100)
-													: 0;
-
-												return (
-													<div key={rating} className="flex items-center">
-														<div className="w-12 text-sm text-gray-600 dark:text-gray-400">
-															{rating} stars
-														</div>
-														<div className="flex-grow mx-2">
-															<div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-																<div
-																	className={`h-2 rounded-full ${
-																		rating >= 4
-																			? 'bg-green-500'
-																			: rating >= 3
-																			? 'bg-yellow-500'
-																			: 'bg-red-500'
-																	}`}
-																	style={{ width: `${percentage}%` }}
-																></div>
-															</div>
-														</div>
-														<div className="w-9 text-sm text-gray-600 dark:text-gray-400 text-right">
-															{percentage}%
-														</div>
-													</div>
-												);
-											})}
-										</div>
-									</div>
-
-									{feedbackSummary.recentFeedback && feedbackSummary.recentFeedback.length > 0 && (
+									) : (
 										<div>
-											<h3 className="font-medium text-gray-800 dark:text-gray-200 mb-2">
-												Recent Feedback
-											</h3>
-											<div className="space-y-3">
-												{feedbackSummary.recentFeedback.slice(0, 3).map((feedback, index) => (
-													<div
-														key={index}
-														className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
-													>
-														<div className="flex justify-between">
-															<span className="text-gray-700 dark:text-gray-300 font-medium">
-																{feedback.eventTitle}
-															</span>
-															<div className="flex">
-																{[...Array(5)].map((_, i) => (
-																	<StarIcon
-																		key={i}
-																		className={`h-4 w-4 ${
-																			i < feedback.rating
-																				? 'text-yellow-500 fill-current'
-																				: 'text-gray-300 dark:text-gray-600'
-																		}`}
-																	/>
-																))}
-															</div>
-														</div>
-														<p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-															{feedback.comment}
-														</p>
-														<p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-															{new Date(feedback.date).toLocaleDateString()}
-														</p>
-													</div>
-												))}
-											</div>
+											{Object.values(organizerProfile.socialLinks || {}).some((link) => link) ? (
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{[
+														{
+															key: 'website',
+															label: 'Website',
+															icon: <GlobeAltIcon className="h-5 w-5 text-primary" />,
+														},
+														{
+															key: 'linkedin',
+															label: 'LinkedIn',
+															icon: <BriefcaseIcon className="h-5 w-5 text-primary" />,
+														},
+														{
+															key: 'twitter',
+															label: 'Twitter / X',
+															icon: (
+																<ChatBubbleLeftRightIcon className="h-5 w-5 text-primary" />
+															),
+														},
+														{
+															key: 'instagram',
+															label: 'Instagram',
+															icon: <InstagramIcon className="h-5 w-5 text-primary" />,
+														},
+													].map(
+														(social) =>
+															organizerProfile.socialLinks?.[social.key] && (
+																<a
+																	key={social.key}
+																	href={organizerProfile.socialLinks[social.key]}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="group flex items-center p-4 rounded-xl bg-gradient-to-r from-primary/5 to-brand-light/5 hover:from-primary/10 hover:to-brand-light/10 border border-primary/10 hover:border-primary/20 transition-all duration-300 transform hover:scale-105"
+																>
+																	<div className="mr-3">{social.icon}</div>
+																	<div>
+																		<span className="font-medium text-primary group-hover:text-brand-dark transition-colors">
+																			{social.label}
+																		</span>
+																		<LinkIcon className="h-4 w-4 ml-2 inline opacity-60 group-hover:opacity-100 transition-opacity" />
+																	</div>
+																</a>
+															)
+													)}
+												</div>
+											) : (
+												<div className="text-center py-12">
+													<LinkIcon className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+													<p className="text-muted-foreground text-lg">
+														No social links added yet
+													</p>
+													<p className="text-muted-foreground/60 text-sm mt-1">
+														Click edit to add your social profiles
+													</p>
+												</div>
+											)}
 										</div>
 									)}
 								</div>
 							</div>
-						) : (
-							<p className="text-gray-500 dark:text-gray-400">
-								No feedback data available yet. As you host more events and receive feedback, this
-								section will be populated.
-							</p>
-						)}
+						</div>
+
+						{/* Enhanced Right Column: Feedback Summary */}
+						<div className="space-y-8">
+							<div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden backdrop-blur-sm animate-fade-in sticky top-20">
+								<div className="bg-gradient-to-r from-success/10 to-brand-light/10 p-6 border-b border-border/30">
+									<h2 className="text-2xl font-bold text-card-foreground flex items-center">
+										<StarIcon className="h-6 w-6 text-brand-primary mr-3" />
+										Feedback Summary
+									</h2>
+									<p className="text-muted-foreground mt-1">Your organizer performance metrics</p>
+								</div>
+
+								<div className="p-6">
+									{feedbackSummary ? (
+										<div className="space-y-6">
+											{/* Overall Rating Card */}
+											<div className="bg-gradient-to-br from-accent/20 to-brand-light/20 rounded-xl p-6 border border-accent/20">
+												<h3 className="font-bold text-accent-foreground mb-4 flex items-center">
+													<SparklesIcon className="h-5 w-5 mr-2" />
+													Overall Rating
+												</h3>
+												<div className="flex items-center justify-center mb-4">
+													<div className="text-center">
+														<div className="flex justify-center mb-2">
+															{[...Array(5)].map((_, index) => (
+																<StarIcon
+																	key={index}
+																	className={`h-8 w-8 transition-all duration-200 ${
+																		index <
+																		Math.floor(feedbackSummary.averageRating || 0)
+																			? 'text-brand-primary fill-current'
+																			: 'text-muted-foreground/20'
+																	}`}
+																/>
+															))}
+														</div>
+														<span className="text-4xl font-bold text-accent-foreground">
+															{feedbackSummary.averageRating
+																? feedbackSummary.averageRating.toFixed(1)
+																: 'N/A'}
+														</span>
+														<span className="text-muted-foreground text-lg ml-1">/ 5</span>
+													</div>
+												</div>
+												<p className="text-center text-muted-foreground">
+													Based on{' '}
+													<span className="font-semibold text-accent-foreground">
+														{feedbackSummary.totalFeedback || 0}
+													</span>{' '}
+													feedback submissions
+												</p>
+											</div>
+
+											{/* Feedback Breakdown */}
+											<div>
+												<h3 className="font-bold text-card-foreground mb-4">
+													Feedback Breakdown
+												</h3>
+												<div className="space-y-3">
+													{[5, 4, 3, 2, 1].map((rating) => {
+														const count = feedbackSummary.ratingCounts?.[rating] || 0;
+														const percentage = feedbackSummary.totalFeedback
+															? Math.round((count / feedbackSummary.totalFeedback) * 100)
+															: 0;
+
+														return (
+															<div key={rating} className="flex items-center space-x-3">
+																<div className="w-16 text-sm font-medium text-muted-foreground">
+																	{rating} stars
+																</div>
+																<div className="flex-grow">
+																	<div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+																		<div
+																			className={`h-full rounded-full transition-all duration-500 ${
+																				rating >= 4
+																					? 'bg-gradient-to-r from-success to-success/80'
+																					: rating >= 3
+																					? 'bg-gradient-to-r from-warning to-warning/80'
+																					: 'bg-gradient-to-r from-error to-error/80'
+																			}`}
+																			style={{ width: `${percentage}%` }}
+																		></div>
+																	</div>
+																</div>
+																<div className="w-12 text-sm font-semibold text-muted-foreground text-right">
+																	{percentage}%
+																</div>
+															</div>
+														);
+													})}
+												</div>
+											</div>
+
+											{/* Recent Feedback */}
+											{feedbackSummary.recentFeedback &&
+												feedbackSummary.recentFeedback.length > 0 && (
+													<div>
+														<h3 className="font-bold text-card-foreground mb-4">
+															Recent Feedback
+														</h3>
+														<div className="space-y-4">
+															{feedbackSummary.recentFeedback
+																.slice(0, 3)
+																.map((feedback, index) => (
+																	<div
+																		key={index}
+																		className="bg-muted/50 p-4 rounded-xl border border-border/30 hover:bg-muted/70 transition-all duration-200"
+																	>
+																		<div className="flex justify-between items-start mb-2">
+																			<span className="font-medium text-secondary line-clamp-1">
+																				{feedback.eventTitle}
+																			</span>
+																			<div className="flex ml-2">
+																				{[...Array(5)].map((_, i) => (
+																					<StarIcon
+																						key={i}
+																						className={`h-4 w-4 ${
+																							i < feedback.rating
+																								? 'text-brand-primary fill-current'
+																								: 'text-muted-foreground/30'
+																						}`}
+																					/>
+																				))}
+																			</div>
+																		</div>
+																		{feedback.comment && (
+																			<p className="text-muted-foreground text-sm mb-2 line-clamp-2">
+																				"{feedback.comment}"
+																			</p>
+																		)}
+																		<p className="text-xs text-muted-foreground/60">
+																			{new Date(feedback.date).toLocaleDateString(
+																				'en-US',
+																				{
+																					year: 'numeric',
+																					month: 'short',
+																					day: 'numeric',
+																				}
+																			)}
+																		</p>
+																	</div>
+																))}
+														</div>
+													</div>
+												)}
+										</div>
+									) : (
+										<div className="text-center py-12">
+											<div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
+												<StarIcon className="h-10 w-10 text-muted-foreground/40" />
+											</div>
+											<h3 className="text-lg font-semibold text-muted-foreground mb-2">
+												No Feedback Yet
+											</h3>
+											<p className="text-muted-foreground/60 text-sm leading-relaxed">
+												As you host more events and receive feedback, this section will be
+												populated with valuable insights.
+											</p>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
