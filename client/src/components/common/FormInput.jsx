@@ -21,17 +21,19 @@ const FormInput = ({
 }) => {
 	return (
 		<div className={className}>
-			<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
-				<span className="flex items-center">
-					{label}
-					{required && <span className="text-brand ml-1">*</span>}
-					{tooltip && (
-						<span className="ml-2">
-							<Tooltip content={tooltip} position="top" />
-						</span>
-					)}
-				</span>
-			</label>
+			{label && (
+				<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
+					<span className="flex items-center">
+						{label}
+						{required && <span className="text-brand ml-1">*</span>}
+						{tooltip && (
+							<span className="ml-2">
+								<Tooltip content={tooltip} position="top" />
+							</span>
+						)}
+					</span>
+				</label>
+			)}
 			<div className="relative">
 				{icon && (
 					<div

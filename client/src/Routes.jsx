@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ErrorProvider } from './context/ErrorContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Navigation from './components/common/Navigation';
 import Footer from './components/common/Footer';
+import { GlobalErrorAlert } from './components/common';
 import { GoogleCallback } from './components/auth';
 import './styles/main.css';
 
@@ -63,77 +65,82 @@ const DashboardRouter = () => {
 
 function AppRoutes() {
 	return (
-		<AuthProvider>
-			<Router>
-				<div className="min-h-screen flex flex-col ym-bg-card">
-					<Navigation />
-					<main className="flex-grow flex flex-col min-h-screen">
-						<Suspense
-							fallback={
-								<div className="flex flex-col justify-center items-center h-[70vh]">
-									<div
-										className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mb-4"
-										style={{ borderTopColor: 'var(--ring)' }}
-									></div>
-									<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
+		<ErrorProvider>
+			<AuthProvider>
+				<Router>
+					{/* Global Error Alert */}
+					<GlobalErrorAlert />
+
+					<div className="min-h-screen flex flex-col ym-bg-card">
+						<Navigation />
+						<main className="flex-grow flex flex-col min-h-screen">
+							<Suspense
+								fallback={
+									<div className="flex flex-col justify-center items-center h-[70vh]">
+										<div
+											className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mb-4"
+											style={{ borderTopColor: 'var(--ring)' }}
+										></div>
+										<h2 className="text-xl font-semibold ym-text-primary">Loading</h2>
+									</div>
+								}
+							>
+								<div className="min-h-[calc(100vh-80px)]">
+									<Routes>
+										{/* Public routes */}
+										<Route path="/" element={<HomePage />} />
+										<Route path="/about" element={<AboutPage />} />
+										<Route path="/contact" element={<ContactPage />} />
+										<Route path="/login" element={<LoginPage />} />
+										<Route path="/register" element={<RegisterPage />} />
+										<Route path="/event/:id" element={<EventDetails />} />
+										<Route path="/events" element={<EventsPage />} />
+
+										{/* Google OAuth routes */}
+										<Route path="/auth/success" element={<GoogleCallback />} />
+										<Route path="/auth/error" element={<NotFound />} />
+
+										{/* Dashboard redirector route */}
+										<Route path="/dashboard" element={<DashboardRouter />} />
+
+										{/* User routes */}
+										<Route element={<ProtectedRoute requiredRole="user" />}>
+											<Route path="/user/dashboard" element={<UserDashboard />} />
+											<Route path="/user/profile" element={<UserProfile />} />
+											<Route path="/event/:id/feedback" element={<UserEventFeedback />} />
+										</Route>
+
+										{/* Admin routes */}
+										<Route element={<ProtectedRoute requiredRole="admin" />}>
+											<Route path="/admin/dashboard" element={<AdminDashboard />} />
+											<Route path="/admin/profile" element={<AdminProfile />} />
+											<Route path="/admin/users" element={<AdminUsers />} />
+											<Route path="/admin/organizers" element={<AdminOrganizers />} />
+											<Route path="/admin/events" element={<AdminEvents />} />
+											<Route path="/admin/analytics" element={<AdminAnalytics />} />
+											<Route path="/admin/moderation" element={<AdminModeration />} />
+											<Route path="/admin/announcements" element={<AdminAnnouncements />} />
+										</Route>
+
+										{/* Organizer routes */}
+										<Route element={<ProtectedRoute requiredRole={['organizer', 'admin']} />}>
+											<Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
+											<Route path="/organizer/profile" element={<OrganizerProfile />} />
+											<Route path="/organizer/settings" element={<OrganizerSettings />} />
+											<Route path="/organizer/event/:id" element={<OrganizerManageEvent />} />
+										</Route>
+
+										{/* Fallback route */}
+										<Route path="*" element={<NotFound />} />
+									</Routes>
 								</div>
-							}
-						>
-							<div className="min-h-[calc(100vh-80px)]">
-								<Routes>
-									{/* Public routes */}
-									<Route path="/" element={<HomePage />} />
-									<Route path="/about" element={<AboutPage />} />
-									<Route path="/contact" element={<ContactPage />} />
-									<Route path="/login" element={<LoginPage />} />
-									<Route path="/register" element={<RegisterPage />} />
-									<Route path="/event/:id" element={<EventDetails />} />
-									<Route path="/events" element={<EventsPage />} />
-
-									{/* Google OAuth routes */}
-									<Route path="/auth/success" element={<GoogleCallback />} />
-									<Route path="/auth/error" element={<NotFound />} />
-
-									{/* Dashboard redirector route */}
-									<Route path="/dashboard" element={<DashboardRouter />} />
-
-									{/* User routes */}
-									<Route element={<ProtectedRoute requiredRole="user" />}>
-										<Route path="/user/dashboard" element={<UserDashboard />} />
-										<Route path="/user/profile" element={<UserProfile />} />
-										<Route path="/event/:id/feedback" element={<UserEventFeedback />} />
-									</Route>
-
-									{/* Admin routes */}
-									<Route element={<ProtectedRoute requiredRole="admin" />}>
-										<Route path="/admin/dashboard" element={<AdminDashboard />} />
-										<Route path="/admin/profile" element={<AdminProfile />} />
-										<Route path="/admin/users" element={<AdminUsers />} />
-										<Route path="/admin/organizers" element={<AdminOrganizers />} />
-										<Route path="/admin/events" element={<AdminEvents />} />
-										<Route path="/admin/analytics" element={<AdminAnalytics />} />
-										<Route path="/admin/moderation" element={<AdminModeration />} />
-										<Route path="/admin/announcements" element={<AdminAnnouncements />} />
-									</Route>
-
-									{/* Organizer routes */}
-									<Route element={<ProtectedRoute requiredRole={['organizer', 'admin']} />}>
-										<Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
-										<Route path="/organizer/profile" element={<OrganizerProfile />} />
-										<Route path="/organizer/settings" element={<OrganizerSettings />} />
-										<Route path="/organizer/event/:id" element={<OrganizerManageEvent />} />
-									</Route>
-
-									{/* Fallback route */}
-									<Route path="*" element={<NotFound />} />
-								</Routes>
-							</div>
-						</Suspense>
-					</main>
-					<Footer />
-				</div>
-			</Router>
-		</AuthProvider>
+							</Suspense>
+						</main>
+						<Footer />
+					</div>
+				</Router>
+			</AuthProvider>
+		</ErrorProvider>
 	);
 }
 

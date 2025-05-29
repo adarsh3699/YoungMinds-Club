@@ -110,46 +110,72 @@
 
 /* Dark Mode Theme */
 .dark {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  --background: #0a0f1c;
+  --foreground: #f1f5f9;
   --card: #1e293b;
-  --card-foreground: #f8fafc;
+  --card-foreground: #f1f5f9;
   --primary: #fbbf24;
-  --primary-foreground: #0f172a;
-  --secondary: #334155;
-  --secondary-foreground: #f8fafc;
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
-  --accent: #451a03;
+  --primary-foreground: #1e293b;
+  --secondary: #374151;
+  --secondary-foreground: #f1f5f9;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #7c2d12;
   --accent-foreground: #fde047;
-  --destructive: #7f1d1d;
-  --destructive-foreground: #f8fafc;
-  --border: #334155;
-  --input: #334155;
+  --destructive: #dc2626;
+  --destructive-foreground: #f1f5f9;
+  --border: #374151;
+  --input: #374151;
   --ring: #fde047;
   
   /* Sidebar - Dark Mode */
-  --sidebar-background: #171717;
-  --sidebar-foreground: #f5f5f5;
+  --sidebar-background: #111827;
+  --sidebar-foreground: #f3f4f6;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #f5f5f5;
-  --sidebar-border: #262626;
+  --sidebar-accent: #1f2937;
+  --sidebar-accent-foreground: #f3f4f6;
+  --sidebar-border: #374151;
   --sidebar-ring: #3b82f6;
 
   /* Brand Colors - Dark Mode */
-  --brand-light: #451a03;
+  --brand-light: #7c2d12;
+  --brand-lighter: #451a03;
+  --brand-lightest: #292524;
   --brand-primary: #fbbf24;
+  --brand-secondary: #f59e0b;
+  --brand-tertiary: #f97316;
   --brand-dark: #fde047;
-  --brand-darker: #fde047;
+  --brand-darker: #facc15;
+  
+  /* Surface Colors - Dark Mode */
   --surface-primary: #111827;
-  --surface-secondary: #191f35;
-  --gradient-hero: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%);
-  --gradient-hero-image: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  --surface-secondary: #1f2937;
+  --surface-accent: #7c2d12;
+  
+  /* Text Colors - Dark Mode */
   --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
+  --text-secondary: #e5e7eb;
   --text-muted: #9ca3af;
+  
+  /* Footer Colors - Dark Mode */
+  --footer-bg: #0f172a;
+  --footer-text: #f9fafb;
+  --footer-text-muted: #9ca3af;
+  --footer-border: #374151;
+  
+  /* Status Colors - Dark Mode */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  
+  /* Enhanced Gradients for Dark Mode */
+  --gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #fde047 0%, #fbbf24 100%);
+  --gradient-hero: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0a0f1c 100%);
+  --gradient-auth: linear-gradient(135deg, #1e293b 0%, #374151 50%, #1f2937 100%);
+  --gradient-hero-image: linear-gradient(135deg, #b45309 0%, #92400e 100%);
 }
 
 /* ==============================================
@@ -674,3 +700,156 @@ a {
 .ym-footer-text-muted { color: var(--footer-text-muted); }
 .ym-footer-text-muted:hover { color: var(--footer-text); }
 .ym-footer-border { border-color: var(--footer-border); }
+
+/* ==============================================
+   DARK MODE SPECIFIC ENHANCEMENTS
+   ============================================== */
+
+/* Enhanced background gradients for dark mode */
+.dark .bg-gradient-primary-light { 
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 
+}
+.dark .bg-gradient-success-light { 
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.1)); 
+}
+.dark .bg-gradient-brand-tertiary-light { 
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.1)); 
+}
+.dark .bg-gradient-brand-primary-light { 
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 
+}
+
+/* Enhanced opacity backgrounds for dark mode */
+.dark .bg-primary-5 { background-color: rgba(251, 191, 36, 0.08); }
+.dark .bg-success-5 { background-color: rgba(16, 185, 129, 0.08); }
+.dark .bg-success-10 { background-color: rgba(16, 185, 129, 0.15); }
+.dark .bg-destructive-10 { background-color: rgba(220, 38, 38, 0.15); }
+.dark .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.15); }
+.dark .bg-purple-10 { background-color: rgba(147, 51, 234, 0.15); }
+.dark .bg-cyan-10 { background-color: rgba(6, 182, 212, 0.15); }
+.dark .bg-teal-10 { background-color: rgba(20, 184, 166, 0.15); }
+.dark .bg-pink-10 { background-color: rgba(236, 72, 153, 0.15); }
+
+/* Enhanced admin dashboard specific styling */
+.dark .bg-card { 
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+.dark .bg-card-hover:hover { 
+  background-color: var(--muted);
+  transition: background-color 0.2s ease;
+}
+
+/* Enhanced gradient backgrounds for main page areas */
+.dark .min-h-screen.bg-gradient-to-br {
+  background: linear-gradient(135deg, var(--background) 0%, var(--surface-secondary) 25%, var(--surface-primary) 75%, var(--background) 100%);
+}
+
+/* Better contrast for admin section cards */
+.dark .backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Enhanced border styling for dark mode */
+.dark .border-border\/50 {
+  border-color: rgba(55, 65, 81, 0.5);
+}
+
+.dark .border-border\/30 {
+  border-color: rgba(55, 65, 81, 0.3);
+}
+
+.dark .border-border\/20 {
+  border-color: rgba(55, 65, 81, 0.2);
+}
+
+/* Enhanced admin dashboard header styling */
+.dark .bg-gradient-to-r.from-primary\/10.via-brand-light.to-accent\/20 {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.12) 0%, var(--brand-light) 50%, rgba(124, 45, 18, 0.25) 100%);
+}
+
+/* Better shadow and glow effects for dark mode */
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced button styling for dark mode */
+.dark .btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--brand-secondary) 100%);
+  box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.2);
+}
+
+.dark .btn-primary:hover {
+  background: linear-gradient(135deg, var(--brand-dark) 0%, var(--primary) 100%);
+  box-shadow: 0 6px 20px 0 rgba(251, 191, 36, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Enhanced error alert styling for dark mode */
+.dark .bg-destructive\/10 {
+  background-color: rgba(220, 38, 38, 0.12);
+}
+
+.dark .text-destructive {
+  color: #fca5a5;
+}
+
+.dark .border-destructive\/30 {
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Enhanced transitions for dark mode */
+.dark * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Better loading spinner contrast in dark mode */
+.dark .border-primary\/30 {
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.dark .border-t-primary {
+  border-top-color: var(--primary);
+}
+
+.dark .border-t-brand-secondary {
+  border-top-color: var(--brand-secondary);
+}
+
+/* Enhanced admin stats card styling */
+.dark .group:hover {
+  background-color: rgba(55, 65, 81, 0.1);
+}
+
+/* Better text contrast for card elements */
+.dark .text-card-foreground {
+  color: var(--card-foreground);
+}
+
+.dark .text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+/* Enhanced focus states for dark mode */
+.dark .focus-ring:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Better input styling for dark mode */
+.dark .input-base {
+  background-color: var(--input);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .input-base:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.1);
+}

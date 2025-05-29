@@ -8,4 +8,6 @@ export { default as Modal } from './Modal';
 export { default as Tabs } from './Tabs';
 export { default as Accordion } from './Accordion';
 export { default as Switch } from './Switch';
-export { default as Tooltip } from './Tooltip'; 
+export { default as Tooltip } from './Tooltip';
+export { default as ErrorAlert } from './ErrorAlert';
+export { default as GlobalErrorAlert } from './GlobalErrorAlert'; 
