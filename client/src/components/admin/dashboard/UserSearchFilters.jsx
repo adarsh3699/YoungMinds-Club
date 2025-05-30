@@ -13,6 +13,7 @@ const STATUS_OPTIONS = [
 	{ value: 'all', label: 'All Status' },
 	{ value: 'active', label: 'Active' },
 	{ value: 'suspended', label: 'Suspended' },
+	{ value: 'flagged', label: 'Flagged' },
 ];
 
 const UserSearchFilters = memo(
@@ -27,6 +28,9 @@ const UserSearchFilters = memo(
 		totalCount,
 		animationDelay = '0.3s',
 	}) => {
+		// Show role filter only if both roleFilter and setRoleFilter are provided
+		const showRoleFilter = roleFilter !== undefined && setRoleFilter !== undefined;
+
 		return (
 			<div
 				className="bg-card rounded-2xl shadow-xl p-6 mb-8 animate-fade-in relative z-20"
@@ -48,16 +52,18 @@ const UserSearchFilters = memo(
 						/>
 					</div>
 
-					{/* Role Filter */}
-					<div className="min-w-[180px]">
-						<SelectInput
-							value={roleFilter}
-							onChange={(e) => setRoleFilter(e.target.value)}
-							options={ROLE_OPTIONS}
-							icon={<FunnelIcon className="w-5 h-5" />}
-							className="w-full"
-						/>
-					</div>
+					{/* Role Filter - Conditionally rendered */}
+					{showRoleFilter && (
+						<div className="min-w-[180px]">
+							<SelectInput
+								value={roleFilter}
+								onChange={(e) => setRoleFilter(e.target.value)}
+								options={ROLE_OPTIONS}
+								icon={<FunnelIcon className="w-5 h-5" />}
+								className="w-full"
+							/>
+						</div>
+					)}
 
 					{/* Status Filter */}
 					<div className="min-w-[180px]">

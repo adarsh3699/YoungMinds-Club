@@ -22,7 +22,7 @@ const OrganizerDashboard = lazy(() => import('./pages/organizer/dashboard'));
 const OrganizerProfile = lazy(() => import('./pages/organizer/profile'));
 const OrganizerSettings = lazy(() => import('./pages/organizer/settings'));
 const OrganizerManageEvent = lazy(() => import('./pages/organizer/manage-event'));
-const AdminDashboard = lazy(() => import('./pages/admin/dashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminProfile = lazy(() => import('./pages/admin/profile'));
 const AdminUsers = lazy(() => import('./pages/admin/users'));
 const AdminOrganizers = lazy(() => import('./pages/admin/OrganizersPage'));

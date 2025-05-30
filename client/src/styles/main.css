@@ -99,6 +99,8 @@
   --error: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --indigo: #6366f1;
+  --purple: #9333ea;
   
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -169,6 +171,8 @@
   --error: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --indigo: #6366f1;
+  --purple: #9333ea;
   
   /* Enhanced Gradients for Dark Mode */
   --gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -565,11 +569,14 @@ a {
 .bg-gradient-success-light { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
 .bg-gradient-brand-tertiary-light { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); }
 .bg-gradient-brand-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
+.bg-gradient-indigo-light { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05)); }
 
 /* Essential background colors for admin sections */
 .bg-primary-5 { background-color: rgba(245, 158, 11, 0.05); }
 .bg-success-5 { background-color: rgba(16, 185, 129, 0.05); }
 .bg-success-10 { background-color: rgba(16, 185, 129, 0.1); }
+.bg-warning-5 { background-color: rgba(245, 158, 11, 0.05); }
+.bg-warning-10 { background-color: rgba(245, 158, 11, 0.1); }
 .bg-destructive-10 { background-color: rgba(239, 68, 68, 0.1); }
 .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.1); }
 .bg-purple-10 { background-color: rgba(147, 51, 234, 0.1); }
@@ -718,11 +725,16 @@ a {
 .dark .bg-gradient-brand-primary-light { 
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 
 }
+.dark .bg-gradient-indigo-light { 
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.1)); 
+}
 
 /* Enhanced opacity backgrounds for dark mode */
 .dark .bg-primary-5 { background-color: rgba(251, 191, 36, 0.08); }
 .dark .bg-success-5 { background-color: rgba(16, 185, 129, 0.08); }
 .dark .bg-success-10 { background-color: rgba(16, 185, 129, 0.15); }
+.dark .bg-warning-5 { background-color: rgba(245, 158, 11, 0.08); }
+.dark .bg-warning-10 { background-color: rgba(245, 158, 11, 0.15); }
 .dark .bg-destructive-10 { background-color: rgba(220, 38, 38, 0.15); }
 .dark .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.15); }
 .dark .bg-purple-10 { background-color: rgba(147, 51, 234, 0.15); }

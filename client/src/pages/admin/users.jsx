@@ -1,7 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
-import { UserStatsCards, UserSearchFilters, UsersTable, AdminUserModal } from '../../components/admin/dashboard';
+import {
+	UserStatsCards,
+	UserSearchFilters,
+	UsersTable,
+	AdminUserModal,
+	AdminPageHeader,
+} from '../../components/admin/dashboard';
 import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
@@ -202,7 +208,10 @@ const UsersPage = () => {
 				userData.email.toLowerCase().includes(searchLower);
 
 			const matchesRole = roleFilter === 'all' || userData.role === roleFilter;
-			const matchesStatus = statusFilter === 'all' || (userData.status || 'active') === statusFilter;
+			const matchesStatus =
+				statusFilter === 'all' ||
+				(statusFilter === 'flagged' && userData.isFlagged) ||
+				(statusFilter !== 'flagged' && (userData.status || 'active') === statusFilter);
 
 			return matchesSearch && matchesRole && matchesStatus;
 		});
@@ -354,30 +363,13 @@ const UsersPage = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
 			<div className="max-w-7xl mx-auto p-6">
-				{/* Inline Header */}
-				<div
-					className="bg-gradient-to-r from-primary/10 via-brand-light to-accent/20 rounded-2xl shadow-xl p-8 mb-8 animate-fade-in"
-					style={{ animationFillMode: 'both' }}
-				>
-					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-						<div className="flex items-center gap-4">
-							<div className="p-3 rounded-xl bg-card/80 text-destructive border border-border/20 shadow-lg">
-								<UserGroupIcon className="w-8 h-8" />
-							</div>
-							<div>
-								<h1 className="text-3xl font-bold text-card-foreground">User Management</h1>
-								<p className="text-muted-foreground mt-1">Manage users, roles, and permissions</p>
-							</div>
-						</div>
-						<a
-							href="/admin/dashboard"
-							className="btn-primary px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg flex items-center gap-2 w-fit"
-						>
-							<ChevronDownIcon className="w-4 h-4 rotate-90" />
-							Back to Dashboard
-						</a>
-					</div>
-				</div>
+				{/* Header */}
+				<AdminPageHeader
+					icon={<UserGroupIcon className="w-8 h-8" />}
+					title="User Management"
+					description="Manage users, roles, and permissions"
+					iconBgColor="text-destructive"
+				/>
 
 				{/* Statistics Cards */}
 				<UserStatsCards userStats={userStats} />

@@ -273,7 +273,7 @@ exports.toggleUserFlag = async (req, res) => {
     try {
         const { isFlagged, flagReason } = req.body;
 
-        const updateData = { isFlagged };
+        const updateData = { isFlagged, flagReason: '' };
         if (isFlagged && flagReason) {
             updateData.flagReason = flagReason;
         }
