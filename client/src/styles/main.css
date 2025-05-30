@@ -190,17 +190,21 @@
 }
 
 html, body {
-    margin: 0;
-    padding: 0 !important;
-    height: 100%;
-    overflow: auto !important;
+  margin: 0;
+  padding: 0 !important;
+  height: 100%;
+  overflow: auto !important;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
-    min-height: 100vh;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
 }
 
 /* ==============================================
@@ -288,10 +292,16 @@ body {
 .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
 
 /* ==============================================
-   UTILITY CLASSES
+   GRADIENT BACKGROUNDS
    ============================================== */
+/* Admin Dashboard Gradients */
+.bg-gradient-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
+.bg-gradient-success-light { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
+.bg-gradient-brand-tertiary-light { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); }
+.bg-gradient-brand-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
+.bg-gradient-indigo-light { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05)); }
 
-/* Background Classes */
+/* General Gradients */
 .gradient-bg { background: var(--gradient-primary); }
 .gradient-text,
 .yellow-gradient-text {
@@ -305,273 +315,11 @@ body {
 .auth-bg { background: var(--gradient-auth); }
 .hero-image-bg { background: var(--gradient-hero-image); }
 .hero-image-overlay { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2)); }
-.features-bg { background-color: var(--surface-primary); }
-.events-bg { background-color: var(--surface-secondary); }
-.faq-bg { background-color: var(--surface-primary); }
-
-/* Color Utility Classes */
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-muted { color: var(--text-muted); }
-.text-brand { color: var(--brand-dark); }
-.text-brand-primary { color: var(--brand-primary); }
-.text-brand-secondary { color: var(--brand-secondary); }
-.text-brand-tertiary { color: var(--brand-tertiary); }
-.text-brand-dark { color: var(--brand-darker); }
-.text-brand-dark:hover { color: #92400e !important; }
-
-.bg-brand-light { background-color: var(--brand-light); }
-.bg-brand { background-color: var(--brand-secondary); }
-.bg-brand:hover { background-color: var(--brand-dark); }
-.bg-brand-tertiary { background-color: var(--brand-tertiary); }
-
-/* Card & Surface Colors */
-.bg-card { background-color: var(--card); }
-.bg-card-hover { background-color: var(--muted); }
-.border-card { border-color: var(--border); }
-.text-card { color: var(--card-foreground); }
-
-/* Core Theme Utility Classes */
-.bg-primary { background-color: var(--primary); }
-.text-primary-foreground { color: var(--primary-foreground); }
-.bg-secondary { background-color: var(--secondary); }
-.text-secondary-foreground { color: var(--secondary-foreground); }
-.bg-accent { background-color: var(--accent); }
-.text-accent-foreground { color: var(--accent-foreground); }
-.bg-destructive { background-color: var(--destructive); }
-.text-destructive-foreground { color: var(--destructive-foreground); }
-
-/* Focus Ring Utility */
-.focus-ring:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ring);
-}
-
-/* Input Styles */
-.input-base {
-  background-color: var(--card);
-  border: 1px solid var(--input);
-  color: var(--card-foreground);
-}
-
-.input-base:focus {
-  outline: none;
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
-}
-
-.input-error {
-  border-color: var(--destructive);
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.input-error:focus {
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-}
-
-/* Status Colors */
-.bg-success { background-color: var(--success); }
-.text-success { color: var(--success); }
-.border-success { border-color: var(--success); }
-.bg-error { background-color: var(--error); }
-.text-error { color: var(--error); }
-.border-error { border-color: var(--error); }
-.bg-warning { background-color: var(--warning); }
-.text-warning { color: var(--warning); }
-.border-warning { border-color: var(--warning); }
-.bg-info { background-color: var(--info); }
-.text-info { color: var(--info); }
-.border-info { border-color: var(--info); }
-
-/* Additional border colors for theme integration */
-.border-primary { border-color: var(--primary); }
-.border-destructive { border-color: var(--destructive); }
-.border-brand-primary { border-color: var(--brand-primary); }
-.border-brand-tertiary { border-color: var(--brand-tertiary); }
 
 /* ==============================================
-   LAYOUT COMPONENTS
+   OPACITY BACKGROUND COLORS
    ============================================== */
-.container {
-    max-width: 1200px;
-    margin: initial auto;
-    padding: 0 1rem;
-}
-
-nav {
-    position: sticky;
-    top: 0;
-    left: 0;
-}
-
-main {
-  min-height: calc(100vh - 144px);
-    display: flex;
-    flex-direction: column;
-}
-
-main > div {
-  min-height: calc(100vh - 144px);
-}
-
-/* ==============================================
-   UI COMPONENTS
-   ============================================== */
-.btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  background: var(--gradient-primary);
-    color: white;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
-}
-
-.card {
-  background: var(--card);
-  color: var(--card-foreground);
-  border-radius: var(--radius);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    margin: 1rem 0;
-  border: 1px solid var(--border);
-}
-
-.glass-effect {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* ==============================================
-   AUTH PAGE SPECIFIC
-   ============================================== */
-.auth-page {
-  background: var(--background);
-    min-height: 100vh;
-}
-
-.auth-pattern-bg {
-  background-image: radial-gradient(circle at 1px 1px, rgba(251, 191, 36, 0.15) 1px, transparent 0);
-  background-size: 20px 20px;
-}
-
-.auth-hero-shadow { text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-.auth-card-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-
-.enhanced-hero-bg {
-  background: var(--gradient-auth);
-  position: relative;
-}
-
-.enhanced-hero-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.1) 100%);
-  pointer-events: none;
-}
-
-/* ==============================================
-   SCROLLBAR STYLING
-   ============================================== */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--muted);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--gradient-primary);
-    border-radius: 10px;
-  border: 2px solid var(--muted);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-}
-
-::-webkit-scrollbar-corner { background: transparent; }
-
-* {
-    scrollbar-width: thin;
-  scrollbar-color: var(--brand-secondary) var(--muted);
-}
-
-@supports (scrollbar-gutter: stable) {
-  body { scrollbar-gutter: stable; }
-}
-
-/* ==============================================
-   UTILITY CLASSES
-   ============================================== */
-
-/* Overflow Classes */
-.overflow-x-auto { overflow-x: auto; }
-.overflow-x-scroll { overflow-x: scroll; }
-
-.table-container { width: 100%; overflow-x: auto; }
-.table-scroll {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-/* Line Clamping */
-.line-clamp-1,
-.line-clamp-2,
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-}
-
-.line-clamp-1 { -webkit-line-clamp: 1; }
-.line-clamp-2 { -webkit-line-clamp: 2; }
-.line-clamp-3 { -webkit-line-clamp: 3; }
-
-/* Toggle/Checkbox Styles */
-.toggle-checkbox {
-  opacity: 0;
-  position: absolute;
-}
-
-.toggle-checkbox:checked { right: 0px; }
-.toggle-checkbox:checked + .toggle-label { background-color: var(--primary-color); }
-.toggle-label { transition: background-color 0.2s ease; }
-
-/* FAQ Accordion */
-.faq-accordion-content { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-.faq-accordion-enter { animation: slideDown 0.5s ease-out forwards; }
-.faq-accordion-exit { animation: slideUp 0.3s ease-in forwards; }
-
-/* Generic Styles */
-a {
-  text-decoration: none;
-}
-
-/* Essential admin dashboard utilities - only used classes */
-.bg-gradient-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
-.bg-gradient-success-light { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
-.bg-gradient-brand-tertiary-light { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); }
-.bg-gradient-brand-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
-.bg-gradient-indigo-light { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05)); }
-
-/* Essential background colors for admin sections */
+/* Admin Section Opacity Backgrounds */
 .bg-primary-5 { background-color: rgba(245, 158, 11, 0.05); }
 .bg-success-5 { background-color: rgba(16, 185, 129, 0.05); }
 .bg-success-10 { background-color: rgba(16, 185, 129, 0.1); }
@@ -584,7 +332,28 @@ a {
 .bg-teal-10 { background-color: rgba(20, 184, 166, 0.1); }
 .bg-pink-10 { background-color: rgba(236, 72, 153, 0.1); }
 
-/* Essential text colors for admin sections */
+/* White Opacity Backgrounds */
+.bg-white-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+.bg-white-90 { background-color: rgba(255, 255, 255, 0.9); }
+
+/* ==============================================
+   COLOR UTILITY CLASSES
+   ============================================== */
+/* Text Colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-brand { color: var(--brand-dark); }
+.text-brand-primary { color: var(--brand-primary); }
+.text-brand-secondary { color: var(--brand-secondary); }
+.text-brand-tertiary { color: var(--brand-tertiary); }
+.text-brand-dark { color: var(--brand-darker); }
+.text-brand-dark:hover { color: #92400e !important; }
+
+/* Admin Section Text Colors */
 .text-indigo { color: rgb(99, 102, 241); }
 .text-purple { color: rgb(147, 51, 234); }
 .text-cyan { color: rgb(6, 182, 212); }
@@ -616,15 +385,63 @@ a {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Background Opacity Classes */
-.bg-white-20 {
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-}
+/* Background Colors */
+.bg-brand-light { background-color: var(--brand-light); }
+.bg-brand { background-color: var(--brand-secondary); }
+.bg-brand:hover { background-color: var(--brand-dark); }
+.bg-brand-tertiary { background-color: var(--brand-tertiary); }
 
-.bg-white-90 { background-color: rgba(255, 255, 255, 0.9); }
+/* Surface & Page Backgrounds */
+.features-bg { background-color: var(--surface-primary); }
+.events-bg { background-color: var(--surface-secondary); }
+.faq-bg { background-color: var(--surface-primary); }
 
-/* Button Styles */
+/* Card & Surface Colors */
+.bg-card { background-color: var(--card); }
+.bg-card-hover { background-color: var(--muted); }
+.border-card { border-color: var(--border); }
+.text-card { color: var(--card-foreground); }
+
+/* Core Theme Utility Classes */
+.bg-primary { background-color: var(--primary); }
+.text-primary-foreground { color: var(--primary-foreground); }
+.bg-secondary { background-color: var(--secondary); }
+.text-secondary-foreground { color: var(--secondary-foreground); }
+.bg-accent { background-color: var(--accent); }
+.text-accent-foreground { color: var(--accent-foreground); }
+.bg-destructive { background-color: var(--destructive); }
+.text-destructive-foreground { color: var(--destructive-foreground); }
+
+/* Status Colors */
+.bg-success { background-color: var(--success); }
+.text-success { color: var(--success); }
+.border-success { border-color: var(--success); }
+.bg-error { background-color: var(--error); }
+.text-error { color: var(--error); }
+.border-error { border-color: var(--error); }
+.bg-warning { background-color: var(--warning); }
+.text-warning { color: var(--warning); }
+.border-warning { border-color: var(--warning); }
+.bg-info { background-color: var(--info); }
+.text-info { color: var(--info); }
+.border-info { border-color: var(--info); }
+
+/* Border Colors */
+.border-primary { border-color: var(--primary); }
+.border-destructive { border-color: var(--destructive); }
+.border-brand-primary { border-color: var(--brand-primary); }
+.border-brand-tertiary { border-color: var(--brand-tertiary); }
+
+/* Footer Colors */
+.footer-bg { background-color: var(--footer-bg); }
+.footer-text { color: var(--footer-text); }
+.footer-text-muted { color: var(--footer-text-muted); }
+.footer-text-muted:hover { color: var(--footer-text); }
+.footer-border { border-color: var(--footer-border); }
+
+/* ==============================================
+   BUTTON STYLES
+   ============================================== */
 .btn-primary {
   background-color: var(--primary);
   color: var(--primary-foreground);
@@ -658,19 +475,211 @@ a {
   border-color: #dc2626;
 }
 
-/* Footer Utility Classes */
-.footer-bg { background-color: var(--footer-bg); }
-.footer-text { color: var(--footer-text); }
-.footer-text-muted { color: var(--footer-text-muted); }
-.footer-text-muted:hover { color: var(--footer-text); }
-.footer-border { border-color: var(--footer-border); }
+/* ==============================================
+   INPUT & FORM STYLES
+   ============================================== */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
 
-/* Legacy class names for backward compatibility */
+.input-base {
+  background-color: var(--card);
+  border: 1px solid var(--input);
+  color: var(--card-foreground);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+}
+
+.input-error {
+  border-color: var(--destructive);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* ==============================================
+   LAYOUT COMPONENTS
+   ============================================== */
+.container {
+  max-width: 1200px;
+  margin: initial auto;
+  padding: 0 1rem;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+main {
+  min-height: calc(100vh - 144px);
+  display: flex;
+  flex-direction: column;
+}
+
+main > div {
+  min-height: calc(100vh - 144px);
+}
+
+/* ==============================================
+   UI COMPONENTS
+   ============================================== */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  background: var(--gradient-primary);
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ==============================================
+   UTILITY CLASSES
+   ============================================== */
+/* Overflow Classes */
+.overflow-x-auto { overflow-x: auto; }
+.overflow-x-scroll { overflow-x: scroll; }
+
+.table-container { width: 100%; overflow-x: auto; }
+.table-scroll {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Line Clamping */
+.line-clamp-1,
+.line-clamp-2,
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-1 { -webkit-line-clamp: 1; }
+.line-clamp-2 { -webkit-line-clamp: 2; }
+.line-clamp-3 { -webkit-line-clamp: 3; }
+
+/* Toggle/Checkbox Styles */
+.toggle-checkbox {
+  opacity: 0;
+  position: absolute;
+}
+
+.toggle-checkbox:checked { right: 0px; }
+.toggle-checkbox:checked + .toggle-label { background-color: var(--primary-color); }
+.toggle-label { transition: background-color 0.2s ease; }
+
+/* FAQ Accordion */
+.faq-accordion-content { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.faq-accordion-enter { animation: slideDown 0.5s ease-out forwards; }
+.faq-accordion-exit { animation: slideUp 0.3s ease-in forwards; }
+
+/* ==============================================
+   SCROLLBAR STYLING
+   ============================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  border: 2px solid var(--muted);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+::-webkit-scrollbar-corner { background: transparent; }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-secondary) var(--muted);
+}
+
+@supports (scrollbar-gutter: stable) {
+  body { scrollbar-gutter: stable; }
+}
+
+/* ==============================================
+   PAGE-SPECIFIC STYLES
+   ============================================== */
+/* Auth Page Styles */
+.auth-page {
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.auth-pattern-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(251, 191, 36, 0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.auth-hero-shadow { text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+.auth-card-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+.enhanced-hero-bg {
+  background: var(--gradient-auth);
+  position: relative;
+}
+
+.enhanced-hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* ==============================================
+   LEGACY COMPATIBILITY CLASSES
+   ============================================== */
 .ym-hero-bg { background: var(--gradient-hero); }
 .ym-auth-bg { background: var(--gradient-auth); }
-.ym-hero-image-bg { 
-  background: var(--gradient-hero-image) ; 
-}
+.ym-hero-image-bg { background: var(--gradient-hero-image); }
 .ym-hero-image-overlay {
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2));
 }
@@ -709,9 +718,8 @@ a {
 .ym-footer-border { border-color: var(--footer-border); }
 
 /* ==============================================
-   DARK MODE SPECIFIC ENHANCEMENTS
+   DARK MODE ENHANCEMENTS
    ============================================== */
-
 /* Enhanced background gradients for dark mode */
 .dark .bg-gradient-primary-light { 
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 

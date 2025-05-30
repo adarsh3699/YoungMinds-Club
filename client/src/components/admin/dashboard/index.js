@@ -8,6 +8,6 @@ export { default as LoadingComponent } from './LoadingComponent';
 export { default as UserStatsCards } from './UserStatsCards';
 export { default as UserSearchFilters } from './UserSearchFilters';
 export { default as UsersTable } from './UsersTable';
-export { default as AdminUserModal } from './AdminUserModal';
-export { default as AdminPageHeader } from './AdminPageHeader'; 
+export { default as AdminConfirmationModal } from './AdminConfirmationModal';
+export { default as AdminPageHeader } from './AdminPageHeader';
 export { default as DashboardHeader } from './DashboardHeader'; 

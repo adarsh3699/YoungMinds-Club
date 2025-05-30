@@ -5,7 +5,7 @@ import {
 	UserStatsCards,
 	UserSearchFilters,
 	UsersTable,
-	AdminUserModal,
+	AdminConfirmationModal,
 	AdminPageHeader,
 } from '../../components/admin/dashboard';
 import {
@@ -408,7 +408,7 @@ const UsersPage = () => {
 				<div className="h-32" />
 
 				{/* Optimized Modal */}
-				<AdminUserModal
+				<AdminConfirmationModal
 					modalType={modal.type}
 					isOpen={modal.isOpen}
 					onClose={closeModal}
