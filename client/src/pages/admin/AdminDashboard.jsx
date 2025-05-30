@@ -18,8 +18,8 @@ import {
 	AdminSectionCard,
 	AnnouncementForm,
 	TopOrganizers,
-	ActiveUsers,
 	DashboardHeader,
+	ActiveUsers,
 	LoadingComponent,
 } from '../../components/admin/dashboard';
 
@@ -52,7 +52,7 @@ const TARGET_AUDIENCES = [
 	{ value: 'organizers', label: 'Organizers' },
 ];
 
-const Dashboard = () => {
+const AdminDashboard = () => {
 	const { user } = useAuth();
 	const { showError } = useError();
 	const [loading, setLoading] = useState(true);
@@ -289,4 +289,4 @@ const Dashboard = () => {
 	);
 };
 
-export default Dashboard;
+export default AdminDashboard;
