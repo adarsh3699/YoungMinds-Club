@@ -1,4 +1,5 @@
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { NavLink } from 'react-router-dom';
 
 const AdminPageHeader = ({
 	icon,
@@ -23,13 +24,13 @@ const AdminPageHeader = ({
 						<p className="text-muted-foreground mt-1">{description}</p>
 					</div>
 				</div>
-				<a
-					href={backLink}
+				<NavLink
+					to={backLink}
 					className="btn-primary px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg flex items-center gap-2 w-fit"
 				>
 					<ChevronDownIcon className="w-4 h-4 rotate-90" />
 					{backText}
-				</a>
+				</NavLink>
 			</div>
 		</div>
 	);
