@@ -1,4 +1,7 @@
-const LoadingComponent = () => {
+import React from 'react';
+import { LoadingComponentProps } from '@/types';
+
+const LoadingComponent: React.FC<LoadingComponentProps> = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
 			<div className="container mx-auto px-4 py-8">
@@ -17,4 +20,4 @@ const LoadingComponent = () => {
 	);
 };
 
-export default LoadingComponent;
+export default LoadingComponent; 

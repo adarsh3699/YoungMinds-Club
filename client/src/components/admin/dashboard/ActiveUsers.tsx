@@ -1,8 +1,10 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { UserIcon } from '@heroicons/react/24/outline';
 import UserCard from './UserCard';
+import { ActiveUsersProps } from '@/types';
 
-const ActiveUsers = ({ activeUsers }) => {
+const ActiveUsers: React.FC<ActiveUsersProps> = ({ users = [] }) => {
 	return (
 		<div className="bg-card rounded-xl shadow-lg border border-border/50 overflow-hidden backdrop-blur-sm">
 			<div className="bg-gradient-to-r from-info/10 to-brand-light/10 p-6 border-b border-border/30">
@@ -14,14 +16,14 @@ const ActiveUsers = ({ activeUsers }) => {
 			</div>
 
 			<div className="p-6">
-				{activeUsers.length === 0 ? (
+				{users.length === 0 ? (
 					<div className="text-center py-8">
 						<UserIcon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
 						<p className="text-muted-foreground">No data available</p>
 					</div>
 				) : (
 					<div className="space-y-4">
-						{activeUsers.map((user, index) => (
+						{users.map((user, index) => (
 							<UserCard key={user._id} user={user} index={index} type="user" />
 						))}
 					</div>
@@ -41,4 +43,4 @@ const ActiveUsers = ({ activeUsers }) => {
 	);
 };
 
-export default ActiveUsers;
+export default ActiveUsers; 

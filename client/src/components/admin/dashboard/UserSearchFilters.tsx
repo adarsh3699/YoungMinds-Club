@@ -1,22 +1,23 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { FormInput, SelectInput } from '../../common';
+import { UserSearchFiltersProps, AdminRoleOption, StatusOption } from '@/types';
 
-const ROLE_OPTIONS = [
+const ROLE_OPTIONS: AdminRoleOption[] = [
 	{ value: 'all', label: 'All Roles' },
 	{ value: 'user', label: 'Users' },
 	{ value: 'organizer', label: 'Organizers' },
 	{ value: 'admin', label: 'Admins' },
 ];
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: StatusOption[] = [
 	{ value: 'all', label: 'All Status' },
 	{ value: 'active', label: 'Active' },
 	{ value: 'suspended', label: 'Suspended' },
 	{ value: 'flagged', label: 'Flagged' },
 ];
 
-const UserSearchFilters = memo(
+const UserSearchFilters: React.FC<UserSearchFiltersProps> = memo(
 	({
 		searchTerm,
 		setSearchTerm,
@@ -31,6 +32,20 @@ const UserSearchFilters = memo(
 		// Show role filter only if both roleFilter and setRoleFilter are provided
 		const showRoleFilter = roleFilter !== undefined && setRoleFilter !== undefined;
 
+		const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+			setSearchTerm(e.target.value);
+		};
+
+		const handleRoleChange = (e: { target: { name: string; value: string | number } }): void => {
+			if (setRoleFilter) {
+				setRoleFilter(e.target.value as string);
+			}
+		};
+
+		const handleStatusChange = (e: { target: { name: string; value: string | number } }): void => {
+			setStatusFilter(e.target.value as string);
+		};
+
 		return (
 			<div
 				className="bg-card rounded-2xl shadow-xl p-6 mb-8 animate-fade-in relative z-20"
@@ -44,9 +59,10 @@ const UserSearchFilters = memo(
 					<div className="flex-1">
 						<FormInput
 							type="text"
+							name="search"
 							placeholder="Search users by name or email..."
 							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
+							onChange={handleSearchChange}
 							icon={<MagnifyingGlassIcon className="w-5 h-5" />}
 							className="w-full"
 						/>
@@ -56,10 +72,10 @@ const UserSearchFilters = memo(
 					{showRoleFilter && (
 						<div className="min-w-[180px]">
 							<SelectInput
+								name="roleFilter"
 								value={roleFilter}
-								onChange={(e) => setRoleFilter(e.target.value)}
+								onChange={handleRoleChange}
 								options={ROLE_OPTIONS}
-								icon={<FunnelIcon className="w-5 h-5" />}
 								className="w-full"
 							/>
 						</div>
@@ -68,10 +84,10 @@ const UserSearchFilters = memo(
 					{/* Status Filter */}
 					<div className="min-w-[180px]">
 						<SelectInput
+							name="statusFilter"
 							value={statusFilter}
-							onChange={(e) => setStatusFilter(e.target.value)}
+							onChange={handleStatusChange}
 							options={STATUS_OPTIONS}
-							icon={<ExclamationCircleIcon className="w-5 h-5" />}
 							className="w-full"
 						/>
 					</div>
@@ -88,4 +104,4 @@ const UserSearchFilters = memo(
 
 UserSearchFilters.displayName = 'UserSearchFilters';
 
-export default UserSearchFilters;
+export default UserSearchFilters; 

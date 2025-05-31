@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
+import { UserStatsCardsComponentProps, StatCardProps } from '@/types';
 
-const StatCard = memo(({ value, label, color = 'text-card-foreground', delay }) => (
+const StatCard: React.FC<StatCardProps> = memo(({ value, label, color = 'text-card-foreground', delay }) => (
 	<div
 		className="bg-card rounded-xl p-4 shadow-lg border border-border hover:shadow-xl transition-all duration-200 animate-fade-in"
 		style={{
@@ -15,7 +16,7 @@ const StatCard = memo(({ value, label, color = 'text-card-foreground', delay }) 
 
 StatCard.displayName = 'StatCard';
 
-const UserStatsCards = ({ userStats }) => {
+const UserStatsCards: React.FC<UserStatsCardsComponentProps> = ({ userStats }) => {
 	const stats = [
 		{ value: userStats.total, label: 'Total Users', color: 'text-card-foreground' },
 		{ value: userStats.active, label: 'Active', color: 'text-success' },
@@ -41,4 +42,4 @@ const UserStatsCards = ({ userStats }) => {
 	);
 };
 
-export default UserStatsCards;
+export default UserStatsCards; 

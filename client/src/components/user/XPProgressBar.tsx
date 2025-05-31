@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
+import { XPLevel, XPProgressBarProps } from '@/types';
 
-const XPProgressBar = ({ xp }) => {
+const XPProgressBar: React.FC<XPProgressBarProps> = ({ xp }) => {
 	// Define XP thresholds for each level
-	const levels = useMemo(
+	const levels: XPLevel[] = useMemo(
 		() => [
 			{ name: 'Newbie', min: 0, max: 49 },
 			{ name: 'Regular', min: 50, max: 149 },
@@ -14,18 +15,18 @@ const XPProgressBar = ({ xp }) => {
 	);
 
 	// Find current level based on XP
-	const currentLevel = useMemo(() => {
-		return levels.find((level) => xp >= level.min && xp <= level.max);
+	const currentLevel = useMemo((): XPLevel => {
+		return levels.find((level) => xp >= level.min && xp <= level.max) || levels[0];
 	}, [xp, levels]);
 
 	// Find next level
-	const nextLevel = useMemo(() => {
+	const nextLevel = useMemo((): XPLevel | null => {
 		const currentLevelIndex = levels.findIndex((level) => level.name === currentLevel.name);
 		return currentLevelIndex < levels.length - 1 ? levels[currentLevelIndex + 1] : null;
 	}, [currentLevel, levels]);
 
 	// Calculate progress percentage
-	const progressPercentage = useMemo(() => {
+	const progressPercentage = useMemo((): number => {
 		if (!nextLevel) return 100; // Already at max level
 
 		const totalRange = nextLevel.min - currentLevel.min;
@@ -34,7 +35,7 @@ const XPProgressBar = ({ xp }) => {
 	}, [xp, currentLevel, nextLevel]);
 
 	// XP needed for next level
-	const xpForNextLevel = useMemo(() => {
+	const xpForNextLevel = useMemo((): number => {
 		return nextLevel ? nextLevel.min - xp : 0;
 	}, [xp, nextLevel]);
 
@@ -60,7 +61,7 @@ const XPProgressBar = ({ xp }) => {
 				></div>
 
 				{/* Level markers */}
-				{levels.slice(1, -1).map((level, index) => (
+				{levels.slice(1, -1).map((level) => (
 					<div
 						key={level.name}
 						className="absolute top-0 bottom-0 border-l ym-border-card"
@@ -98,4 +99,4 @@ const XPProgressBar = ({ xp }) => {
 	);
 };
 
-export default XPProgressBar;
+export default XPProgressBar; 

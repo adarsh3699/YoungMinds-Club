@@ -1,4 +1,7 @@
-const BadgeCollection = ({ badges, getBadgeInfo }) => {
+import React from 'react';
+import { BadgeCollectionProps } from '@/types';
+
+const BadgeCollection: React.FC<BadgeCollectionProps> = ({ badges, getBadgeInfo }) => {
 	return (
 		<div className="ym-bg-card rounded-xl shadow-lg p-6 border ym-border-card animate-fade-in h-fit">
 			<div className="flex items-center justify-between mb-6">
@@ -95,30 +98,12 @@ const BadgeCollection = ({ badges, getBadgeInfo }) => {
 										<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 group-hover:animate-pulse rounded-xl"></div>
 									)}
 
-									{/* Lock Icon for Locked Badges */}
-									{/* {!isUnlocked && (
-										<div className="absolute top-2 right-2">
-											<svg
-												className="w-4 h-4 text-gray-400"
-												fill="currentColor"
-												viewBox="0 0 20 20"
-											>
-												<path
-													fillRule="evenodd"
-													d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-													clipRule="evenodd"
-												/>
-											</svg>
-										</div>
-									)} */}
-
 									{/* Badge Icon with Glow Effect */}
 									<div
 										className={`text-4xl mb-3 transition-all duration-300 ${
 											isUnlocked ? 'group-hover:scale-110 group-hover:animate-pulse' : 'grayscale'
 										}`}
 									>
-										{/* {isUnlocked ? ( */}
 										<div className="relative">{badgeInfo.icon}</div>
 									</div>
 
@@ -218,4 +203,4 @@ const BadgeCollection = ({ badges, getBadgeInfo }) => {
 	);
 };
 
-export default BadgeCollection;
+export default BadgeCollection; 

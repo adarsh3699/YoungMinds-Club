@@ -1,7 +1,9 @@
+import React from 'react';
 import { AcademicCapIcon } from '@heroicons/react/24/outline';
 import XPProgressBar from '../XPProgressBar';
+import { XPSectionProps } from '@/types';
 
-const XPSection = ({ userProfile, xpHistory }) => {
+const XPSection: React.FC<XPSectionProps> = ({ userProfile, xpHistory }) => {
 	return (
 		<div className="ym-bg-card rounded-xl shadow-lg p-6 mt-6 border ym-border-card animate-fade-in">
 			<h2 className="text-xl font-semibold ym-text-primary mb-4">XP Progress</h2>
@@ -64,4 +66,4 @@ const XPSection = ({ userProfile, xpHistory }) => {
 	);
 };
 
-export default XPSection;
+export default XPSection; 

@@ -1,8 +1,10 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
 import UserCard from './UserCard';
+import { TopOrganizersProps } from '@/types';
 
-const TopOrganizers = ({ topOrganizers }) => {
+const TopOrganizers: React.FC<TopOrganizersProps> = ({ organizers = [] }) => {
 	return (
 		<div className="bg-card rounded-xl shadow-lg border border-border/50 overflow-hidden backdrop-blur-sm">
 			<div className="bg-gradient-to-r from-success/10 to-brand-light/10 p-6 border-b border-border/30">
@@ -14,14 +16,14 @@ const TopOrganizers = ({ topOrganizers }) => {
 			</div>
 
 			<div className="p-6">
-				{topOrganizers.length === 0 ? (
+				{organizers.length === 0 ? (
 					<div className="text-center py-8">
 						<UserGroupIcon className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
 						<p className="text-muted-foreground">No data available</p>
 					</div>
 				) : (
 					<div className="space-y-4">
-						{topOrganizers.map((organizer, index) => (
+						{organizers.map((organizer, index) => (
 							<UserCard key={organizer._id} user={organizer} index={index} type="organizer" />
 						))}
 					</div>
@@ -41,4 +43,4 @@ const TopOrganizers = ({ topOrganizers }) => {
 	);
 };
 
-export default TopOrganizers;
+export default TopOrganizers; 

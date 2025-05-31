@@ -1,6 +1,8 @@
+import React from 'react';
 import { SparklesIcon } from '@heroicons/react/24/outline';
+import { DashboardHeaderProps } from '@/types';
 
-const DashboardHeader = () => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = () => {
 	return (
 		<div className="bg-gradient-to-r from-primary/10 via-brand-light to-accent/20 p-8 border-b border-border/30">
 			<div className="flex items-center space-x-3">
@@ -12,4 +14,4 @@ const DashboardHeader = () => {
 	);
 };
 
-export default DashboardHeader;
+export default DashboardHeader; 

@@ -1,16 +1,19 @@
-import { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { ExclamationTriangleIcon, FlagIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../common';
+import { AdminConfirmationModalProps, ModalConfiguration } from '@/types';
 
 // Constants for better maintainability and performance
 const MODAL_TYPES = {
-	DELETE: 'delete',
-	STATUS: 'status',
-	FLAG: 'flag',
-	DEMOTE: 'demote',
-};
+	DELETE: 'delete' as const,
+	STATUS: 'status' as const,
+	FLAG: 'flag' as const,
+	DEMOTE: 'demote' as const,
+} as const;
 
-const MODAL_CONFIGURATIONS = {
+type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
+
+const MODAL_CONFIGURATIONS: Record<ModalType, ModalConfiguration> = {
 	[MODAL_TYPES.DELETE]: {
 		title: 'Delete User',
 		iconBg: 'bg-destructive/10',
@@ -18,12 +21,13 @@ const MODAL_CONFIGURATIONS = {
 		baseMessage: 'Are you sure you want to delete "{userName}"? This action cannot be undone.',
 		confirmClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/80',
 		getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
-		getConfirmText: (deleteAllData) => (deleteAllData ? 'Delete Everything' : 'Delete User Only'),
+		getConfirmText: (deleteAllData: boolean) => (deleteAllData ? 'Delete Everything' : 'Delete User Only'),
 	},
 	[MODAL_TYPES.STATUS]: {
 		iconBg: 'bg-warning/10',
+		confirmClass: '',
 		getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-warning" />,
-		getConfig: (isActivating) => ({
+		getConfig: (isActivating: boolean) => ({
 			title: isActivating ? 'Activate User' : 'Suspend User',
 			headerTitle: isActivating ? 'Activate User Account' : 'Suspend User Account',
 			message: isActivating
@@ -39,7 +43,7 @@ const MODAL_CONFIGURATIONS = {
 		iconBg: 'bg-info/10',
 		confirmClass: 'bg-info text-white hover:bg-info/80',
 		getIcon: () => <FlagIcon className="w-8 h-8 text-info" />,
-		getConfig: (isFlagged) => ({
+		getConfig: (isFlagged: boolean) => ({
 			title: isFlagged ? 'Unflag User' : 'Flag User',
 			headerTitle: isFlagged ? 'Remove Flag' : 'Flag User',
 			message: isFlagged
@@ -63,64 +67,78 @@ const BASE_BUTTON_CLASSES = 'flex-1 px-4 py-3 rounded-xl transition-all duration
 const DISABLED_BUTTON_CLASSES = `${BASE_BUTTON_CLASSES} bg-muted text-muted-foreground cursor-not-allowed opacity-50`;
 const ACTIVE_BUTTON_TRANSFORM = 'transform hover:scale-105';
 
-const AdminConfirmationModal = memo(
+interface ExtendedConfig extends ModalConfiguration {
+	title: string;
+	headerTitle: string;
+	message: string;
+	confirmText: string;
+	icon: React.ReactNode;
+}
+
+const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 	({
 		modalType,
 		isOpen,
 		onClose,
 		userName,
-		deleteAllData,
+		deleteAllData = false,
 		onToggleDeleteAllData,
 		currentStatus,
-		isFlagged,
-		flagReason,
+		isFlagged = false,
+		flagReason = '',
 		onFlagReasonChange,
 		onConfirm,
 	}) => {
 		// Memoized modal configuration with optimized logic
-		const config = useMemo(() => {
-			if (!modalType || !MODAL_CONFIGURATIONS[modalType]) return {};
-
+		const config = useMemo((): ExtendedConfig => {
 			const baseConfig = MODAL_CONFIGURATIONS[modalType];
+			if (!baseConfig) return {} as ExtendedConfig;
+
 			const message = (baseConfig.baseMessage || baseConfig.message || '').replace('{userName}', userName);
 
 			switch (modalType) {
 				case MODAL_TYPES.DELETE:
 					return {
 						...baseConfig,
+						title: baseConfig.title!,
+						headerTitle: baseConfig.headerTitle!,
 						message,
-						icon: baseConfig.getIcon(),
-						confirmText: baseConfig.getConfirmText(deleteAllData),
+						icon: baseConfig.getIcon!(),
+						confirmText: baseConfig.getConfirmText!(deleteAllData),
 					};
 
 				case MODAL_TYPES.STATUS:
 					const isActivating = currentStatus === 'suspended';
-					const statusConfig = baseConfig.getConfig(isActivating);
+					const statusConfig = baseConfig.getConfig!(isActivating);
 					return {
 						...baseConfig,
 						...statusConfig,
 						message: statusConfig.message.replace('{userName}', userName),
-						icon: baseConfig.getIcon(),
+						icon: baseConfig.getIcon!(),
+						confirmClass: statusConfig.confirmClass || baseConfig.confirmClass,
 					};
 
 				case MODAL_TYPES.FLAG:
-					const flagConfig = baseConfig.getConfig(isFlagged);
+					const flagConfig = baseConfig.getConfig!(isFlagged);
 					return {
 						...baseConfig,
 						...flagConfig,
 						message: flagConfig.message.replace('{userName}', userName),
-						icon: baseConfig.getIcon(),
+						icon: baseConfig.getIcon!(),
 					};
 
 				case MODAL_TYPES.DEMOTE:
 					return {
 						...baseConfig,
+						title: baseConfig.title!,
+						headerTitle: baseConfig.headerTitle!,
 						message,
-						icon: baseConfig.getIcon(),
+						confirmText: baseConfig.confirmText!,
+						icon: baseConfig.getIcon!(),
 					};
 
 				default:
-					return baseConfig;
+					return baseConfig as ExtendedConfig;
 			}
 		}, [modalType, userName, deleteAllData, currentStatus, isFlagged]);
 
@@ -280,4 +298,4 @@ const AdminConfirmationModal = memo(
 
 AdminConfirmationModal.displayName = 'AdminConfirmationModal';
 
-export default AdminConfirmationModal;
+export default AdminConfirmationModal; 

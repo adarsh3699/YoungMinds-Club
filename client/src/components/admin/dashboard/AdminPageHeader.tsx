@@ -1,7 +1,9 @@
+import React from 'react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { NavLink } from 'react-router-dom';
+import { AdminPageHeaderProps } from '@/types';
 
-const AdminPageHeader = ({
+const AdminPageHeader: React.FC<AdminPageHeaderProps> = ({
 	icon,
 	title,
 	description,
@@ -36,4 +38,4 @@ const AdminPageHeader = ({
 	);
 };
 
-export default AdminPageHeader;
+export default AdminPageHeader; 

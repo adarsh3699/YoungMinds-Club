@@ -1,9 +1,10 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
+import { UsersTableProps, EmptyStateProps, TableHeaderProps, LoadingSpinnerProps } from '@/types';
 
-const EmptyState = memo(({ hasFilters }) => (
+const EmptyState: React.FC<EmptyStateProps> = memo(({ hasFilters }) => (
 	<tr>
-		<td colSpan="5" className="py-20 text-center">
+		<td colSpan={5} className="py-20 text-center">
 			<div className="flex flex-col items-center gap-4 animate-fade-in">
 				<UserGroupIcon className="w-16 h-16 text-muted-foreground/50" />
 				<div>
@@ -19,7 +20,7 @@ const EmptyState = memo(({ hasFilters }) => (
 
 EmptyState.displayName = 'EmptyState';
 
-const TableHeader = memo(() => (
+const TableHeader: React.FC<TableHeaderProps> = memo(() => (
 	<thead className="bg-gradient-to-r from-muted to-muted/50">
 		<tr>
 			<th className="py-4 px-6 text-left text-sm font-semibold text-card-foreground border-b border-border">
@@ -43,7 +44,7 @@ const TableHeader = memo(() => (
 
 TableHeader.displayName = 'TableHeader';
 
-const LoadingSpinner = memo(() => (
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(() => (
 	<div className="text-center py-20">
 		<div className="inline-flex items-center gap-3 text-muted-foreground">
 			<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -54,7 +55,7 @@ const LoadingSpinner = memo(() => (
 
 LoadingSpinner.displayName = 'LoadingSpinner';
 
-const UsersTable = ({
+const UsersTable: React.FC<UsersTableProps> = ({
 	loading,
 	filteredUsers,
 	searchTerm,
@@ -63,7 +64,7 @@ const UsersTable = ({
 	renderUserRow,
 	animationDelay = '0.35s',
 }) => {
-	const hasFilters = searchTerm || roleFilter !== 'all' || statusFilter !== 'all';
+	const hasFilters = Boolean(searchTerm || (roleFilter && roleFilter !== 'all') || statusFilter !== 'all');
 	const isEmpty = filteredUsers.length === 0 && !loading;
 
 	return (
@@ -91,4 +92,4 @@ const UsersTable = ({
 	);
 };
 
-export default UsersTable;
+export default UsersTable; 

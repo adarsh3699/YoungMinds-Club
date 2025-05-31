@@ -1,6 +1,8 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { AdminSectionCardComponentProps } from '@/types';
 
-const AdminSectionCard = ({ section }) => {
+const AdminSectionCard: React.FC<AdminSectionCardComponentProps> = ({ section }) => {
 	return (
 		<Link
 			to={section.link}
@@ -35,4 +37,4 @@ const AdminSectionCard = ({ section }) => {
 	);
 };
 
-export default AdminSectionCard;
+export default AdminSectionCard; 

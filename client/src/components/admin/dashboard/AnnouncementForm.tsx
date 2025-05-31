@@ -1,38 +1,39 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { MegaphoneIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { AnnouncementFormComponentProps, AnnouncementFormState, AnnouncementTypeOption, TargetAudienceOption } from '@/types';
 
 // Constants
-const INITIAL_ANNOUNCEMENT = {
+const INITIAL_ANNOUNCEMENT: AnnouncementFormState = {
 	title: '',
 	message: '',
 	type: 'info',
 	target: 'all',
 };
 
-const ANNOUNCEMENT_TYPES = [
+const ANNOUNCEMENT_TYPES: AnnouncementTypeOption[] = [
 	{ value: 'info', label: 'Information' },
 	{ value: 'success', label: 'Success' },
 	{ value: 'warning', label: 'Warning' },
 	{ value: 'error', label: 'Error' },
 ];
 
-const TARGET_AUDIENCES = [
+const TARGET_AUDIENCES: TargetAudienceOption[] = [
 	{ value: 'all', label: 'All Users' },
 	{ value: 'users', label: 'Regular Users' },
 	{ value: 'organizers', label: 'Organizers' },
 ];
 
-const AnnouncementForm = ({ showForm, onToggleForm }) => {
-	const [announcement, setAnnouncement] = useState(INITIAL_ANNOUNCEMENT);
+const AnnouncementForm: React.FC<AnnouncementFormComponentProps> = ({ showForm, onToggleForm }) => {
+	const [announcement, setAnnouncement] = useState<AnnouncementFormState>(INITIAL_ANNOUNCEMENT);
 
-	const handleAnnouncementChange = useCallback((e) => {
+	const handleAnnouncementChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
 		setAnnouncement((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
 	const submitAnnouncement = useCallback(
-		async (e) => {
+		async (e: React.FormEvent<HTMLFormElement>) => {
 			e.preventDefault();
 			try {
 				const response = await axios.post('/admin/announcements', announcement);
@@ -170,4 +171,4 @@ const AnnouncementForm = ({ showForm, onToggleForm }) => {
 	);
 };
 
-export default AnnouncementForm;
+export default AnnouncementForm; 

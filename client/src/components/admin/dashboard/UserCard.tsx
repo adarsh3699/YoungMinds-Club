@@ -1,8 +1,9 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { StarIcon } from '@heroicons/react/24/outline';
+import { UserCardProps } from '@/types';
 
 // Optimized User Card Component
-const UserCard = memo(({ user, index, type = 'user' }) => {
+const UserCard: React.FC<UserCardProps> = memo(({ user, index, type = 'user' }) => {
 	const isOrganizer = type === 'organizer';
 	const colorClass = isOrganizer ? 'success' : 'info';
 
@@ -83,4 +84,4 @@ const UserCard = memo(({ user, index, type = 'user' }) => {
 
 UserCard.displayName = 'UserCard';
 
-export default UserCard;
+export default UserCard; 

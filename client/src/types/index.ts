@@ -521,4 +521,311 @@ export interface EventsSectionProps {}
 
 export interface FAQSectionProps {}
 
-export interface CTASectionProps {} 
+export interface CTASectionProps {}
+
+// User Component Types
+export interface UserProfile {
+  _id?: string;
+  name: string;
+  email: string;
+  college?: string;
+  profilePicture?: string;
+  badge?: string;
+  xp?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BadgeInfo {
+  icon: React.ReactNode;
+  color: string;
+}
+
+export interface BadgeItem {
+  _id?: string;
+  name: string;
+  description?: string;
+  unlocked?: boolean;
+  earnedDate?: string;
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface XPLevel {
+  name: string;
+  min: number;
+  max: number;
+}
+
+export interface XPHistoryEntry {
+  _id?: string;
+  date: string;
+  description: string;
+  amount: number;
+}
+
+export interface ProfileFormValues {
+  name: string;
+  email: string;
+  college: string;
+}
+
+// User Component Props
+export interface ProfileHeaderProps {
+  userProfile: UserProfile | null;
+  editMode: boolean;
+  formValues: ProfileFormValues;
+  saving: boolean;
+  onToggleEditMode: () => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSaveProfile: (e: React.FormEvent<HTMLFormElement>) => void;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  getBadgeInfo: (badgeName: string) => BadgeInfo;
+}
+
+export interface BadgeCollectionProps {
+  badges: BadgeItem[] | null;
+  getBadgeInfo: (badgeName: string) => BadgeInfo;
+}
+
+export interface XPProgressBarProps {
+  xp: number;
+}
+
+export interface XPSectionProps {
+  userProfile: UserProfile | null;
+  xpHistory: XPHistoryEntry[] | null;
+}
+
+// Admin Component Types
+export interface AdminPageHeaderProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  backLink?: string;
+  backText?: string;
+  iconBgColor?: string;
+}
+
+export interface AdminConfirmationModalProps {
+  modalType: 'delete' | 'status' | 'flag' | 'demote';
+  isOpen: boolean;
+  onClose: () => void;
+  userName: string;
+  deleteAllData?: boolean;
+  onToggleDeleteAllData?: () => void;
+  currentStatus?: string;
+  isFlagged?: boolean;
+  flagReason?: string;
+  onFlagReasonChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onConfirm: () => void;
+}
+
+export interface UserSearchFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  roleFilter?: string;
+  setRoleFilter?: (role: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  filteredCount: number;
+  totalCount: number;
+  animationDelay?: string;
+}
+
+export interface StatusOption {
+  value: string;
+  label: string;
+}
+
+export interface AdminRoleOption {
+  value: string;
+  label: string;
+}
+
+export interface ModalConfiguration {
+  title?: string;
+  iconBg: string;
+  headerTitle?: string;
+  baseMessage?: string;
+  message?: string;
+  confirmText?: string;
+  confirmClass: string;
+  getIcon?: () => React.ReactNode;
+  getConfig?: (param: boolean) => {
+    title: string;
+    headerTitle: string;
+    message: string;
+    confirmText: string;
+    confirmClass?: string;
+  };
+  getConfirmText?: (param: boolean) => string;
+}
+
+// Dashboard Header Props
+export interface DashboardHeaderProps {}
+
+// Stats Card Props
+export interface StatsCardProps {
+  title: string;
+  value: string | number;
+  description: string;
+  icon: React.ReactNode;
+  bgClass: string;
+  borderClass: string;
+  iconBgClass: string;
+}
+
+// User Card Props
+export interface UserCardData {
+  _id?: string;
+  name: string;
+  profilePicture?: string;
+  badge?: string;
+  xp?: number;
+  eventsAttended?: number;
+  eventsCount?: number;
+  organizationName?: string;
+  rating?: number;
+  lastActive?: string;
+}
+
+export interface UserCardProps {
+  user: UserCardData;
+  index: number;
+  type?: 'user' | 'organizer';
+}
+
+// Loading Component Props
+export interface LoadingComponentProps {}
+
+// Users Table Props
+export interface UsersTableProps {
+  loading: boolean;
+  filteredUsers: any[];
+  searchTerm: string;
+  roleFilter?: string;
+  statusFilter: string;
+  renderUserRow: (userData: any, index: number) => React.ReactNode;
+  animationDelay?: string;
+}
+
+// Empty State Props
+export interface EmptyStateProps {
+  hasFilters: boolean;
+}
+
+// Table Header Props
+export interface TableHeaderProps {}
+
+// Loading Spinner Props  
+export interface LoadingSpinnerProps {}
+
+// Admin Section Card Props
+export interface AdminSectionCardProps {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+// Admin Section Data for cards
+export interface AdminSection {
+  title: string;
+  description: string;
+  link: string;
+  icon: React.ReactNode;
+  bg: string;
+  text: string;
+  count?: number;
+}
+
+// Updated Admin Section Card Props with proper section interface
+export interface AdminSectionCardComponentProps {
+  section: AdminSection;
+}
+
+// User Stats Cards Props
+export interface UserStatsCardsProps {
+  totalUsers: number;
+  activeUsers: number;
+  newUsersThisMonth: number;
+  suspendedUsers: number;
+  loading?: boolean;
+}
+
+// User Stats Data interface
+export interface UserStatsData {
+  total: number;
+  active: number;
+  suspended: number;
+  flagged: number;
+  admins: number;
+  organizers: number;
+  regularUsers: number;
+}
+
+// Updated User Stats Cards Props with proper data interface
+export interface UserStatsCardsComponentProps {
+  userStats: UserStatsData;
+}
+
+// Stat Card Props for internal component
+export interface StatCardProps {
+  value: number;
+  label: string;
+  color?: string;
+  delay: string;
+}
+
+// Announcement Form Props
+export interface AnnouncementFormProps {
+  onSubmit?: (announcement: AnnouncementData) => void;
+  loading?: boolean;
+}
+
+export interface AnnouncementData {
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  priority: 'low' | 'medium' | 'high';
+  targetAudience: 'all' | 'users' | 'organizers' | 'admins';
+  expiresAt?: string;
+}
+
+// Updated Announcement Form Props for the actual component
+export interface AnnouncementFormComponentProps {
+  showForm: boolean;
+  onToggleForm: () => void;
+}
+
+// Announcement Form State
+export interface AnnouncementFormState {
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  target: 'all' | 'users' | 'organizers';
+}
+
+// Select Option Types for Announcement Form
+export interface AnnouncementTypeOption {
+  value: 'info' | 'success' | 'warning' | 'error';
+  label: string;
+}
+
+export interface TargetAudienceOption {
+  value: 'all' | 'users' | 'organizers';
+  label: string;
+}
+
+// Top Organizers Props
+export interface TopOrganizersProps {
+  organizers?: UserCardData[];
+  loading?: boolean;
+}
+
+// Active Users Props  
+export interface ActiveUsersProps {
+  users?: UserCardData[];
+  loading?: boolean;
+} 

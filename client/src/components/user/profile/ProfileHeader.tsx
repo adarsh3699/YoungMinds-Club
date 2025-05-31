@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import {
 	PencilIcon,
 	CameraIcon,
@@ -7,8 +7,9 @@ import {
 	UserIcon,
 	AcademicCapIcon,
 } from '@heroicons/react/24/outline';
+import { ProfileHeaderProps } from '@/types';
 
-const ProfileHeader = ({
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 	userProfile,
 	editMode,
 	formValues,
@@ -19,10 +20,12 @@ const ProfileHeader = ({
 	onFileChange,
 	getBadgeInfo,
 }) => {
-	const fileInputRef = useRef(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const handleProfilePictureClick = () => {
-		fileInputRef.current.click();
+	const handleProfilePictureClick = (): void => {
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
 	};
 
 	return (
@@ -213,4 +216,4 @@ const ProfileHeader = ({
 	);
 };
 
-export default ProfileHeader;
+export default ProfileHeader; 

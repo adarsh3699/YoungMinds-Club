@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
+import { StatsCardProps } from '@/types';
 
 // Optimized Stats Card Component
-const StatsCard = memo(({ title, value, description, icon, bgClass, borderClass, iconBgClass }) => (
+const StatsCard: React.FC<StatsCardProps> = memo(({ title, value, description, icon, bgClass, borderClass, iconBgClass }) => (
 	<div
 		className={`${bgClass} p-6 rounded-xl border ${borderClass} hover:shadow-lg transition-all duration-300 group relative overflow-hidden`}
 	>
@@ -28,4 +29,4 @@ const StatsCard = memo(({ title, value, description, icon, bgClass, borderClass,
 
 StatsCard.displayName = 'StatsCard';
 
-export default StatsCard;
+export default StatsCard; 
