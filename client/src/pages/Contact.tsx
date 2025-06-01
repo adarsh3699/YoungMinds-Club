@@ -1,30 +1,72 @@
 import React, { useState } from 'react';
 import { EnvelopeIcon, PhoneIcon, MapPinIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 
-const Contact = () => {
-	const [formData, setFormData] = useState({
-		firstName: '',
-		lastName: '',
+interface ContactFormData {
+	fullName: string;
+	email: string;
+	subject: string;
+	message: string;
+}
+
+const Contact: React.FC = () => {
+	const [formData, setFormData] = useState<ContactFormData>({
+		fullName: '',
 		email: '',
 		subject: '',
 		message: '',
 	});
 
-	const handleChange = (e) => {
+	const [errors, setErrors] = useState<{ [key: string]: string }>({});
+	const [loading, setLoading] = useState<boolean>(false);
+	const [submitted, setSubmitted] = useState<boolean>(false);
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+		const { name, value } = e.target;
 		setFormData({
 			...formData,
-			[e.target.name]: e.target.value,
+			[name]: value,
 		});
+		// Clear error when user starts typing
+		if (errors[name]) {
+			setErrors({
+				...errors,
+				[name]: '',
+			});
+		}
 	};
 
-	const handleSubmit = (e) => {
+	const validateForm = (): boolean => {
+		const newErrors: { [key: string]: string } = {};
+
+		if (!formData.fullName.trim()) {
+			newErrors.fullName = 'Full name is required';
+		}
+
+		if (!formData.email.trim()) {
+			newErrors.email = 'Email is required';
+		} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+			newErrors.email = 'Please enter a valid email';
+		}
+
+		if (!formData.subject.trim()) {
+			newErrors.subject = 'Subject is required';
+		}
+
+		if (!formData.message.trim()) {
+			newErrors.message = 'Message is required';
+		}
+
+		setErrors(newErrors);
+		return Object.keys(newErrors).length === 0;
+	};
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		// Handle form submission here
 		console.log('Form submitted:', formData);
 		// Reset form
 		setFormData({
-			firstName: '',
-			lastName: '',
+			fullName: '',
 			email: '',
 			subject: '',
 			message: '',
@@ -167,28 +209,14 @@ const Contact = () => {
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 									<div>
 										<label className="block text-sm font-medium ym-text-primary mb-1">
-											First Name
+											Full Name
 										</label>
 										<input
 											type="text"
-											name="firstName"
-											value={formData.firstName}
-											onChange={handleChange}
-											placeholder="Enter your first name"
-											className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
-											required
-										/>
-									</div>
-									<div>
-										<label className="block text-sm font-medium ym-text-primary mb-1">
-											Last Name
-										</label>
-										<input
-											type="text"
-											name="lastName"
-											value={formData.lastName}
-											onChange={handleChange}
-											placeholder="Enter your last name"
+											name="fullName"
+											value={formData.fullName}
+											onChange={handleInputChange}
+											placeholder="Enter your full name"
 											className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 											required
 										/>
@@ -201,7 +229,7 @@ const Contact = () => {
 										type="email"
 										name="email"
 										value={formData.email}
-										onChange={handleChange}
+										onChange={handleInputChange}
 										placeholder="Enter your email address"
 										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 										required
@@ -214,7 +242,7 @@ const Contact = () => {
 										type="text"
 										name="subject"
 										value={formData.subject}
-										onChange={handleChange}
+										onChange={handleInputChange}
 										placeholder="Enter the subject"
 										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors"
 										required
@@ -226,7 +254,7 @@ const Contact = () => {
 									<textarea
 										name="message"
 										value={formData.message}
-										onChange={handleChange}
+										onChange={handleInputChange}
 										placeholder="Enter your message"
 										className="w-full px-4 py-3 rounded-lg input-base focus-ring transition-colors min-h-[150px]"
 										required

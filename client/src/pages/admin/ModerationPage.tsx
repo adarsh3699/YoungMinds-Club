@@ -1,19 +1,26 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  FlaggedItems,
+  ModerationApiResponse,
+  UnflagResponse,
+  EventDeleteResponse,
+  UserStatusUpdateResponse
+} from '@/types';
 
-const ModerationPage = () => {
-  const [flaggedItems, setFlaggedItems] = useState({ users: [], events: [] });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const ModerationPage: React.FC = () => {
+  const [flaggedItems, setFlaggedItems] = useState<FlaggedItems>({ users: [], events: [] });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchFlaggedItems = async () => {
+    const fetchFlaggedItems = async (): Promise<void> => {
       try {
         setLoading(true);
-        const response = await axios.get("/admin/moderation/flagged");
+        const response: AxiosResponse<ModerationApiResponse> = await axios.get("/admin/moderation/flagged");
         if (response.data.success) {
           setFlaggedItems(response.data.flaggedItems);
         }
@@ -28,9 +35,9 @@ const ModerationPage = () => {
     fetchFlaggedItems();
   }, []);
 
-  const handleUnflagUser = async (userId) => {
+  const handleUnflagUser = async (userId: string): Promise<void> => {
     try {
-      const response = await axios.put(`/admin/users/${userId}/flag`, {
+      const response: AxiosResponse<UnflagResponse> = await axios.put(`/admin/users/${userId}/flag`, {
         isFlagged: false
       });
       
@@ -47,9 +54,9 @@ const ModerationPage = () => {
     }
   };
 
-  const handleUnflagEvent = async (eventId) => {
+  const handleUnflagEvent = async (eventId: string): Promise<void> => {
     try {
-      const response = await axios.put(`/admin/events/${eventId}/flag`, {
+      const response: AxiosResponse<UnflagResponse> = await axios.put(`/admin/events/${eventId}/flag`, {
         isFlagged: false
       });
       
@@ -66,9 +73,9 @@ const ModerationPage = () => {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
+  const handleDeleteEvent = async (eventId: string): Promise<void> => {
     try {
-      const response = await axios.delete(`/admin/events/${eventId}`);
+      const response: AxiosResponse<EventDeleteResponse> = await axios.delete(`/admin/events/${eventId}`);
       if (response.data.success) {
         // Remove the event from the flagged list
         setFlaggedItems({
@@ -82,9 +89,9 @@ const ModerationPage = () => {
     }
   };
 
-  const handleSuspendUser = async (userId) => {
+  const handleSuspendUser = async (userId: string): Promise<void> => {
     try {
-      const response = await axios.put(`/admin/users/${userId}/status`, {
+      const response: AxiosResponse<UserStatusUpdateResponse> = await axios.put(`/admin/users/${userId}/status`, {
         status: 'suspended'
       });
       
@@ -94,7 +101,7 @@ const ModerationPage = () => {
           ...flaggedItems,
           users: flaggedItems.users.map(user => 
             user._id === userId 
-              ? { ...user, status: 'suspended' } 
+              ? { ...user, status: 'suspended' as const } 
               : user
           )
         });
@@ -238,7 +245,7 @@ const ModerationPage = () => {
                                 src={event.poster} 
                                 alt={event.title} 
                                 className="w-12 h-12 object-cover rounded mr-3"
-                                onError={(e) => { e.target.src = 'https://via.placeholder.com/100?text=Event'; }} 
+                                onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/100?text=Event'; }}
                               />
                               {event.title}
                             </div>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axios, { AxiosResponse } from 'axios';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
 import {
 	DashboardOverview,
@@ -9,30 +9,39 @@ import {
 	LoadingState,
 	ErrorState,
 } from '../../components/organizer/dashboard';
+import {
+	OrganizerDashboardData,
+	OrganizerEvent,
+	OrganizerFeedbackSummary,
+	FilterOption,
+	OrganizerDashboardApiResponse,
+	OrganizerEventsApiResponse,
+	OrganizerFeedbackApiResponse
+} from '@/types';
 
-const Dashboard = () => {
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [dashboardData, setDashboardData] = useState(null);
-	const [events, setEvents] = useState([]);
-	const [feedbackSummary, setFeedbackSummary] = useState(null);
-	const [eventFilter, setEventFilter] = useState('all');
-	const [showCreateModal, setShowCreateModal] = useState(false);
+const Dashboard: React.FC = () => {
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [dashboardData, setDashboardData] = useState<OrganizerDashboardData | null>(null);
+	const [events, setEvents] = useState<OrganizerEvent[]>([]);
+	const [feedbackSummary, setFeedbackSummary] = useState<OrganizerFeedbackSummary | null>(null);
+	const [eventFilter, setEventFilter] = useState<string>('all');
+	const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
 
 	// Fetch dashboard data
 	useEffect(() => {
-		const fetchDashboardData = async () => {
+		const fetchDashboardData = async (): Promise<void> => {
 			try {
 				setLoading(true);
-				const response = await axios.get('/organizer/dashboard');
+				const response: AxiosResponse<OrganizerDashboardApiResponse> = await axios.get('/organizer/dashboard');
 				setDashboardData(response.data.data);
 
 				// Fetch events in the same call
-				const eventsResponse = await axios.get('/organizer/events');
+				const eventsResponse: AxiosResponse<OrganizerEventsApiResponse> = await axios.get('/organizer/events');
 				setEvents(Array.isArray(eventsResponse.data.events) ? eventsResponse.data.events : []);
 
 				// Fetch feedback summary
-				const feedbackResponse = await axios.get('/organizer/feedback/summary');
+				const feedbackResponse: AxiosResponse<OrganizerFeedbackApiResponse> = await axios.get('/organizer/feedback/summary');
 				if (feedbackResponse.data.success) {
 					setFeedbackSummary(feedbackResponse.data.summary);
 				}
@@ -48,17 +57,17 @@ const Dashboard = () => {
 		fetchDashboardData();
 	}, []);
 
-	const toggleCreateModal = () => {
+	const toggleCreateModal = (): void => {
 		setShowCreateModal(!showCreateModal);
 	};
 
-	const handleEventCreated = (newEvent) => {
+	const handleEventCreated = (newEvent: OrganizerEvent): void => {
 		// Add the new event to the events list
 		setEvents([newEvent, ...events]);
 		setShowCreateModal(false);
 	};
 
-	const filterOptions = [
+	const filterOptions: FilterOption[] = [
 		{ value: 'all', label: 'All Events' },
 		{ value: 'upcoming', label: 'Upcoming Events' },
 		{ value: 'past', label: 'Past Events' },
@@ -66,7 +75,7 @@ const Dashboard = () => {
 	];
 
 	// Calculate total registrations from events as a fallback
-	const calculatedTotalRegistrations = events.reduce((sum, event) => sum + (event.registrationCount || 0), 0);
+	const calculatedTotalRegistrations: number = events.reduce((sum, event) => sum + (event.registrationCount || 0), 0);
 
 	if (loading) {
 		return <LoadingState />;

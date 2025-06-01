@@ -1,11 +1,11 @@
 import React from 'react';
 import { useError } from '@/context/ErrorContext';
-import ErrorAlert from './ErrorAlert';
+import MsgAlert from './msgAlert';
 
 const GlobalErrorAlert: React.FC = () => {
 	const { error, clearError } = useError();
 
-	return <ErrorAlert error={error} onClose={clearError} />;
+	return <MsgAlert message={error} type="error" onClose={clearError} />;
 };
 
 export default GlobalErrorAlert; 

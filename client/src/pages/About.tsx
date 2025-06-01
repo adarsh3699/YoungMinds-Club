@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { UsersIcon, TrophyIcon, StarIcon, HeartIcon } from '@heroicons/react/24/outline';
 
-const About = () => {
+const About: React.FC = () => {
 	return (
 		<div className="min-h-screen bg-white">
 			<div className="py-16">

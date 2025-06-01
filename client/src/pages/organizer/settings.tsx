@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { ShieldCheckIcon, CogIcon, KeyIcon } from '@heroicons/react/24/outline';
 import Switch from '../../components/common/Switch';
+import {
+	OrganizerSettings,
+	MessageState,
+	OrganizerSettingsApiResponse
+} from '@/types';
 
-const Settings = () => {
+const Settings: React.FC = () => {
 	const { user } = useAuth();
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState(false);
-	const [message, setMessage] = useState({ type: '', text: '' });
+	const [loading, setLoading] = useState<boolean>(true);
+	const [saving, setSaving] = useState<boolean>(false);
+	const [message, setMessage] = useState<MessageState>({ type: '', text: '' });
 
-	const [settings, setSettings] = useState({
+	const [settings, setSettings] = useState<OrganizerSettings>({
 		privacy: {
 			showEmail: false,
 			showPhone: false,
@@ -22,7 +27,7 @@ const Settings = () => {
 	});
 
 	useEffect(() => {
-		const fetchSettings = async () => {
+		const fetchSettings = async (): Promise<void> => {
 			setLoading(true);
 			try {
 				// This endpoint would need to be implemented on the backend
@@ -33,7 +38,7 @@ const Settings = () => {
 
 				// When the endpoint exists, uncomment this code:
 				/*
-        const response = await axios.get('/organizer/settings');
+        const response: AxiosResponse<OrganizerSettingsApiResponse> = await axios.get('/organizer/settings');
         if (response.data.success) {
           setSettings(response.data.settings);
         }
@@ -52,7 +57,7 @@ const Settings = () => {
 		fetchSettings();
 	}, []);
 
-	const handleSave = async () => {
+	const handleSave = async (): Promise<void> => {
 		setSaving(true);
 		setMessage({ type: '', text: '' });
 
@@ -69,7 +74,7 @@ const Settings = () => {
 
 			// When the endpoint exists, uncomment this code:
 			/*
-      const response = await axios.put('/organizer/settings', settings);
+      const response: AxiosResponse<OrganizerSettingsApiResponse> = await axios.put('/organizer/settings', settings);
       if (response.data.success) {
         setMessage({
           type: 'success',
@@ -88,12 +93,12 @@ const Settings = () => {
 		}
 	};
 
-	const handleToggle = (category, setting) => {
+	const handleToggle = (category: keyof OrganizerSettings, setting: string): void => {
 		setSettings((prev) => ({
 			...prev,
 			[category]: {
 				...prev[category],
-				[setting]: !prev[category][setting],
+				[setting]: !prev[category][setting as keyof typeof prev[typeof category]],
 			},
 		}));
 	};
@@ -262,7 +267,7 @@ const Settings = () => {
 									<button
 										type="button"
 										className="px-6 py-3 ym-bg-amber-400 ym-text-white font-semibold rounded-lg hover:ym-bg-amber-400:hover transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2"
-										style={{ '--tw-ring-color': 'var(--ring)' }}
+										style={{ '--tw-ring-color': 'var(--ring)' } as React.CSSProperties}
 									>
 										Change Password
 									</button>
@@ -279,7 +284,7 @@ const Settings = () => {
 							className={`px-8 py-3 gradient-bg ym-text-white text-base font-semibold rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
 								saving ? 'opacity-70 cursor-not-allowed transform-none' : ''
 							}`}
-							style={{ '--tw-ring-color': 'var(--ring)' }}
+							style={{ '--tw-ring-color': 'var(--ring)' } as React.CSSProperties}
 						>
 							{saving ? (
 								<span className="flex items-center">

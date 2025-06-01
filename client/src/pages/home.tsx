@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { HeroSection, FeaturesSection, EventsSection, FAQSection, CTASection } from '../components/home_comp';
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
 	useEffect(() => {
 		// Intersection Observer for animations
 		const observer = new IntersectionObserver(

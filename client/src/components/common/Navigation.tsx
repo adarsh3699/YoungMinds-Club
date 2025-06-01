@@ -152,7 +152,7 @@ const Navigation: React.FC = () => {
 													<span className="sr-only">Open user menu</span>
 													<div className="h-8 w-8 rounded-full ym-bg-yellow-100 flex items-center justify-center">
 														<span className="font-medium ym-text-yellow-700">
-															{user?.firstName?.charAt(0).toUpperCase() || 'U'}
+															{user?.name?.charAt(0).toUpperCase() || 'U'}
 														</span>
 													</div>
 												</Menu.Button>
@@ -169,7 +169,7 @@ const Navigation: React.FC = () => {
 												<Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ym-bg-card ring-1 ring-black ring-opacity-5 focus:outline-none border ym-border-card">
 													<div className="px-4 py-2 border-b ym-border-card">
 														<p className="text-sm font-medium ym-text-primary truncate">
-															{user?.firstName} {user?.lastName}
+															{user?.name}
 														</p>
 														<p className="text-xs ym-text-muted truncate">{user?.email}</p>
 													</div>
@@ -298,13 +298,13 @@ const Navigation: React.FC = () => {
 									<div className="flex-shrink-0">
 										<div className="h-10 w-10 rounded-full ym-bg-yellow-100 flex items-center justify-center">
 											<span className="font-medium ym-text-yellow-700">
-												{user?.firstName?.charAt(0).toUpperCase() || 'U'}
+												{user?.name?.charAt(0).toUpperCase() || 'U'}
 											</span>
 										</div>
 									</div>
 									<div className="ml-3">
 										<div className="text-base font-medium ym-text-primary">
-											{user?.firstName} {user?.lastName}
+											{user?.name}
 										</div>
 										<div className="text-sm font-medium ym-text-muted">{user?.email}</div>
 									</div>

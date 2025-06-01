@@ -1,36 +1,49 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import EventCard from '../../components/organizer/EventCard';
 import XPProgressBar from '../../components/user/XPProgressBar';
 import { Tabs, SelectInput } from '../../components/common';
+import {
+	UserDashboardProfile,
+	Announcement,
+	EventCardData,
+	DashboardEventFilters,
+	UserDashboardApiResponse,
+	AnnouncementsApiResponse,
+	RecommendedEventsApiResponse,
+	DashboardBadgeInfo,
+	BadgeType,
+	AnnouncementType,
+	SelectOption,
+	PaginationData
+} from '@/types';
 
-const UserDashboard = () => {
+const UserDashboard: React.FC = () => {
 	const { user } = useAuth();
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [events, setEvents] = useState([]);
-	const [recommendedEvents, setRecommendedEvents] = useState([]);
-	const [userProfile, setUserProfile] = useState(null);
-	const [announcements, setAnnouncements] = useState([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [userProfile, setUserProfile] = useState<UserDashboardProfile | null>(null);
+	const [events, setEvents] = useState<EventCardData[]>([]);
+	const [recommendedEvents, setRecommendedEvents] = useState<EventCardData[]>([]);
+	const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [totalPages, setTotalPages] = useState<number>(1);
+	const [activeTab, setActiveTab] = useState<string>('registered');
 
 	// Filters and search state
-	const [searchQuery, setSearchQuery] = useState('');
-	const [category, setCategory] = useState('');
-	const [city, setCity] = useState('');
-	const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
-	const [tag, setTag] = useState('');
-
-	// Pagination state
-	const [currentPage, setCurrentPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
+	const [searchQuery, setSearchQuery] = useState<string>('');
+	const [category, setCategory] = useState<string>('');
+	const [city, setCity] = useState<string>('');
+	const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>({ startDate: '', endDate: '' });
+	const [tag, setTag] = useState<string>('');
 
 	// Categories and tag options
-	const categories = ['Technology', 'Business', 'Education', 'Arts', 'Science', 'Music', 'Sports', 'Other'];
-	const popularTags = ['MUN', 'Hackathon', 'Workshop', 'Conference', 'Networking', 'Career'];
+	const categories: string[] = ['Technology', 'Business', 'Education', 'Arts', 'Science', 'Music', 'Sports', 'Other'];
+	const popularTags: string[] = ['MUN', 'Hackathon', 'Workshop', 'Conference', 'Networking', 'Career'];
 
 	// Indian States and Union Territories
-	const indianStates = [
+	const indianStates: string[] = [
 		'Andhra Pradesh',
 		'Arunachal Pradesh',
 		'Assam',
@@ -70,17 +83,17 @@ const UserDashboard = () => {
 	];
 
 	// Convert arrays to options format for SelectInput
-	const categoryOptions = [
+	const categoryOptions: SelectOption[] = [
 		{ value: '', label: 'All Categories' },
 		...categories.map((cat) => ({ value: cat, label: cat })),
 	];
 
-	const stateOptions = [
+	const stateOptions: SelectOption[] = [
 		{ value: '', label: 'All States' },
 		...indianStates.map((state) => ({ value: state, label: state })),
 	];
 
-	const tagOptions = [{ value: '', label: 'All Tags' }, ...popularTags.map((tag) => ({ value: tag, label: tag }))];
+	const tagOptions: SelectOption[] = [{ value: '', label: 'All Tags' }, ...popularTags.map((tag) => ({ value: tag, label: tag }))];
 
 	// Load user profile and events
 	useEffect(() => {
@@ -88,18 +101,18 @@ const UserDashboard = () => {
 			setLoading(true);
 			try {
 				// Get user profile with XP and badge
-				const profileResponse = await axios.get('/user/dashboard');
+				const profileResponse: AxiosResponse<{ profile: UserDashboardProfile }> = await axios.get('/user/dashboard');
 				setUserProfile(profileResponse.data.profile);
 
 				// Get recommended events
-				const recommendedResponse = await axios.get('/events/recommended');
+				const recommendedResponse: AxiosResponse<RecommendedEventsApiResponse> = await axios.get('/events/recommended');
 				setRecommendedEvents(recommendedResponse.data.events);
 
 				// Get all events with default filters
 				await fetchEvents();
 
 				// Fetch active announcements
-				const announcementsResponse = await axios.get('/user/announcements');
+				const announcementsResponse: AxiosResponse<AnnouncementsApiResponse> = await axios.get('/user/announcements');
 				if (announcementsResponse.data.success) {
 					setAnnouncements(announcementsResponse.data.announcements);
 				}
@@ -115,7 +128,7 @@ const UserDashboard = () => {
 	}, []);
 
 	// Fetch events with filters
-	const fetchEvents = async (page = 1) => {
+	const fetchEvents = async (page: number = 1): Promise<void> => {
 		try {
 			const queryParams = new URLSearchParams();
 
@@ -128,10 +141,14 @@ const UserDashboard = () => {
 			if (tag) queryParams.append('tag', tag);
 
 			// Add pagination
-			queryParams.append('page', page);
-			queryParams.append('limit', 9); // 9 events per page
+			queryParams.append('page', page.toString());
+			queryParams.append('limit', '9'); // 9 events per page
 
-			const response = await axios.get(`/events?${queryParams.toString()}`);
+			const response: AxiosResponse<{
+				events: EventCardData[];
+				currentPage: number;
+				totalPages: number;
+			}> = await axios.get(`/events?${queryParams.toString()}`);
 
 			setEvents(response.data.events);
 			setCurrentPage(response.data.currentPage);
@@ -143,14 +160,14 @@ const UserDashboard = () => {
 	};
 
 	// Handle search and filter changes
-	const handleSearch = (e) => {
+	const handleSearch = (e: React.FormEvent<HTMLFormElement>): void => {
 		e.preventDefault();
 		setCurrentPage(1); // Reset to first page
 		fetchEvents(1);
 	};
 
 	// Reset all filters
-	const handleResetFilters = () => {
+	const handleResetFilters = (): void => {
 		setSearchQuery('');
 		setCategory('');
 		setCity('');
@@ -161,7 +178,7 @@ const UserDashboard = () => {
 	};
 
 	// Handle pagination
-	const handlePageChange = (newPage) => {
+	const handlePageChange = (newPage: number): void => {
 		if (newPage >= 1 && newPage <= totalPages) {
 			setCurrentPage(newPage);
 			fetchEvents(newPage);
@@ -169,16 +186,21 @@ const UserDashboard = () => {
 	};
 
 	// Handle saving/unsaving event
-	const handleSaveToggle = (eventId, isSaved) => {
+	const handleSaveToggle = (eventId: string, isSaved: boolean): void => {
 		// Update the UI to reflect saved state
 		setEvents(events.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
 
 		setRecommendedEvents(recommendedEvents.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
 	};
 
+	// Dummy handlers for EventCard (since these are not needed for dashboard)
+	const handleManage = () => {};
+	const handleEdit = () => {};
+	const handleDelete = () => {};
+
 	// Badge mapping for badge icons and colors
-	const getBadgeInfo = (badgeName) => {
-		switch (badgeName) {
+	const getBadgeInfo = (badgeName: string): DashboardBadgeInfo => {
+		switch (badgeName as BadgeType) {
 			case 'Newbie':
 				return { color: 'ym-bg-amber-100 ym-text-yellow-700', icon: '🌱' };
 			case 'Regular':
@@ -195,7 +217,7 @@ const UserDashboard = () => {
 	};
 
 	// Announcement type styling
-	const getAnnouncementStyle = (type) => {
+	const getAnnouncementStyle = (type: AnnouncementType): string => {
 		switch (type) {
 			case 'info':
 				return 'ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700';
@@ -303,7 +325,7 @@ const UserDashboard = () => {
 
 						<XPProgressBar xp={userProfile.xp} />
 
-						{userProfile.streakCount > 0 && (
+						{(userProfile.streakCount || 0) > 0 && (
 							<div className="mt-4 ym-bg-amber-100 rounded-lg p-3 flex items-center">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -327,10 +349,13 @@ const UserDashboard = () => {
 
 				{/* Events Section with Tabs */}
 				<Tabs
+					activeTab={activeTab}
+					onTabChange={setActiveTab}
 					tabs={[
 						{
-							key: 'all',
-							label: 'All Events',
+							id: 'registered',
+							key: 'registered',
+							label: 'Registered Events',
 							content: (
 								<>
 									{/* Search and Filters Section */}
@@ -362,7 +387,7 @@ const UserDashboard = () => {
 													id="category-filter"
 													name="category"
 													value={category}
-													onChange={(e) => setCategory(e.target.value)}
+													onChange={(e) => setCategory(e.target.value as string)}
 													options={categoryOptions}
 													placeholder="All Categories"
 													className="mb-0"
@@ -372,7 +397,7 @@ const UserDashboard = () => {
 													id="state-filter"
 													name="city"
 													value={city}
-													onChange={(e) => setCity(e.target.value)}
+													onChange={(e) => setCity(e.target.value as string)}
 													options={stateOptions}
 													placeholder="All States"
 													className="mb-0"
@@ -382,7 +407,7 @@ const UserDashboard = () => {
 													id="tag-filter"
 													name="tag"
 													value={tag}
-													onChange={(e) => setTag(e.target.value)}
+													onChange={(e) => setTag(e.target.value as string)}
 													options={tagOptions}
 													placeholder="All Tags"
 													className="mb-0"
@@ -437,6 +462,9 @@ const UserDashboard = () => {
 															key={event._id}
 															event={event}
 															onSaveToggle={handleSaveToggle}
+															onManage={handleManage}
+															onEdit={handleEdit}
+															onDelete={handleDelete}
 														/>
 													))}
 												</div>
@@ -494,6 +522,7 @@ const UserDashboard = () => {
 							),
 						},
 						{
+							id: 'recommended',
 							key: 'recommended',
 							label: 'Recommended for You',
 							content: (
@@ -531,6 +560,9 @@ const UserDashboard = () => {
 													key={event._id}
 													event={event}
 													onSaveToggle={handleSaveToggle}
+													onManage={handleManage}
+													onEdit={handleEdit}
+													onDelete={handleDelete}
 												/>
 											))}
 										</div>

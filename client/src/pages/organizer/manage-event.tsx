@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { format } from 'date-fns';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import {
@@ -14,28 +14,44 @@ import {
 } from '@heroicons/react/24/outline';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
 import { Modal, Tabs } from '../../components/common';
+import {
+	ManageEventData,
+	AttendeeData,
+	EventManageApiResponse,
+	AttendeesApiResponse,
+	TabItem
+} from '@/types';
 
-const EventManagePage = () => {
-	const { id } = useParams();
+// Custom tab item interface to allow JSX labels
+interface EventTabItem {
+	id: string;
+	key?: string;
+	label: React.ReactNode;
+	content: React.ReactNode;
+}
+
+const EventManagePage: React.FC = () => {
+	const { id: eventId } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const [event, setEvent] = useState(null);
-	const [attendees, setAttendees] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [showEditModal, setShowEditModal] = useState(false);
-	const [showQrCode, setShowQrCode] = useState(false);
+	const [event, setEvent] = useState<ManageEventData | null>(null);
+	const [attendees, setAttendees] = useState<AttendeeData[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [showEditModal, setShowEditModal] = useState<boolean>(false);
+	const [showQrCode, setShowQrCode] = useState<boolean>(false);
+	const [activeTab, setActiveTab] = useState<string>('attendees');
 
 	// Fetch event and attendee data
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchData = async (): Promise<void> => {
 			try {
 				setLoading(true);
 				// Fetch event details
-				const eventResponse = await axios.get(`/organizer/events/${id}`);
+				const eventResponse: AxiosResponse<EventManageApiResponse> = await axios.get(`/organizer/events/${eventId}`);
 				setEvent(eventResponse.data.event);
 
 				// Fetch attendees
-				const attendeesResponse = await axios.get(`/organizer/events/${id}/attendees`);
+				const attendeesResponse: AxiosResponse<AttendeesApiResponse> = await axios.get(`/organizer/events/${eventId}/attendees`);
 				setAttendees(attendeesResponse.data.attendees);
 
 				setLoading(false);
@@ -47,9 +63,9 @@ const EventManagePage = () => {
 		};
 
 		fetchData();
-	}, [id]);
+	}, [eventId]);
 
-	const formatDate = (dateString) => {
+	const formatDate = (dateString: string): string => {
 		try {
 			return format(new Date(dateString), 'MMMM d, yyyy h:mm a');
 		} catch (error) {
@@ -57,17 +73,19 @@ const EventManagePage = () => {
 		}
 	};
 
-	const handleEditSuccess = (updatedEvent) => {
+	const handleEditSuccess = (updatedEvent: ManageEventData): void => {
 		setShowEditModal(false);
 		setEvent(updatedEvent);
 	};
 
-	const handleDuplicateEvent = () => {
+	const handleDuplicateEvent = (): void => {
+		if (!event) return;
+		
 		const eventToDuplicate = { ...event };
 		// Remove specific fields
-		delete eventToDuplicate._id;
-		delete eventToDuplicate.createdAt;
-		delete eventToDuplicate.updatedAt;
+		delete (eventToDuplicate as any)._id;
+		delete (eventToDuplicate as any).createdAt;
+		delete (eventToDuplicate as any).updatedAt;
 
 		// Set a default title to indicate it's a duplicate
 		eventToDuplicate.title = `Copy of ${eventToDuplicate.title}`;
@@ -76,7 +94,9 @@ const EventManagePage = () => {
 		navigate('/organizer/events/create');
 	};
 
-	const downloadCSV = () => {
+	const downloadCSV = (): void => {
+		if (!event) return;
+		
 		// Format attendees data for CSV
 		const csvContent = [
 			// CSV Header
@@ -103,8 +123,10 @@ const EventManagePage = () => {
 		document.body.removeChild(link);
 	};
 
-	const downloadQRCode = () => {
-		const canvas = document.getElementById('event-qrcode');
+	const downloadQRCode = (): void => {
+		if (!event) return;
+		
+		const canvas = document.getElementById('event-qrcode') as HTMLCanvasElement;
 		if (canvas) {
 			const link = document.createElement('a');
 			link.download = `${event.title.replace(/\s+/g, '_')}_qrcode.png`;
@@ -303,6 +325,31 @@ const EventManagePage = () => {
 		</div>
 	);
 
+	const tabs: EventTabItem[] = [
+		{
+			id: 'attendees',
+			key: 'attendees',
+			label: (
+				<span className="flex items-center">
+					<UsersIcon className="h-5 w-5 mr-2" />
+					Attendees
+				</span>
+			),
+			content: attendeesTabContent,
+		},
+		{
+			id: 'analytics',
+			key: 'analytics',
+			label: (
+				<span className="flex items-center">
+					<ChartBarIcon className="h-5 w-5 mr-2" />
+					Analytics
+				</span>
+			),
+			content: analyticsTabContent,
+		},
+	];
+
 	return (
 		<div className="max-w-7xl mx-auto p-6 bg-gray-900 min-h-screen text-gray-200">
 			{/* Back Button and Event Title */}
@@ -446,28 +493,9 @@ const EventManagePage = () => {
 			{/* Tabs */}
 			<div className="bg-gray-800 shadow-md overflow-hidden border-0">
 				<Tabs
-					tabs={[
-						{
-							key: 'attendees',
-							label: (
-								<span className="flex items-center">
-									<UsersIcon className="h-5 w-5 mr-2" />
-									Attendees
-								</span>
-							),
-							content: attendeesTabContent,
-						},
-						{
-							key: 'analytics',
-							label: (
-								<span className="flex items-center">
-									<ChartBarIcon className="h-5 w-5 mr-2" />
-									Analytics
-								</span>
-							),
-							content: analyticsTabContent,
-						},
-					]}
+					tabs={tabs}
+					activeTab={activeTab}
+					onTabChange={setActiveTab}
 				/>
 			</div>
 
@@ -479,12 +507,14 @@ const EventManagePage = () => {
 				noPadding={true}
 				showCloseButton={false}
 			>
-				<CreateEventModal
-					onClose={() => setShowEditModal(false)}
-					onSuccess={handleEditSuccess}
-					eventToEdit={event}
-					isEditing={true}
-				/>
+				{event && (
+					<CreateEventModal
+						onClose={() => setShowEditModal(false)}
+						onSuccess={handleEditSuccess}
+						eventToEdit={event as any}
+						isEditing={true}
+					/>
+				)}
 			</Modal>
 
 			{/* QR Code Modal */}

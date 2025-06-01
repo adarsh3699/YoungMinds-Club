@@ -1,31 +1,40 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import axios, { AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { Modal } from "../../components/common";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  AdminAnnouncement,
+  AnnouncementFormData,
+  DeleteModalState,
+  AdminAnnouncementsApiResponse,
+  CreateAnnouncementApiResponse,
+  DeleteAnnouncementApiResponse,
+  UpdateAnnouncementApiResponse
+} from '@/types';
 
-const AnnouncementsPage = () => {
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, announcementId: null, title: '' });
-  const [formData, setFormData] = useState({
+const AnnouncementsPage: React.FC = () => {
+  const [announcements, setAnnouncements] = useState<AdminAnnouncement[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<DeleteModalState>({ isOpen: false, announcementId: null, title: '' });
+  const [formData, setFormData] = useState<AnnouncementFormData>({
     title: '',
     message: '',
     type: 'info',
     expiresAt: ''
   });
-  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [isFormSubmitting, setIsFormSubmitting] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>('');
 
   useEffect(() => {
     fetchAnnouncements();
   }, []);
 
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await axios.get("/admin/announcements");
+      const response: AxiosResponse<AdminAnnouncementsApiResponse> = await axios.get("/admin/announcements");
       if (response.data.success) {
         setAnnouncements(response.data.announcements);
       }
@@ -37,7 +46,7 @@ const AnnouncementsPage = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -45,7 +54,7 @@ const AnnouncementsPage = () => {
     });
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setFormError('');
 
@@ -61,7 +70,7 @@ const AnnouncementsPage = () => {
 
     try {
       setIsFormSubmitting(true);
-      const response = await axios.post("/admin/announcements", formData);
+      const response: AxiosResponse<CreateAnnouncementApiResponse> = await axios.post("/admin/announcements", formData);
       
       if (response.data.success) {
         // Add the new announcement to the list
@@ -83,13 +92,13 @@ const AnnouncementsPage = () => {
     }
   };
 
-  const confirmDeleteAnnouncement = (announcementId, title) => {
+  const confirmDeleteAnnouncement = (announcementId: string, title: string): void => {
     setDeleteModal({ isOpen: true, announcementId, title });
   };
 
-  const handleDeleteAnnouncement = async () => {
+  const handleDeleteAnnouncement = async (): Promise<void> => {
     try {
-      const response = await axios.delete(`/admin/announcements/${deleteModal.announcementId}`);
+      const response: AxiosResponse<DeleteAnnouncementApiResponse> = await axios.delete(`/admin/announcements/${deleteModal.announcementId}`);
       if (response.data.success) {
         // Remove the announcement from the list
         setAnnouncements(announcements.filter((a) => a._id !== deleteModal.announcementId));
@@ -101,13 +110,13 @@ const AnnouncementsPage = () => {
     }
   };
 
-  const closeDeleteModal = () => {
+  const closeDeleteModal = (): void => {
     setDeleteModal({ isOpen: false, announcementId: null, title: '' });
   };
 
-  const toggleAnnouncementStatus = async (announcementId, currentStatus) => {
+  const toggleAnnouncementStatus = async (announcementId: string, currentStatus: boolean): Promise<void> => {
     try {
-      const response = await axios.put(`/admin/announcements/${announcementId}`, {
+      const response: AxiosResponse<UpdateAnnouncementApiResponse> = await axios.put(`/admin/announcements/${announcementId}`, {
         isActive: !currentStatus
       });
       
@@ -127,7 +136,7 @@ const AnnouncementsPage = () => {
     }
   };
 
-  const getAnnouncementTypeStyles = (type) => {
+  const getAnnouncementTypeStyles = (type: 'info' | 'warning' | 'success' | 'error'): string => {
     switch (type) {
       case 'info':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
@@ -210,7 +219,7 @@ const AnnouncementsPage = () => {
                 name="message"
                 value={formData.message}
                 onChange={handleInputChange}
-                rows="3"
+                rows={3}
                 className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 placeholder="Announcement message"
               ></textarea>

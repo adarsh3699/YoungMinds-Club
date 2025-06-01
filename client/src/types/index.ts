@@ -2,8 +2,7 @@
 export interface User {
   _id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   role: 'user' | 'organizer' | 'admin';
   profileImage?: string;
   phoneNumber?: string;
@@ -129,6 +128,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   setToken: (token: string | null) => void;
   setUser: (user: User | null) => void;
+  updateUserInfo?: (userInfo: { name: string; email: string }) => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isOrganizer: boolean;
@@ -143,8 +143,7 @@ export interface ErrorContextType {
 
 // Form Data Types
 export interface RegisterData {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword?: string;
@@ -239,6 +238,7 @@ export interface FormInputProps {
   min?: string | number;
   max?: string | number;
   className?: string;
+  style?: React.CSSProperties;
   step?: string | number;
   tooltip?: string;
   disabled?: boolean;
@@ -366,7 +366,7 @@ export interface TooltipProps {
 export interface TabItem {
   id: string;
   key?: string;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
   content: React.ReactNode;
 }
@@ -414,7 +414,15 @@ export interface ProtectedRouteProps {
   redirectPath?: string;
 }
 
-// Error Alert Props
+// Message Alert Props (New preferred interface)
+export interface MsgAlertProps {
+  message: string | null;
+  type?: 'success' | 'error' | 'warning' | 'info';
+  onClose: () => void;
+  duration?: number;
+}
+
+// @deprecated - Use MsgAlertProps instead. Kept for backward compatibility.
 export interface ErrorAlertProps {
   error: string | null;
   onClose: () => void;
@@ -828,4 +836,817 @@ export interface TopOrganizersProps {
 export interface ActiveUsersProps {
   users?: UserCardData[];
   loading?: boolean;
+}
+
+// Organizer Application Types
+export interface OrganizerApplicationData {
+  organizationName: string;
+  socialLinks?: string;
+  reason: string;
+  experience: string;
+}
+
+export interface OrganizerApplicationProps {
+  applyingForOrganizer: boolean;
+  organizerApplication: OrganizerApplicationData;
+  saving: boolean;
+  onApplicationChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onSubmitApplication: (event: React.FormEvent<HTMLFormElement>) => void;
+  onToggleApplication: () => void;
+}
+
+// Contact Form Types
+export interface ContactFormData {
+  fullName: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactProps {}
+
+// Event Details Page Types
+export interface EventLocation {
+  type: 'online' | 'offline';
+  venue?: string;
+  address?: string;
+  city?: string;
+  onlineUrl?: string;
+}
+
+export interface EventOrganizer {
+  _id?: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  bio?: string;
+}
+
+export interface EventDetailsData {
+  _id: string;
+  title: string;
+  description: string;
+  shortDescription?: string;
+  date: string;
+  endDate?: string;
+  location: EventLocation;
+  category: string;
+  type: string;
+  price: number;
+  poster: string;
+  organizer: EventOrganizer;
+  registrationDeadline?: string;
+  registrationCount: number;
+  capacity: number;
+  tags?: string[];
+  requirements?: string[];
+  status: 'draft' | 'published' | 'cancelled' | 'completed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Event Registration Response Types
+export interface EventRegistrationResponse {
+  success: boolean;
+  message: string;
+  xp?: number;
+  booking?: Booking;
+}
+
+export interface EventSaveResponse {
+  success: boolean;
+  message: string;
+  isSaved: boolean;
+}
+
+export interface UserEventsResponse {
+  success: boolean;
+  events?: Array<{ id: string; title: string; date: string }>;
+  savedEvents?: Array<{ id: string; title: string; date: string }>;
+}
+
+// Event Details Component Props
+export interface EventDetailsProps {}
+
+// Event Discovery Page Types
+export interface EventDiscoverFilters {
+  searchQuery: string;
+  selectedCategory: string;
+  selectedLocation: string;
+  isOnlineOnly: boolean;
+  dateRange: DateRange;
+  sortBy: string;
+}
+
+export interface DateRange {
+  start: string;
+  end: string;
+}
+
+export interface EventsApiResponse {
+  success: boolean;
+  events: EventCardData[];
+  message?: string;
+}
+
+// Event Discovery Component Props
+export interface EventDiscoverProps {}
+
+// Event Card Component with Discover-specific properties
+export interface EventDiscoverData extends EventCardData {
+  _id: string;
+  createdAt: string;
+  isOnline?: boolean;
+  location: {
+    city?: string;
+    type?: 'online' | 'offline';
+    venue?: string;
+  };
+  tags?: string[];
+}
+
+// Date Change Handler Type
+export type DateChangeField = 'start' | 'end';
+
+// Event Handler Types for EventDiscover
+export interface EventDiscoverHandlers {
+  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCategoryChange: (e: { target: { value: string } }) => void;
+  handleLocationChange: (e: { target: { value: string } }) => void;
+  handleOnlineToggle: (e: { target: { checked: boolean } }) => void;
+  handleSortChange: (e: { target: { value: string } }) => void;
+  handleDateChange: (field: DateChangeField, value: string) => void;
+  handleSaveToggle: (eventId: string, isSaved: boolean) => Promise<void>;
+  resetFilters: () => void;
+}
+
+// User Dashboard Page Types
+export interface UserDashboardProfile {
+  badge: string;
+  xp: number;
+  streakCount?: number;
+}
+
+export interface Announcement {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface DashboardEventFilters {
+  searchQuery: string;
+  category: string;
+  city: string;
+  dateRange: {
+    startDate: string;
+    endDate: string;
+  };
+  tag: string;
+}
+
+export interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  events: EventCardData[];
+}
+
+export interface UserDashboardApiResponse {
+  success: boolean;
+  profile: UserDashboardProfile;
+  events: EventCardData[];
+  recommendedEvents: EventCardData[];
+  announcements: Announcement[];
+  currentPage: number;
+  totalPages: number;
+  message?: string;
+}
+
+export interface AdminAnnouncementsApiResponse {
+  success: boolean;
+  announcements: AdminAnnouncement[];
+}
+
+export interface RecommendedEventsApiResponse {
+  success: boolean;
+  events: EventCardData[];
+  message?: string;
+}
+
+// Badge and XP Types
+export interface DashboardBadgeInfo {
+  color: string;
+  icon: string;
+}
+
+export type BadgeType = 'Newbie' | 'Regular' | 'Champ' | 'Veteran' | 'Master';
+export type AnnouncementType = 'info' | 'warning' | 'success' | 'error';
+
+// User Dashboard Component Props
+export interface UserDashboardProps {}
+
+// Event Handler Types for UserDashboard
+export interface UserDashboardHandlers {
+  handleSearch: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleResetFilters: () => void;
+  handlePageChange: (newPage: number) => void;
+  handleSaveToggle: (eventId: string, isSaved: boolean) => void;
+  getBadgeInfo: (badgeName: string) => DashboardBadgeInfo;
+  getAnnouncementStyle: (type: AnnouncementType) => string;
+}
+
+// Event Feedback Types
+export interface EventFeedbackData {
+  id: string;
+  title: string;
+  poster: string;
+  date: string;
+  organizer: {
+    name: string;
+  };
+}
+
+export interface FeedbackFormData {
+  rating: number;
+  comment: string;
+}
+
+export interface FeedbackApiResponse {
+  success: boolean;
+  message?: string;
+  xp?: number;
+}
+
+export interface UserEventRegistration {
+  id: string;
+  feedback?: {
+    given: boolean;
+  };
+}
+
+export interface UserEventsApiResponse {
+  success: boolean;
+  registeredEvents: UserEventRegistration[];
+}
+
+// Organizer Dashboard Types
+export interface OrganizerDashboardData {
+  totalEvents: number;
+  totalRegistrations: number;
+  totalRevenue: number;
+  upcomingEvents: number;
+}
+
+export interface OrganizerEvent {
+  _id: string;
+  title: string;
+  date: string;
+  status: 'draft' | 'published' | 'cancelled';
+  registrationCount: number;
+  maxParticipants?: number;
+  poster?: string;
+  description?: string;
+  location?: string;
+  price?: number;
+}
+
+export interface OrganizerFeedbackSummary {
+  averageRating: number;
+  totalFeedbacks: number;
+  ratingDistribution: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
+  };
+}
+
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
+export interface OrganizerDashboardApiResponse {
+  success: boolean;
+  data: OrganizerDashboardData;
+}
+
+export interface OrganizerEventsApiResponse {
+  success: boolean;
+  events: OrganizerEvent[];
+}
+
+export interface OrganizerFeedbackApiResponse {
+  success: boolean;
+  summary: OrganizerFeedbackSummary;
+}
+
+// Organizer Dashboard Component Props
+export interface DashboardOverviewProps {
+  onCreateEvent: () => void;
+  dashboardData: OrganizerDashboardData | null;
+  calculatedTotalRegistrations: number;
+  feedbackSummary: OrganizerFeedbackSummary | null;
+}
+
+export interface EventRegistrationChartProps {
+  events: OrganizerEvent[];
+}
+
+export interface FeedbackSummaryProps {
+  feedbackSummary: OrganizerFeedbackSummary | null;
+}
+
+export interface EventsListProps {
+  events: OrganizerEvent[];
+  eventFilter: string;
+  setEventFilter: (filter: string) => void;
+  filterOptions: FilterOption[];
+  onCreateEvent: () => void;
+}
+
+// Organizer Settings Types
+export interface PrivacySettings {
+  showEmail: boolean;
+  showPhone: boolean;
+  publicProfile: boolean;
+}
+
+export interface SecuritySettings {
+  twoFactorAuth: boolean;
+}
+
+export interface OrganizerSettings {
+  privacy: PrivacySettings;
+  security: SecuritySettings;
+}
+
+export interface MessageState {
+  type: 'success' | 'error' | '';
+  text: string;
+}
+
+export interface OrganizerSettingsApiResponse {
+  success: boolean;
+  settings: OrganizerSettings;
+}
+
+// Organizer Manage Event Types
+export interface ManageEventData {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+  endDate?: string;
+  location: {
+    type: 'online' | 'offline';
+    venue?: string;
+    address?: string;
+    city?: string;
+    onlineUrl?: string;
+  };
+  category: string;
+  type: string;
+  price: number;
+  poster: string;
+  registrationCount: number;
+  capacity: number;
+  tags?: string[];
+  status: 'draft' | 'published' | 'cancelled' | 'completed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AttendeeData {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  registrationDate: string;
+  status: 'registered' | 'attended';
+  hasFeedback: boolean;
+}
+
+export interface EventManageApiResponse {
+  success: boolean;
+  event: ManageEventData;
+}
+
+export interface AttendeesApiResponse {
+  success: boolean;
+  attendees: AttendeeData[];
+}
+
+// Organizer Profile Types
+export interface SocialLinks {
+  [key: string]: string | undefined;
+  website?: string;
+  linkedin?: string;
+  twitter?: string;
+  instagram?: string;
+}
+
+export interface OrganizerProfileData {
+  _id?: string;
+  name: string;
+  organizationName?: string;
+  bio?: string;
+  email: string;
+  profilePicture?: string;
+  socialLinks?: SocialLinks;
+  rating?: number;
+  totalEvents?: number;
+  totalRevenue?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface OrganizerFormValues {
+  name: string;
+  organizationName: string;
+  bio: string;
+  email: string;
+  socialLinks: SocialLinks;
+}
+
+export interface OrganizerProfileApiResponse {
+  success: boolean;
+  profile: OrganizerProfileData;
+}
+
+export interface OrganizerProfilePictureResponse {
+  success: boolean;
+  profilePicture: string;
+}
+
+// Admin Dashboard Types
+export interface AdminDashboardStats {
+  totalUsers: number;
+  totalOrganizers: number;
+  totalEvents: number;
+  totalRegistrations: number;
+  flaggedItems: number;
+}
+
+export interface AdminAnnouncementForm {
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  target: 'all' | 'users' | 'organizers';
+}
+
+export interface AdminStatsApiResponse {
+  success: boolean;
+  stats: AdminDashboardStats;
+}
+
+export interface AdminTopOrganizersApiResponse {
+  success: boolean;
+  organizers: UserCardData[];
+}
+
+export interface AdminActiveUsersApiResponse {
+  success: boolean;
+  users: UserCardData[];
+}
+
+export interface AdminAnnouncementApiResponse {
+  success: boolean;
+  message?: string;
+}
+
+// Analytics Page Types
+export interface TopEventData {
+  _id: string;
+  title: string;
+  shortDescription: string;
+  count: number;
+}
+
+export interface TopOrganizerData {
+  _id: string;
+  name: string;
+  eventCount: number;
+  totalRegistrations: number;
+}
+
+export interface TopUserData {
+  _id: string;
+  user: {
+    name: string;
+  } | null;
+  xp: number;
+  badges: string[];
+  streak: number;
+}
+
+export interface AnalyticsData {
+  topEvents: TopEventData[];
+  topOrganizers: TopOrganizerData[];
+  topUsers: TopUserData[];
+}
+
+export interface AnalyticsApiResponse {
+  success: boolean;
+  analytics: AnalyticsData;
+}
+
+export interface AnalyticsBadgeInfo {
+  color: string;
+  icon: string;
+}
+
+// Admin Profile Types
+export interface AdminProfileData {
+  _id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  role: 'admin' | 'superadmin';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminLog {
+  id?: string;
+  timestamp: string;
+  action: 'create' | 'update' | 'delete' | string;
+  targetType?: string;
+  description?: string;
+  details?: string;
+  status: 'success' | 'error' | 'pending' | string;
+}
+
+export interface AdminTeamMember {
+  _id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  role: 'admin' | 'superadmin';
+  createdAt: string;
+}
+
+export interface AdminProfileApiResponse {
+  success: boolean;
+  profile: AdminProfileData;
+}
+
+export interface AdminLogsApiResponse {
+  success: boolean;
+  logs: AdminLog[];
+}
+
+export interface AdminTeamApiResponse {
+  success: boolean;
+  team: AdminTeamMember[];
+}
+
+export interface AdminProfilePictureResponse {
+  success: boolean;
+  profilePicture: string;
+}
+
+// Announcements Page Types
+export interface AdminAnnouncement {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  isActive: boolean;
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface AnnouncementFormData {
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  expiresAt: string;
+}
+
+export interface DeleteModalState {
+  isOpen: boolean;
+  announcementId: string | null;
+  title: string;
+}
+
+export interface AdminAnnouncementsApiResponse {
+  success: boolean;
+  announcements: AdminAnnouncement[];
+}
+
+export interface CreateAnnouncementApiResponse {
+  success: boolean;
+  announcement: AdminAnnouncement;
+}
+
+export interface DeleteAnnouncementApiResponse {
+  success: boolean;
+}
+
+export interface UpdateAnnouncementApiResponse {
+  success: boolean;
+}
+
+export interface AnnouncementsApiResponse {
+  success: boolean;
+  announcements: Announcement[];
+  message?: string;
+}
+
+export interface RecommendedEventsApiResponse {
+  success: boolean;
+  events: EventCardData[];
+  message?: string;
+}
+
+// User Management Types
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'organizer' | 'admin';
+  status?: 'active' | 'suspended';
+  isFlagged?: boolean;
+  flagReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserModalState {
+  isOpen: boolean;
+  type: 'delete' | 'status' | 'flag' | null;
+  userId: string | null;
+  userName: string;
+  deleteAllData: boolean;
+  currentStatus: string;
+  isFlagged: boolean;
+  flagReason: string;
+}
+
+export interface StatusBadgeStyle {
+  className: string;
+  icon: React.ReactNode;
+  text: string;
+}
+
+export interface UserRowProps {
+  userData: UserData;
+  index: number;
+  user: User | null;
+  onRoleChange: (userId: string, newRole: string) => void;
+  onStatusChange: (userId: string, userName: string, status: string) => void;
+  onFlag: (userId: string, userName: string, isFlagged: boolean, flagReason?: string) => void;
+  onDelete: (userId: string, userName: string) => void;
+  isInitialLoad: boolean;
+}
+
+export interface UsersApiResponse {
+  success: boolean;
+  users: UserData[];
+}
+
+export interface UserRoleUpdateResponse {
+  success: boolean;
+}
+
+export interface UserStatusUpdateResponse {
+  success: boolean;
+}
+
+export interface UserFlagUpdateResponse {
+  success: boolean;
+}
+
+export interface UserDeleteResponse {
+  success: boolean;
+}
+
+// Organizers Management Types
+export interface OrganizerData {
+  _id: string;
+  name: string;
+  email: string;
+  organizationName?: string;
+  role: 'organizer';
+  status?: 'active' | 'suspended';
+  isFlagged?: boolean;
+  flagReason?: string | null;
+  eventCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizerModalState {
+  isOpen: boolean;
+  type: 'status' | 'flag' | 'demote' | null;
+  organizerId: string | null;
+  organizerName: string;
+  currentStatus: string;
+  isFlagged: boolean;
+  flagReason: string;
+}
+
+export interface OrganizersApiResponse {
+  success: boolean;
+  organizers: OrganizerData[];
+  message?: string;
+}
+
+export interface OrganizerStatsCardData {
+  title: string;
+  value: number;
+  description: string;
+  icon: React.ReactNode;
+  bgClass: string;
+  borderClass: string;
+  iconBgClass: string;
+}
+
+// Events Management Types
+export interface AdminEventData {
+  _id: string;
+  title: string;
+  date: string;
+  poster: string;
+  organizer?: {
+    name: string;
+  };
+  category: string;
+  isPublished: boolean;
+  isFeatured?: boolean;
+  isFlagged?: boolean;
+  flagReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventDeleteModalState {
+  isOpen: boolean;
+  eventId: string | null;
+  eventTitle: string;
+}
+
+export interface EventFlagModalState {
+  isOpen: boolean;
+  eventId: string | null;
+  eventTitle: string;
+  isFlagged: boolean;
+  flagReason: string;
+}
+
+export interface AdminEventsApiResponse {
+  success: boolean;
+  events: AdminEventData[];
+  message?: string;
+}
+
+export interface EventDeleteResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface EventFlagResponse {
+  success: boolean;
+  message?: string;
+}
+
+// Moderation Page Types
+export interface FlaggedUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'organizer' | 'admin';
+  status?: 'active' | 'suspended';
+  flagReason?: string | null;
+}
+
+export interface FlaggedEvent {
+  _id: string;
+  title: string;
+  poster: string;
+  date: string;
+  organizer?: {
+    name: string;
+  };
+  flagReason?: string | null;
+}
+
+export interface FlaggedItems {
+  users: FlaggedUser[];
+  events: FlaggedEvent[];
+}
+
+export interface ModerationApiResponse {
+  success: boolean;
+  flaggedItems: FlaggedItems;
+  message?: string;
+}
+
+export interface UnflagResponse {
+  success: boolean;
+  message?: string;
 } 

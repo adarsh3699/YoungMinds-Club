@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Disclosure, Transition } from '@headlessui/react';
 import {
 	MagnifyingGlassIcon,
@@ -15,9 +15,17 @@ import { SelectInput, Switch } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { 
+	EventDiscoverData, 
+	EventsApiResponse, 
+	DateRange, 
+	DateChangeField, 
+	SelectOption,
+	EventSaveResponse 
+} from '@/types';
 
 // Categories
-const EVENT_CATEGORIES = [
+const EVENT_CATEGORIES: SelectOption[] = [
 	{ label: 'All Categories', value: '' },
 	{ label: 'Model United Nations', value: 'MUN' },
 	{ label: 'Debate', value: 'Debate' },
@@ -28,7 +36,7 @@ const EVENT_CATEGORIES = [
 ];
 
 // Locations
-const LOCATIONS = [
+const LOCATIONS: SelectOption[] = [
 	{ label: 'All Locations', value: '' },
 	{ label: 'Mumbai', value: 'Mumbai' },
 	{ label: 'Delhi', value: 'Delhi' },
@@ -39,49 +47,55 @@ const LOCATIONS = [
 ];
 
 // Sort options
-const SORT_OPTIONS = [
+const SORT_OPTIONS: SelectOption[] = [
 	{ label: 'Newest', value: 'newest' },
 	{ label: 'Most Popular', value: 'popular' },
 	{ label: 'Upcoming', value: 'upcoming' },
 	{ label: 'Outgoing', value: 'outgoing' },
 ];
 
-const EventsPage = () => {
+const EventsPage: React.FC = () => {
 	const { isAuthenticated } = useAuth();
 	const navigate = useNavigate();
+	
 	// State for events data
-	const [events, setEvents] = useState([]);
-	const [filteredEvents, setFilteredEvents] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [savedEventIds, setSavedEventIds] = useState([]);
+	const [events, setEvents] = useState<EventDiscoverData[]>([]);
+	const [filteredEvents, setFilteredEvents] = useState<EventDiscoverData[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [savedEventIds, setSavedEventIds] = useState<string[]>([]);
 
 	// State for filters and search
-	const [searchQuery, setSearchQuery] = useState('');
-	const [selectedCategory, setSelectedCategory] = useState('');
-	const [selectedLocation, setSelectedLocation] = useState('');
-	const [isOnlineOnly, setIsOnlineOnly] = useState(false);
-	const [dateRange, setDateRange] = useState({ start: '', end: '' });
-	const [dateError, setDateError] = useState('');
-	const [sortBy, setSortBy] = useState('newest');
+	const [searchQuery, setSearchQuery] = useState<string>('');
+	const [selectedCategory, setSelectedCategory] = useState<string>('');
+	const [selectedLocation, setSelectedLocation] = useState<string>('');
+	const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
+	const [dateRange, setDateRange] = useState<DateRange>({ start: '', end: '' });
+	const [dateError, setDateError] = useState<string>('');
+	const [sortBy, setSortBy] = useState<string>('newest');
 
 	// Mobile filters visibility
-	const [showMobileFilters, setShowMobileFilters] = useState(false);
+	const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
 
 	// Fetch events data
 	useEffect(() => {
 		const fetchEvents = async () => {
 			setLoading(true);
 			try {
-				const response = await axios.get('/events');
-				// Extract events array from response structure
-				const eventsData = response.data.events || [];
-				setEvents(eventsData);
-				setFilteredEvents(eventsData);
+				const response: AxiosResponse<EventsApiResponse> = await axios.get('/events');
+				if (response.data.success) {
+					const eventsData = response.data.events as EventDiscoverData[];
+					setEvents(eventsData);
+					setFilteredEvents(eventsData);
+				} else {
+					console.error('Error fetching events:', response.data.message);
+					setError('Failed to load events. Please try again later.');
+					setEvents([]);
+					setFilteredEvents([]);
+				}
 			} catch (err) {
 				console.error('Error fetching events:', err);
 				setError('Failed to load events. Please try again later.');
-				// Initialize with empty array on error
 				setEvents([]);
 				setFilteredEvents([]);
 			} finally {
@@ -120,7 +134,7 @@ const EventsPage = () => {
 		// Apply location filter
 		if (selectedLocation) {
 			result = result.filter(
-				(event) => event.location.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
+				(event) => event.location?.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
 			);
 		}
 
@@ -142,16 +156,16 @@ const EventsPage = () => {
 		// Apply sorting
 		switch (sortBy) {
 			case 'newest':
-				result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+				result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 				break;
 			case 'popular':
 				result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
 				break;
 			case 'upcoming':
-				result.sort((a, b) => new Date(a.date) - new Date(b.date));
+				result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 				break;
 			case 'outgoing':
-				result.sort((a, b) => new Date(b.date) - new Date(a.date));
+				result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 				break;
 			default:
 				break;
@@ -160,7 +174,7 @@ const EventsPage = () => {
 		setFilteredEvents(result);
 	}, [events, searchQuery, selectedCategory, selectedLocation, isOnlineOnly, dateRange, sortBy]);
 
-	const resetFilters = () => {
+	const resetFilters = (): void => {
 		setSearchQuery('');
 		setSelectedCategory('');
 		setSelectedLocation('');
@@ -170,27 +184,27 @@ const EventsPage = () => {
 		setSortBy('newest');
 	};
 
-	const handleSearchChange = (e) => {
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		setSearchQuery(e.target.value);
 	};
 
-	const handleCategoryChange = (e) => {
-		setSelectedCategory(e.target.value);
+	const handleCategoryChange = (e: { target: { name: string; value: string | number } }) => {
+		setSelectedCategory(e.target.value as string);
 	};
 
-	const handleLocationChange = (e) => {
-		setSelectedLocation(e.target.value);
+	const handleLocationChange = (e: { target: { name: string; value: string | number } }) => {
+		setSelectedLocation(e.target.value as string);
 	};
 
-	const handleOnlineToggle = (e) => {
+	const handleOnlineToggle = (e: { target: { checked: boolean } }): void => {
 		setIsOnlineOnly(e.target.checked);
 	};
 
-	const handleSortChange = (e) => {
-		setSortBy(e.target.value);
+	const handleSortChange = (e: { target: { name: string; value: string | number } }) => {
+		setSortBy(e.target.value as string);
 	};
 
-	const handleDateChange = (field, value) => {
+	const handleDateChange = (field: DateChangeField, value: string): void => {
 		// Create a new date range object
 		const newDateRange = { ...dateRange, [field]: value };
 
@@ -213,7 +227,7 @@ const EventsPage = () => {
 	};
 
 	// Handle saving/unsaving event
-	const handleSaveToggle = async (eventId, isSaved) => {
+	const handleSaveToggle = async (eventId: string, isSaved: boolean): Promise<void> => {
 		if (!isAuthenticated) {
 			// Redirect to login if not authenticated
 			navigate('/login');
@@ -222,7 +236,7 @@ const EventsPage = () => {
 
 		try {
 			// Always use POST method, as the server endpoint handles both save and unsave
-			const response = await axios.post(`/events/${eventId}/save`);
+			const response: AxiosResponse<EventSaveResponse> = await axios.post(`/events/${eventId}/save`);
 
 			// Get updated saved status from server response
 			const { isSaved: newSavedStatus } = response.data;
@@ -597,8 +611,10 @@ const EventsPage = () => {
 								<EventCard
 									key={event._id}
 									event={event}
-									onSaveToggle={isAuthenticated ? handleSaveToggle : undefined}
-									isSaved={savedEventIds.includes(event._id)}
+									onSaveToggle={handleSaveToggle}
+									onManage={() => {}}
+									onEdit={() => {}}
+									onDelete={() => {}}
 								/>
 							))}
 						</div>

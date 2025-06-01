@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
 	PencilIcon,
 	CameraIcon,
@@ -16,18 +16,27 @@ import {
 	BriefcaseIcon,
 	ChatBubbleLeftRightIcon,
 	CameraIcon as InstagramIcon,
+	CalendarIcon
 } from '@heroicons/react/24/outline';
 import { FormInput, TextareaField } from '../../components/common';
+import {
+	OrganizerProfileData,
+	OrganizerFormValues,
+	OrganizerFeedbackSummary,
+	OrganizerProfileApiResponse,
+	OrganizerProfilePictureResponse,
+	SocialLinks
+} from '@/types';
 
-const Profile = () => {
-	const { updateUserInfo } = useAuth();
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState(false);
-	const [error, setError] = useState(null);
-	const [organizerProfile, setOrganizerProfile] = useState(null);
-	const [feedbackSummary, setFeedbackSummary] = useState(null);
-	const [editMode, setEditMode] = useState(false);
-	const [formValues, setFormValues] = useState({
+const Profile: React.FC = () => {
+	const { user } = useAuth();
+	const [loading, setLoading] = useState<boolean>(true);
+	const [saving, setSaving] = useState<boolean>(false);
+	const [error, setError] = useState<string | null>(null);
+	const [organizerProfile, setOrganizerProfile] = useState<OrganizerProfileData | null>(null);
+	const [feedbackSummary, setFeedbackSummary] = useState<OrganizerFeedbackSummary | null>(null);
+	const [editMode, setEditMode] = useState<boolean>(false);
+	const [formValues, setFormValues] = useState<OrganizerFormValues>({
 		name: '',
 		organizationName: '',
 		bio: '',
@@ -39,14 +48,14 @@ const Profile = () => {
 			instagram: '',
 		},
 	});
-	const fileInputRef = useRef(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		const fetchProfileData = async () => {
+		const fetchProfileData = async (): Promise<void> => {
 			setLoading(true);
 			try {
 				// Get organizer profile data
-				const profileResponse = await axios.get('/organizer/profile');
+				const profileResponse: AxiosResponse<OrganizerProfileApiResponse> = await axios.get('/organizer/profile');
 				if (profileResponse.data.success) {
 					const profileData = profileResponse.data.profile;
 					setOrganizerProfile(profileData);
@@ -67,10 +76,8 @@ const Profile = () => {
 				}
 
 				// Get feedback summary
-				const feedbackResponse = await axios.get('/organizer/feedback/summary');
-				if (feedbackResponse.data.success) {
-					setFeedbackSummary(feedbackResponse.data.summary);
-				}
+				const feedbackResponse: AxiosResponse<{ summary: OrganizerFeedbackSummary }> = await axios.get('/organizer/feedback/summary');
+				setFeedbackSummary(feedbackResponse.data.summary);
 			} catch (error) {
 				console.error('Error fetching profile data:', error);
 				setError('Failed to load profile data. Please try again.');
@@ -82,7 +89,7 @@ const Profile = () => {
 		fetchProfileData();
 	}, []);
 
-	const toggleEditMode = () => {
+	const toggleEditMode = (): void => {
 		if (editMode) {
 			// Reset form values when canceling edit
 			setFormValues({
@@ -101,7 +108,7 @@ const Profile = () => {
 		setEditMode(!editMode);
 	};
 
-	const handleInputChange = (e) => {
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
 		const { name, value } = e.target;
 		setFormValues({
 			...formValues,
@@ -109,7 +116,7 @@ const Profile = () => {
 		});
 	};
 
-	const handleSocialLinkChange = (e) => {
+	const handleSocialLinkChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		const { name, value } = e.target;
 		setFormValues({
 			...formValues,
@@ -120,25 +127,17 @@ const Profile = () => {
 		});
 	};
 
-	const saveProfile = async (e) => {
+	const saveProfile = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
 		e.preventDefault();
 		setSaving(true);
 		try {
-			const response = await axios.put('/organizer/profile', formValues);
+			const response: AxiosResponse<OrganizerProfileApiResponse> = await axios.put('/organizer/profile', formValues);
 
 			if (response.data.success) {
 				setOrganizerProfile({
-					...organizerProfile,
+					...organizerProfile!,
 					...formValues,
 				});
-
-				// Update auth context if available
-				if (updateUserInfo) {
-					updateUserInfo({
-						name: formValues.name,
-						email: formValues.email,
-					});
-				}
 
 				setEditMode(false);
 			}
@@ -150,12 +149,14 @@ const Profile = () => {
 		}
 	};
 
-	const handleProfilePictureClick = () => {
-		fileInputRef.current.click();
+	const handleProfilePictureClick = (): void => {
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
 	};
 
-	const handleFileChange = async (e) => {
-		const file = e.target.files[0];
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+		const file = e.target.files?.[0];
 		if (!file) return;
 
 		const formData = new FormData();
@@ -163,7 +164,7 @@ const Profile = () => {
 
 		setSaving(true);
 		try {
-			const response = await axios.post('/organizer/profile/picture', formData, {
+			const response: AxiosResponse<OrganizerProfilePictureResponse> = await axios.post('/organizer/profile/picture', formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -171,7 +172,7 @@ const Profile = () => {
 
 			if (response.data.success) {
 				setOrganizerProfile({
-					...organizerProfile,
+					...organizerProfile!,
 					profilePicture: response.data.profilePicture,
 				});
 			}
@@ -351,7 +352,7 @@ const Profile = () => {
 														</span>
 													</div>
 													<p className="text-xs text-muted-foreground mt-1">
-														Based on {feedbackSummary.totalFeedback || 0} reviews
+														Based on {feedbackSummary.totalFeedbacks || 0} reviews
 													</p>
 												</div>
 											)}
@@ -541,11 +542,11 @@ const Profile = () => {
 													type="url"
 													id={social.name}
 													name={social.name}
-													value={formValues.socialLinks[social.name]}
+													value={formValues.socialLinks[social.name] || ''}
 													onChange={handleSocialLinkChange}
 													label={social.label}
 													placeholder={social.placeholder}
-													className="animate-fade-in"
+													className="bg-input text-input-foreground border-input focus:border-ring transition-colors"
 													style={{ animationDelay: `${index * 100}ms` }}
 												/>
 											))}
@@ -661,7 +662,7 @@ const Profile = () => {
 												<p className="text-center text-muted-foreground">
 													Based on{' '}
 													<span className="font-semibold text-accent-foreground">
-														{feedbackSummary.totalFeedback || 0}
+														{feedbackSummary.totalFeedbacks || 0}
 													</span>{' '}
 													feedback submissions
 												</p>
@@ -674,9 +675,9 @@ const Profile = () => {
 												</h3>
 												<div className="space-y-3">
 													{[5, 4, 3, 2, 1].map((rating) => {
-														const count = feedbackSummary.ratingCounts?.[rating] || 0;
-														const percentage = feedbackSummary.totalFeedback
-															? Math.round((count / feedbackSummary.totalFeedback) * 100)
+														const count = feedbackSummary.ratingDistribution[rating as keyof typeof feedbackSummary.ratingDistribution] || 0;
+														const percentage = feedbackSummary.totalFeedbacks
+															? Math.round((count / feedbackSummary.totalFeedbacks) * 100)
 															: 0;
 
 														return (
@@ -707,58 +708,7 @@ const Profile = () => {
 												</div>
 											</div>
 
-											{/* Recent Feedback */}
-											{feedbackSummary.recentFeedback &&
-												feedbackSummary.recentFeedback.length > 0 && (
-													<div>
-														<h3 className="font-bold text-card-foreground mb-4">
-															Recent Feedback
-														</h3>
-														<div className="space-y-4">
-															{feedbackSummary.recentFeedback
-																.slice(0, 3)
-																.map((feedback, index) => (
-																	<div
-																		key={index}
-																		className="bg-muted/50 p-4 rounded-xl border border-border/30 hover:bg-muted/70 transition-all duration-200"
-																	>
-																		<div className="flex justify-between items-start mb-2">
-																			<span className="font-medium text-secondary line-clamp-1">
-																				{feedback.eventTitle}
-																			</span>
-																			<div className="flex ml-2">
-																				{[...Array(5)].map((_, i) => (
-																					<StarIcon
-																						key={i}
-																						className={`h-4 w-4 ${
-																							i < feedback.rating
-																								? 'text-brand-primary fill-current'
-																								: 'text-muted-foreground/30'
-																						}`}
-																					/>
-																				))}
-																			</div>
-																		</div>
-																		{feedback.comment && (
-																			<p className="text-muted-foreground text-sm mb-2 line-clamp-2">
-																				"{feedback.comment}"
-																			</p>
-																		)}
-																		<p className="text-xs text-muted-foreground/60">
-																			{new Date(feedback.date).toLocaleDateString(
-																				'en-US',
-																				{
-																					year: 'numeric',
-																					month: 'short',
-																					day: 'numeric',
-																				}
-																			)}
-																		</p>
-																	</div>
-																))}
-														</div>
-													</div>
-												)}
+											{/* No Recent Feedback - Property not available yet */}
 										</div>
 									) : (
 										<div className="text-center py-12">

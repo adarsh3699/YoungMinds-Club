@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
 	UserStatsCards,
 	UserSearchFilters,
@@ -19,16 +19,30 @@ import {
 	EyeIcon,
 	FlagIcon,
 } from '@heroicons/react/24/outline';
+import {
+	UserData,
+	UserModalState,
+	StatusBadgeStyle,
+	RoleOption,
+	UserRowProps,
+	UsersApiResponse,
+	UserRoleUpdateResponse,
+	UserStatusUpdateResponse,
+	UserFlagUpdateResponse,
+	UserDeleteResponse,
+	AdminConfirmationModalProps
+} from '@/types';
 
 // Constants
 const ROLE_OPTIONS = [
+	{ value: '', label: 'All Roles' },
 	{ value: 'user', label: 'User' },
 	{ value: 'organizer', label: 'Organizer' },
 	{ value: 'admin', label: 'Admin' },
 ];
 
 // Optimized helper functions
-const getStatusBadgeStyle = (status) => {
+const getStatusBadgeStyle = (status?: string): StatusBadgeStyle => {
 	const isActive = status === 'active' || !status;
 	return {
 		className: `inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
@@ -41,7 +55,7 @@ const getStatusBadgeStyle = (status) => {
 	};
 };
 
-const getActionButtonClass = (type, condition = true) => {
+const getActionButtonClass = (type: string, condition: boolean = true): string => {
 	const base =
 		'px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-1';
 	switch (type) {
@@ -61,7 +75,7 @@ const getActionButtonClass = (type, condition = true) => {
 };
 
 // Optimized UserRow Component
-const UserRow = ({ userData, index, user, onRoleChange, onStatusChange, onFlag, onDelete, isInitialLoad }) => {
+const UserRow: React.FC<UserRowProps> = ({ userData, index, user, onRoleChange, onStatusChange, onFlag, onDelete, isInitialLoad }) => {
 	const statusStyle = getStatusBadgeStyle(userData.status);
 	const canModify = userData._id !== user?._id && userData.role !== 'admin';
 	const isProtected = userData._id === user?._id || userData.role === 'admin';
@@ -148,7 +162,7 @@ const UserRow = ({ userData, index, user, onRoleChange, onStatusChange, onFlag, 
 							</button>
 							<button
 								onClick={() =>
-									onFlag(userData._id, userData.name, userData.isFlagged, userData.flagReason)
+									onFlag(userData._id, userData.name, userData.isFlagged || false, userData.flagReason || undefined)
 								}
 								className={getActionButtonClass('flag')}
 							>
@@ -174,18 +188,18 @@ const UserRow = ({ userData, index, user, onRoleChange, onStatusChange, onFlag, 
 	);
 };
 
-const UsersPage = () => {
+const UsersPage: React.FC = () => {
 	const { user } = useAuth();
-	const [users, setUsers] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [roleFilter, setRoleFilter] = useState('all');
-	const [statusFilter, setStatusFilter] = useState('all');
-	const [isInitialLoad, setIsInitialLoad] = useState(true);
+	const [users, setUsers] = useState<UserData[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [searchTerm, setSearchTerm] = useState<string>('');
+	const [roleFilter, setRoleFilter] = useState<string>('all');
+	const [statusFilter, setStatusFilter] = useState<string>('all');
+	const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
 
 	// Simplified modal state
-	const [modal, setModal] = useState({
+	const [modal, setModal] = useState<UserModalState>({
 		isOpen: false,
 		type: null,
 		userId: null,
@@ -239,11 +253,11 @@ const UsersPage = () => {
 	}, [users]);
 
 	// Optimized API calls
-	const fetchUsers = useCallback(async () => {
+	const fetchUsers = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 			setError(null);
-			const response = await axios.get('/admin/users');
+			const response: AxiosResponse<UsersApiResponse> = await axios.get('/admin/users');
 			if (response.data.success) {
 				setUsers(response.data.users);
 				// Reset initial load flag after animation completes
@@ -257,11 +271,11 @@ const UsersPage = () => {
 		}
 	}, []);
 
-	const handleRoleChange = useCallback(async (userId, newRole) => {
+	const handleRoleChange = useCallback(async (userId: string, newRole: string): Promise<void> => {
 		try {
-			const response = await axios.put(`/admin/users/${userId}/role`, { role: newRole });
+			const response: AxiosResponse<UserRoleUpdateResponse> = await axios.put(`/admin/users/${userId}/role`, { role: newRole });
 			if (response.data.success) {
-				setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u)));
+				setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, role: newRole as 'user' | 'organizer' | 'admin' } : u)));
 			}
 		} catch (error) {
 			console.error('Error updating user role:', error);
@@ -270,7 +284,7 @@ const UsersPage = () => {
 	}, []);
 
 	// Simplified modal handlers
-	const openModal = useCallback((type, userId, userName, extra = {}) => {
+	const openModal = useCallback((type: 'delete' | 'status' | 'flag', userId: string, userName: string, extra: Partial<UserModalState> = {}): void => {
 		setModal({
 			isOpen: true,
 			type,
@@ -284,14 +298,14 @@ const UsersPage = () => {
 		});
 	}, []);
 
-	const closeModal = useCallback(() => {
+	const closeModal = useCallback((): void => {
 		setModal((prev) => ({ ...prev, isOpen: false, type: null }));
 	}, []);
 
-	const handleModalAction = useCallback(async () => {
+	const handleModalAction = useCallback(async (): Promise<void> => {
 		try {
 			const { type, userId } = modal;
-			let response;
+			let response: AxiosResponse<any>;
 
 			switch (type) {
 				case 'delete':
@@ -307,7 +321,7 @@ const UsersPage = () => {
 					const newStatus = modal.currentStatus === 'active' ? 'suspended' : 'active';
 					response = await axios.put(`/admin/users/${userId}/status`, { status: newStatus });
 					if (response.data.success) {
-						setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, status: newStatus } : u)));
+						setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, status: newStatus as 'active' | 'suspended' } : u)));
 					}
 					break;
 
@@ -340,7 +354,7 @@ const UsersPage = () => {
 
 	// Optimized render functions
 	const renderUserRow = useCallback(
-		(userData, index) => (
+		(userData: UserData, index: number) => (
 			<UserRow
 				key={userData._id}
 				userData={userData}
@@ -409,7 +423,7 @@ const UsersPage = () => {
 
 				{/* Optimized Modal */}
 				<AdminConfirmationModal
-					modalType={modal.type}
+					modalType={modal.type || 'delete'}
 					isOpen={modal.isOpen}
 					onClose={closeModal}
 					userName={modal.userName}

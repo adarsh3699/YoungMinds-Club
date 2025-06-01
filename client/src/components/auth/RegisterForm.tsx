@@ -65,8 +65,7 @@ const RegisterForm: React.FC = () => {
 			setIsSubmitting(true);
 			try {
 				await register({
-					firstName: registerData.name.split(' ')[0] || registerData.name,
-					lastName: registerData.name.split(' ').slice(1).join(' ') || '',
+					name: registerData.name,
 					email: registerData.email,
 					password: registerData.password,
 					role: registerData.role,

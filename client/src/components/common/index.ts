@@ -1,7 +1,8 @@
 // Common UI Components
 export { default as Button } from './Button';
 export { default as ProtectedRoute } from './ProtectedRoute';
-export { default as ErrorAlert } from './ErrorAlert';
+export { default as ErrorAlert } from './msgAlert';
+export { default as MsgAlert } from './msgAlert';
 export { default as GlobalErrorAlert } from './GlobalErrorAlert';
 export { default as FormInput } from './FormInput';
 export { default as Logo } from './Logo';

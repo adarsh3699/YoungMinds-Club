@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
 	CameraIcon,
 	UserIcon,
@@ -10,35 +10,44 @@ import {
 	ArrowPathIcon,
 	ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import {
+	AdminProfileData,
+	AdminLog,
+	AdminTeamMember,
+	AdminProfileApiResponse,
+	AdminLogsApiResponse,
+	AdminTeamApiResponse,
+	AdminProfilePictureResponse
+} from '@/types';
 
-const Profile = () => {
-	const { user, updateUserInfo } = useAuth();
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [adminProfile, setAdminProfile] = useState(null);
-	const [adminLogs, setAdminLogs] = useState([]);
-	const [otherAdmins, setOtherAdmins] = useState([]);
-	const [refreshing, setRefreshing] = useState(false);
-	const fileInputRef = useRef(null);
+const Profile: React.FC = () => {
+	const { user } = useAuth();
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [adminProfile, setAdminProfile] = useState<AdminProfileData | null>(null);
+	const [adminLogs, setAdminLogs] = useState<AdminLog[]>([]);
+	const [otherAdmins, setOtherAdmins] = useState<AdminTeamMember[]>([]);
+	const [refreshing, setRefreshing] = useState<boolean>(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		const fetchProfileData = async () => {
+		const fetchProfileData = async (): Promise<void> => {
 			setLoading(true);
 			try {
 				// Get admin profile data
-				const profileResponse = await axios.get('/admin/profile');
+				const profileResponse: AxiosResponse<AdminProfileApiResponse> = await axios.get('/admin/profile');
 				if (profileResponse.data.success) {
 					setAdminProfile(profileResponse.data.profile);
 				}
 
 				// Get admin action logs
-				const logsResponse = await axios.get('/admin/logs');
+				const logsResponse: AxiosResponse<AdminLogsApiResponse> = await axios.get('/admin/logs');
 				if (logsResponse.data.success) {
 					setAdminLogs(logsResponse.data.logs);
 				}
 
 				// Get other admins
-				const adminsResponse = await axios.get('/admin/team');
+				const adminsResponse: AxiosResponse<AdminTeamApiResponse> = await axios.get('/admin/team');
 				if (adminsResponse.data.success) {
 					setOtherAdmins(adminsResponse.data.team);
 				}
@@ -53,19 +62,21 @@ const Profile = () => {
 		fetchProfileData();
 	}, []);
 
-	const handleProfilePictureClick = () => {
-		fileInputRef.current.click();
+	const handleProfilePictureClick = (): void => {
+		if (fileInputRef.current) {
+			fileInputRef.current.click();
+		}
 	};
 
-	const handleFileChange = async (e) => {
-		const file = e.target.files[0];
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+		const file = e.target.files?.[0];
 		if (!file) return;
 
 		const formData = new FormData();
 		formData.append('profilePicture', file);
 
 		try {
-			const response = await axios.post('/admin/profile/picture', formData, {
+			const response: AxiosResponse<AdminProfilePictureResponse> = await axios.post('/admin/profile/picture', formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -73,7 +84,7 @@ const Profile = () => {
 
 			if (response.data.success) {
 				setAdminProfile({
-					...adminProfile,
+					...adminProfile!,
 					profilePicture: response.data.profilePicture,
 				});
 			}
@@ -83,10 +94,10 @@ const Profile = () => {
 		}
 	};
 
-	const refreshLogs = async () => {
+	const refreshLogs = async (): Promise<void> => {
 		setRefreshing(true);
 		try {
-			const logsResponse = await axios.get('/admin/logs');
+			const logsResponse: AxiosResponse<AdminLogsApiResponse> = await axios.get('/admin/logs');
 			if (logsResponse.data.success) {
 				setAdminLogs(logsResponse.data.logs);
 			}
@@ -214,7 +225,7 @@ const Profile = () => {
 
 										<div>
 											<h3 className="font-medium text-gray-800 dark:text-gray-200">
-												{admin.name} {admin._id === user._id && '(You)'}
+												{admin.name} {admin._id === user?._id && '(You)'}
 											</h3>
 											<p className="text-sm text-gray-500 dark:text-gray-400">
 												{admin.role === 'superadmin' ? 'Super Admin' : 'Admin'}

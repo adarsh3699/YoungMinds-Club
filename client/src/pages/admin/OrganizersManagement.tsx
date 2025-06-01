@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import axios, { AxiosResponse } from 'axios';
 import {
 	StatsCard,
 	LoadingComponent,
@@ -18,9 +18,18 @@ import {
 	NoSymbolIcon,
 	ArrowDownIcon,
 } from '@heroicons/react/24/outline';
+import {
+	OrganizerData,
+	OrganizerModalState,
+	OrganizersApiResponse,
+	OrganizerStatsCardData,
+	UserStatusUpdateResponse,
+	UserFlagUpdateResponse,
+	UserRoleUpdateResponse
+} from '@/types';
 
 // Constants
-const INITIAL_ADMIN_MODAL = {
+const INITIAL_ADMIN_MODAL: OrganizerModalState = {
 	isOpen: false,
 	type: null,
 	organizerId: null,
@@ -35,26 +44,26 @@ const STATUS_FILTERS = {
 	ACTIVE: 'active',
 	SUSPENDED: 'suspended',
 	FLAGGED: 'flagged',
-};
+} as const;
 
 const USER_STATUSES = {
 	ACTIVE: 'active',
 	SUSPENDED: 'suspended',
-};
+} as const;
 
 const MODAL_TYPES = {
 	STATUS: 'status',
 	FLAG: 'flag',
 	DEMOTE: 'demote',
-};
+} as const;
 
-const OrganizersPage = () => {
-	const [organizers, setOrganizers] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [adminModal, setAdminModal] = useState(INITIAL_ADMIN_MODAL);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [statusFilter, setStatusFilter] = useState(STATUS_FILTERS.ALL);
+const OrganizersPage: React.FC = () => {
+	const [organizers, setOrganizers] = useState<OrganizerData[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [adminModal, setAdminModal] = useState<OrganizerModalState>(INITIAL_ADMIN_MODAL);
+	const [searchTerm, setSearchTerm] = useState<string>('');
+	const [statusFilter, setStatusFilter] = useState<string>(STATUS_FILTERS.ALL);
 
 	// Memoized filtered organizers
 	const filteredOrganizers = useMemo(() => {
@@ -90,18 +99,18 @@ const OrganizersPage = () => {
 	);
 
 	// Optimized data fetching with error handling
-	const fetchOrganizers = useCallback(async () => {
+	const fetchOrganizers = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 			setError(null);
-			const response = await axios.get('/admin/organizers');
+			const response: AxiosResponse<OrganizersApiResponse> = await axios.get('/admin/organizers');
 
 			if (response.data.success) {
 				setOrganizers(response.data.organizers);
 			} else {
 				throw new Error(response.data.message || 'Failed to fetch organizers');
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error fetching organizers:', error);
 			setError(error.response?.data?.message || 'Failed to load organizers. Please try again later.');
 		} finally {
@@ -114,7 +123,7 @@ const OrganizersPage = () => {
 	}, [fetchOrganizers]);
 
 	// Optimized modal handlers
-	const confirmStatusChange = useCallback((organizerId, organizerName, currentStatus) => {
+	const confirmStatusChange = useCallback((organizerId: string, organizerName: string, currentStatus: string): void => {
 		setAdminModal({
 			isOpen: true,
 			type: MODAL_TYPES.STATUS,
@@ -126,7 +135,7 @@ const OrganizersPage = () => {
 		});
 	}, []);
 
-	const openFlagModal = useCallback((organizerId, organizerName, isFlagged, flagReason = '') => {
+	const openFlagModal = useCallback((organizerId: string, organizerName: string, isFlagged: boolean, flagReason: string = ''): void => {
 		setAdminModal({
 			isOpen: true,
 			type: MODAL_TYPES.FLAG,
@@ -138,7 +147,7 @@ const OrganizersPage = () => {
 		});
 	}, []);
 
-	const confirmDemoteUser = useCallback((organizerId, organizerName) => {
+	const confirmDemoteUser = useCallback((organizerId: string, organizerName: string): void => {
 		setAdminModal({
 			isOpen: true,
 			type: MODAL_TYPES.DEMOTE,
@@ -150,18 +159,18 @@ const OrganizersPage = () => {
 		});
 	}, []);
 
-	const closeAdminModal = useCallback(() => {
+	const closeAdminModal = useCallback((): void => {
 		setAdminModal(INITIAL_ADMIN_MODAL);
 	}, []);
 
 	// Optimized status change handler
-	const handleStatusChange = useCallback(async () => {
+	const handleStatusChange = useCallback(async (): Promise<void> => {
 		if (!adminModal.organizerId) return;
 
 		try {
 			const newStatus =
 				adminModal.currentStatus === USER_STATUSES.ACTIVE ? USER_STATUSES.SUSPENDED : USER_STATUSES.ACTIVE;
-			const response = await axios.put(`/admin/users/${adminModal.organizerId}/status`, {
+			const response: AxiosResponse<UserStatusUpdateResponse> = await axios.put(`/admin/users/${adminModal.organizerId}/status`, {
 				status: newStatus,
 			});
 
@@ -173,20 +182,20 @@ const OrganizersPage = () => {
 				);
 				closeAdminModal();
 			} else {
-				throw new Error(response.data.message || 'Failed to update status');
+				throw new Error('Failed to update status');
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error updating organizer status:', error);
 			setError(error.response?.data?.message || 'Failed to update organizer status. Please try again.');
 		}
 	}, [adminModal.organizerId, adminModal.currentStatus, closeAdminModal]);
 
 	// Optimized flag handler
-	const handleFlagOrganizer = useCallback(async () => {
+	const handleFlagOrganizer = useCallback(async (): Promise<void> => {
 		if (!adminModal.organizerId) return;
 
 		try {
-			const response = await axios.put(`/admin/users/${adminModal.organizerId}/flag`, {
+			const response: AxiosResponse<UserFlagUpdateResponse> = await axios.put(`/admin/users/${adminModal.organizerId}/flag`, {
 				isFlagged: !adminModal.isFlagged,
 				flagReason: adminModal.flagReason,
 			});
@@ -205,20 +214,20 @@ const OrganizersPage = () => {
 				);
 				closeAdminModal();
 			} else {
-				throw new Error(response.data.message || 'Failed to update flag status');
+				throw new Error('Failed to update flag status');
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error updating organizer flag status:', error);
 			setError(error.response?.data?.message || 'Failed to update organizer flag status. Please try again.');
 		}
 	}, [adminModal.organizerId, adminModal.isFlagged, adminModal.flagReason, closeAdminModal]);
 
 	// Optimized role change handler (demote)
-	const handleDemoteUser = useCallback(async () => {
+	const handleDemoteUser = useCallback(async (): Promise<void> => {
 		if (!adminModal.organizerId) return;
 
 		try {
-			const response = await axios.put(`/admin/users/${adminModal.organizerId}/role`, {
+			const response: AxiosResponse<UserRoleUpdateResponse> = await axios.put(`/admin/users/${adminModal.organizerId}/role`, {
 				role: 'user',
 			});
 
@@ -226,35 +235,36 @@ const OrganizersPage = () => {
 				setOrganizers((prev) => prev.filter((org) => org._id !== adminModal.organizerId));
 				closeAdminModal();
 			} else {
-				throw new Error(response.data.message || 'Failed to change role');
+				throw new Error('Failed to change role');
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error changing organizer to user:', error);
 			setError(error.response?.data?.message || 'Failed to change role. Please try again.');
 		}
 	}, [adminModal.organizerId, closeAdminModal]);
 
-	const handleFlagReasonChange = useCallback((e) => {
+	const handleFlagReasonChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
 		setAdminModal((prev) => ({ ...prev, flagReason: e.target.value }));
 	}, []);
 
 	// Unified confirm handler for all modal types
-	const handleModalConfirm = useCallback(() => {
+	const handleConfirmAction = (): void => {
 		switch (adminModal.type) {
 			case MODAL_TYPES.STATUS:
-				return handleStatusChange();
+				handleStatusChange();
+				break;
 			case MODAL_TYPES.FLAG:
-				return handleFlagOrganizer();
+				handleFlagOrganizer();
+				break;
 			case MODAL_TYPES.DEMOTE:
-				return handleDemoteUser();
-			default:
-				return;
+				handleDemoteUser();
+				break;
 		}
-	}, [adminModal.type, handleStatusChange, handleFlagOrganizer, handleDemoteUser]);
+	};
 
 	// Memoized render function for organizer rows
 	const renderOrganizerRow = useCallback(
-		(organizer, index) => {
+		(organizer: OrganizerData, index: number) => {
 			const isActive = organizer.status === USER_STATUSES.ACTIVE || !organizer.status;
 			const isSuspended = organizer.status === USER_STATUSES.SUSPENDED;
 
@@ -336,8 +346,8 @@ const OrganizersPage = () => {
 									openFlagModal(
 										organizer._id,
 										organizer.name,
-										organizer.isFlagged,
-										organizer.flagReason
+										organizer.isFlagged || false,
+										organizer.flagReason || undefined
 									)
 								}
 								className={`inline-flex items-center px-3 py-1.5 text-xs rounded-lg transition-all ${
@@ -479,7 +489,7 @@ const OrganizersPage = () => {
 
 				{/* Unified Admin Confirmation Modal for all actions */}
 				<AdminConfirmationModal
-					modalType={adminModal.type}
+					modalType={adminModal.type || 'status'}
 					isOpen={adminModal.isOpen}
 					onClose={closeAdminModal}
 					userName={adminModal.organizerName}
@@ -487,7 +497,7 @@ const OrganizersPage = () => {
 					isFlagged={adminModal.isFlagged}
 					flagReason={adminModal.flagReason}
 					onFlagReasonChange={handleFlagReasonChange}
-					onConfirm={handleModalConfirm}
+					onConfirm={handleConfirmAction}
 				/>
 			</div>
 		</div>

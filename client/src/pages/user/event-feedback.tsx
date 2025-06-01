@@ -1,33 +1,39 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { RadioGroup } from '@headlessui/react';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline';
+import {
+  EventFeedbackData,
+  FeedbackApiResponse,
+  UserEventsApiResponse,
+  ApiResponse
+} from '@/types';
 
-const EventFeedback = () => {
-  const { id } = useParams();
+const EventFeedback: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [xpEarned, setXpEarned] = useState(null);
+  const [event, setEvent] = useState<EventFeedbackData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [xpEarned, setXpEarned] = useState<number | null>(null);
   
   // Form state
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
   
   // Rating options for RadioGroup
-  const ratingOptions = [1, 2, 3, 4, 5];
+  const ratingOptions: number[] = [1, 2, 3, 4, 5];
   
   // Check if user is authenticated and has registered for this event
   useEffect(() => {
-    const fetchEventDetails = async () => {
+    const fetchEventDetails = async (): Promise<void> => {
       setLoading(true);
       try {
         if (!isAuthenticated) {
@@ -36,11 +42,11 @@ const EventFeedback = () => {
         }
         
         // Get the event details
-        const eventResponse = await axios.get(`/events/${id}`);
-        setEvent(eventResponse.data.event);
+        const eventResponse: AxiosResponse<ApiResponse<{ event: EventFeedbackData }>> = await axios.get(`/events/${id}`);
+        setEvent(eventResponse.data.data?.event || null);
         
         // Check if user is registered for this event
-        const userEventsResponse = await axios.get('/user/events');
+        const userEventsResponse: AxiosResponse<UserEventsApiResponse> = await axios.get('/user/events');
         
         const isRegistered = userEventsResponse.data.registeredEvents.some(
           event => event.id === id
@@ -70,7 +76,7 @@ const EventFeedback = () => {
   }, [id, isAuthenticated, navigate]);
   
   // Submit feedback
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     
     if (rating === 0) {
@@ -81,17 +87,17 @@ const EventFeedback = () => {
     setSubmitting(true);
     
     try {
-      const response = await axios.post(`/events/${id}/feedback`, {
+      const response: AxiosResponse<FeedbackApiResponse> = await axios.post(`/events/${id}/feedback`, {
         rating,
         comment
       });
       
       setSubmitted(true);
-      setXpEarned(response.data.xp);
+      setXpEarned(response.data.xp || null);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       setError(
-        error.response?.data?.message || 'Failed to submit feedback. Please try again.'
+        (error as any).response?.data?.message || 'Failed to submit feedback. Please try again.'
       );
     } finally {
       setSubmitting(false);

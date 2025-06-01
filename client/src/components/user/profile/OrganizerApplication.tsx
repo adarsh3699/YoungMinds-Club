@@ -1,6 +1,8 @@
+import React from 'react';
 import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { OrganizerApplicationProps } from '@/types';
 
-const OrganizerApplication = ({
+const OrganizerApplication: React.FC<OrganizerApplicationProps> = ({
 	applyingForOrganizer,
 	organizerApplication,
 	saving,
@@ -46,7 +48,7 @@ const OrganizerApplication = ({
 								type="text"
 								id="socialLinks"
 								name="socialLinks"
-								value={organizerApplication.socialLinks}
+								value={organizerApplication.socialLinks || ''}
 								onChange={onApplicationChange}
 								className="w-full px-3 py-2 border ym-border-card rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ym-bg-card ym-text-card transition-all duration-300"
 								placeholder="LinkedIn, portfolio website, etc."

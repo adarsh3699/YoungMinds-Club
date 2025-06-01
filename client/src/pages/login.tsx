@@ -1,7 +1,8 @@
+import React from 'react';
 import LoginForm from '../components/auth/LoginForm';
 import { AcademicCapIcon, UsersIcon, CalendarIcon, HandRaisedIcon } from '@heroicons/react/24/outline';
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row">
 			{/* Left side - Image/Brand */}

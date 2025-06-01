@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useError } from '../../context/ErrorContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import {
 	UserGroupIcon,
 	UserIcon,
@@ -23,8 +23,20 @@ import {
 	LoadingComponent,
 } from '../../components/admin/dashboard';
 
+import {
+	AdminDashboardStats,
+	AdminAnnouncementForm,
+	AdminStatsApiResponse,
+	AdminTopOrganizersApiResponse,
+	AdminActiveUsersApiResponse,
+	AdminAnnouncementApiResponse,
+	UserCardData,
+	AdminSection,
+	StatsCardProps
+} from '@/types';
+
 // Constants
-const INITIAL_STATS = {
+const INITIAL_STATS: AdminDashboardStats = {
 	totalUsers: 0,
 	totalOrganizers: 0,
 	totalEvents: 0,
@@ -32,7 +44,7 @@ const INITIAL_STATS = {
 	flaggedItems: 0,
 };
 
-const INITIAL_ANNOUNCEMENT = {
+const INITIAL_ANNOUNCEMENT: AdminAnnouncementForm = {
 	title: '',
 	message: '',
 	type: 'info',
@@ -44,26 +56,26 @@ const ANNOUNCEMENT_TYPES = [
 	{ value: 'success', label: 'Success' },
 	{ value: 'warning', label: 'Warning' },
 	{ value: 'error', label: 'Error' },
-];
+] as const;
 
 const TARGET_AUDIENCES = [
 	{ value: 'all', label: 'All Users' },
 	{ value: 'users', label: 'Regular Users' },
 	{ value: 'organizers', label: 'Organizers' },
-];
+] as const;
 
-const AdminDashboard = () => {
+const AdminDashboard: React.FC = () => {
 	const { user } = useAuth();
 	const { showError } = useError();
-	const [loading, setLoading] = useState(true);
-	const [stats, setStats] = useState(INITIAL_STATS);
-	const [topOrganizers, setTopOrganizers] = useState([]);
-	const [activeUsers, setActiveUsers] = useState([]);
-	const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
-	const [announcement, setAnnouncement] = useState(INITIAL_ANNOUNCEMENT);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [stats, setStats] = useState<AdminDashboardStats>(INITIAL_STATS);
+	const [topOrganizers, setTopOrganizers] = useState<UserCardData[]>([]);
+	const [activeUsers, setActiveUsers] = useState<UserCardData[]>([]);
+	const [showAnnouncementForm, setShowAnnouncementForm] = useState<boolean>(false);
+	const [announcement, setAnnouncement] = useState<AdminAnnouncementForm>(INITIAL_ANNOUNCEMENT);
 
 	// Memoized admin sections configuration
-	const adminSections = useMemo(
+	const adminSections = useMemo<AdminSection[]>(
 		() => [
 			{
 				title: 'Users',
@@ -131,7 +143,7 @@ const AdminDashboard = () => {
 	);
 
 	// Memoized stats cards data
-	const statsCardsData = useMemo(
+	const statsCardsData = useMemo<Omit<StatsCardProps, 'key'>[]>(
 		() => [
 			{
 				title: 'Total Users',
@@ -174,14 +186,14 @@ const AdminDashboard = () => {
 	);
 
 	// Optimized data fetching
-	const fetchDashboardData = useCallback(async () => {
+	const fetchDashboardData = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
 
 			const [statsRes, organizersRes, usersRes] = await Promise.all([
-				axios.get('/admin/dashboard/stats'),
-				axios.get('/admin/top-organizers?limit=5'),
-				axios.get('/admin/active-users?limit=5'),
+				axios.get<AdminStatsApiResponse>('/admin/dashboard/stats'),
+				axios.get<AdminTopOrganizersApiResponse>('/admin/top-organizers?limit=5'),
+				axios.get<AdminActiveUsersApiResponse>('/admin/active-users?limit=5'),
 			]);
 
 			if (statsRes.data.success) {
@@ -207,16 +219,16 @@ const AdminDashboard = () => {
 		fetchDashboardData();
 	}, [fetchDashboardData]);
 
-	const handleAnnouncementChange = useCallback((e) => {
+	const handleAnnouncementChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
 		const { name, value } = e.target;
 		setAnnouncement((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
 	const submitAnnouncement = useCallback(
-		async (e) => {
+		async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
 			e.preventDefault();
 			try {
-				const response = await axios.post('/admin/announcements', announcement);
+				const response: AxiosResponse<AdminAnnouncementApiResponse> = await axios.post('/admin/announcements', announcement);
 				if (response.data.success) {
 					setAnnouncement(INITIAL_ANNOUNCEMENT);
 					setShowAnnouncementForm(false);
@@ -230,7 +242,7 @@ const AdminDashboard = () => {
 		[announcement]
 	);
 
-	const toggleAnnouncementForm = useCallback(() => {
+	const toggleAnnouncementForm = useCallback((): void => {
 		setShowAnnouncementForm((prev) => !prev);
 		if (showAnnouncementForm) {
 			setAnnouncement(INITIAL_ANNOUNCEMENT);
@@ -279,8 +291,8 @@ const AdminDashboard = () => {
 
 						{/* Enhanced Top Organizers and Active Users */}
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-							<TopOrganizers topOrganizers={topOrganizers} />
-							<ActiveUsers activeUsers={activeUsers} />
+							<TopOrganizers organizers={topOrganizers} />
+							<ActiveUsers users={activeUsers} />
 						</div>
 					</div>
 				</div>

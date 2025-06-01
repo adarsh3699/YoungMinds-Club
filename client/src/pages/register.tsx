@@ -1,7 +1,8 @@
+import React from 'react';
 import RegisterForm from '../components/auth/RegisterForm';
 import { RocketLaunchIcon, GiftIcon, ArrowPathIcon, UsersIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
-const RegisterPage = () => {
+const RegisterPage: React.FC = () => {
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row">
 			{/* Left side - Image/Brand */}

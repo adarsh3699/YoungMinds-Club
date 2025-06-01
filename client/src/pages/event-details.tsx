@@ -1,31 +1,40 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { formatDate } from '../utils/formatDate';
-import { Tabs } from '../components/common';
+import { Tabs, MsgAlert } from '../components/common';
+import { 
+	EventDetailsData, 
+	EventRegistrationResponse, 
+	EventSaveResponse, 
+	UserEventsResponse,
+	ApiResponse 
+} from '@/types';
 
-const EventDetails = () => {
-	const { id } = useParams();
+const EventDetails: React.FC = () => {
+	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { isAuthenticated } = useAuth();
 
-	const [event, setEvent] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
-	const [isSaved, setIsSaved] = useState(false);
-	const [isRegistered, setIsRegistered] = useState(false);
-	const [registrationSuccess, setRegistrationSuccess] = useState(false);
-	const [xpEarned, setXpEarned] = useState(null);
-	const [registrationError, setRegistrationError] = useState(null);
-	const [activeTab, setActiveTab] = useState('details');
+	const [event, setEvent] = useState<EventDetailsData | null>(null);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+	const [isSaved, setIsSaved] = useState<boolean>(false);
+	const [isRegistered, setIsRegistered] = useState<boolean>(false);
+	const [registrationSuccess, setRegistrationSuccess] = useState<boolean>(false);
+	const [xpEarned, setXpEarned] = useState<number | null>(null);
+	const [registrationError, setRegistrationError] = useState<string | null>(null);
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+	const [activeTab, setActiveTab] = useState<string>('details');
 
 	// Check for registration success from URL query
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
 		if (queryParams.get('registered') === 'true') {
 			setRegistrationSuccess(true);
+			setSuccessMessage('You have successfully registered for this event. You earned 10 XP for registering. Keep it up!');
 			// Clear the URL parameter without refreshing the page
 			const newUrl = window.location.pathname;
 			window.history.replaceState({}, '', newUrl);
@@ -35,14 +44,16 @@ const EventDetails = () => {
 	// Fetch event details
 	useEffect(() => {
 		const fetchEventDetails = async () => {
+			if (!id) return;
+			
 			setLoading(true);
 			try {
-				const response = await axios.get(`/events/${id}`);
-				setEvent(response.data.event);
+				const response: AxiosResponse<{ success: boolean; event: EventDetailsData }> = await axios.get(`/events/${id}`);
+				setEvent(response.data.event || null);
 
 				// If user is authenticated, check if they've saved or registered for this event
 				if (isAuthenticated) {
-					const userEventsResponse = await axios.get('/user/events');
+					const userEventsResponse: AxiosResponse<UserEventsResponse> = await axios.get('/user/events');
 
 					// Check if event is saved
 					const eventIsSaved = userEventsResponse.data.savedEvents?.some(
@@ -72,11 +83,14 @@ const EventDetails = () => {
 			return;
 		}
 
+		if (!id) return;
+
 		try {
-			const response = await axios.post(`/events/${id}/save`);
+			const response: AxiosResponse<EventSaveResponse> = await axios.post(`/events/${id}/save`);
 			setIsSaved(response.data.isSaved);
 		} catch (error) {
 			console.error('Error saving event:', error);
+			setError('Failed to save event. Please try again.');
 		}
 	};
 
@@ -87,22 +101,25 @@ const EventDetails = () => {
 			return;
 		}
 
+		if (!id) return;
+
 		setRegistrationError(null);
 
 		try {
-			const response = await axios.post(`/events/${id}/register`);
+			const response: AxiosResponse<EventRegistrationResponse> = await axios.post(`/events/${id}/register`);
 			setIsRegistered(true);
 			setRegistrationSuccess(true);
-			setXpEarned(response.data.xp);
+			setXpEarned(response.data.xp || null);
+			setSuccessMessage(`Registration successful! You have successfully registered for this event.${response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ''}`);
 			setRegistrationError(null);
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error registering for event:', error);
 			setRegistrationError(error.response?.data?.message || 'Failed to register. Please try again.');
 		}
 	};
 
 	// Generate Google Calendar link
-	const generateGoogleCalendarLink = () => {
+	const generateGoogleCalendarLink = (): string => {
 		if (!event) return '#';
 
 		const startDate = new Date(event.date);
@@ -112,7 +129,7 @@ const EventDetails = () => {
 		const details = `${event.description}\n\nVenue: ${event.location.venue}, ${event.location.address}, ${event.location.city}\n\nOrganized by: ${event.organizer.name}`;
 
 		// Format dates for Google Calendar
-		const formatForCalendar = (date) => {
+		const formatForCalendar = (date: Date): string => {
 			return date.toISOString().replace(/-|:|\.\d+/g, '');
 		};
 
@@ -124,7 +141,7 @@ const EventDetails = () => {
 	};
 
 	// Generate WhatsApp share link
-	const generateWhatsAppLink = () => {
+	const generateWhatsAppLink = (): string => {
 		if (!event) return '#';
 
 		const eventDate = formatDate(event.date);
@@ -168,40 +185,24 @@ const EventDetails = () => {
 
 	return (
 		<div className="min-h-screen ym-features-bg">
+			{/* Message Alerts */}
+			<MsgAlert 
+				message={successMessage} 
+				type="success" 
+				onClose={() => setSuccessMessage(null)} 
+			/>
+			<MsgAlert 
+				message={registrationError} 
+				type="error" 
+				onClose={() => setRegistrationError(null)} 
+			/>
+			<MsgAlert 
+				message={error} 
+				type="error" 
+				onClose={() => setError(null)} 
+			/>
+
 			<div className="container mx-auto px-4 py-12 mt-12">
-				{/* Registration Success Message */}
-				{registrationSuccess && (
-					<div className="ym-bg-success bg-opacity-10 border border-green-200 text-green-700 px-6 py-4 rounded-lg mb-8 flex items-start animate-fade-in">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-6 w-6 mr-2 mt-0.5 ym-text-success"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-							/>
-						</svg>
-						<div>
-							<p className="font-bold">Registration Successful!</p>
-							<p>You have successfully registered for this event.</p>
-							{xpEarned && <p className="mt-1">You earned 10 XP for registering. Keep it up!</p>}
-						</div>
-					</div>
-				)}
-
-				{/* Registration Error Message */}
-				{registrationError && (
-					<div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-8 animate-fade-in">
-						<p className="font-bold">Registration Failed</p>
-						<p>{registrationError}</p>
-					</div>
-				)}
-
 				<div className="flex flex-col md:flex-row gap-8">
 					{/* Event Image */}
 					<div className="md:w-1/2 lg:w-2/5">
@@ -449,20 +450,22 @@ const EventDetails = () => {
 														{event.location.type === 'online' ? (
 															<>
 																<p>Online Event</p>
-																<a
-																	href={event.location.onlineUrl}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	className="ym-text-yellow-600 hover:ym-text-yellow-700 hover:underline transition-colors"
-																>
-																	{event.location.onlineUrl}
-																</a>
+																{event.location.onlineUrl && (
+																	<a
+																		href={event.location.onlineUrl}
+																		target="_blank"
+																		rel="noopener noreferrer"
+																		className="ym-text-yellow-600 hover:ym-text-yellow-700 hover:underline transition-colors"
+																	>
+																		{event.location.onlineUrl}
+																	</a>
+																)}
 															</>
 														) : (
 															<>
-																<p>{event.location.venue}</p>
-																<p>{event.location.address}</p>
-																<p>{event.location.city}</p>
+																{event.location.venue && <p>{event.location.venue}</p>}
+																{event.location.address && <p>{event.location.address}</p>}
+																{event.location.city && <p>{event.location.city}</p>}
 															</>
 														)}
 													</div>

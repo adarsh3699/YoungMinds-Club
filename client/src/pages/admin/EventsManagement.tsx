@@ -1,22 +1,40 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { Modal } from "../../components/common";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  AdminEventData,
+  EventDeleteModalState,
+  EventFlagModalState,
+  AdminEventsApiResponse,
+  EventDeleteResponse,
+  EventFlagResponse
+} from '@/types';
 
-const EventsPage = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, eventId: null, eventTitle: '' });
-  const [flagModal, setFlagModal] = useState({ isOpen: false, eventId: null, eventTitle: '', isFlagged: false, flagReason: '' });
+const EventsPage: React.FC = () => {
+  const [events, setEvents] = useState<AdminEventData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<EventDeleteModalState>({ 
+    isOpen: false, 
+    eventId: null, 
+    eventTitle: '' 
+  });
+  const [flagModal, setFlagModal] = useState<EventFlagModalState>({ 
+    isOpen: false, 
+    eventId: null, 
+    eventTitle: '', 
+    isFlagged: false, 
+    flagReason: '' 
+  });
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchEvents = async (): Promise<void> => {
       try {
         setLoading(true);
-        const response = await axios.get("/admin/events");
+        const response: AxiosResponse<AdminEventsApiResponse> = await axios.get("/admin/events");
         if (response.data.success) {
           setEvents(response.data.events);
         }
@@ -31,13 +49,13 @@ const EventsPage = () => {
     fetchEvents();
   }, []);
 
-  const confirmDeleteEvent = (eventId, eventTitle) => {
+  const confirmDeleteEvent = (eventId: string, eventTitle: string): void => {
     setDeleteModal({ isOpen: true, eventId, eventTitle });
   };
 
-  const handleDeleteEvent = async () => {
+  const handleDeleteEvent = async (): Promise<void> => {
     try {
-      const response = await axios.delete(`/admin/events/${deleteModal.eventId}`);
+      const response: AxiosResponse<EventDeleteResponse> = await axios.delete(`/admin/events/${deleteModal.eventId}`);
       if (response.data.success) {
         // Remove the event from the list
         setEvents(events.filter((event) => event._id !== deleteModal.eventId));
@@ -49,17 +67,17 @@ const EventsPage = () => {
     }
   };
 
-  const closeDeleteModal = () => {
+  const closeDeleteModal = (): void => {
     setDeleteModal({ isOpen: false, eventId: null, eventTitle: '' });
   };
 
-  const openFlagModal = (eventId, eventTitle, isFlagged, flagReason = '') => {
+  const openFlagModal = (eventId: string, eventTitle: string, isFlagged: boolean, flagReason: string = ''): void => {
     setFlagModal({ isOpen: true, eventId, eventTitle, isFlagged, flagReason });
   };
 
-  const handleFlagEvent = async () => {
+  const handleFlagEvent = async (): Promise<void> => {
     try {
-      const response = await axios.put(`/admin/events/${flagModal.eventId}/flag`, {
+      const response: AxiosResponse<EventFlagResponse> = await axios.put(`/admin/events/${flagModal.eventId}/flag`, {
         isFlagged: !flagModal.isFlagged,
         flagReason: flagModal.flagReason
       });
@@ -85,11 +103,11 @@ const EventsPage = () => {
     }
   };
 
-  const closeFlagModal = () => {
+  const closeFlagModal = (): void => {
     setFlagModal({ isOpen: false, eventId: null, eventTitle: '', isFlagged: false, flagReason: '' });
   };
 
-  const handleFlagReasonChange = (e) => {
+  const handleFlagReasonChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setFlagModal({ ...flagModal, flagReason: e.target.value });
   };
 
@@ -137,7 +155,7 @@ const EventsPage = () => {
                             src={event.poster} 
                             alt={event.title} 
                             className="w-12 h-12 object-cover rounded mr-3"
-                            onError={(e) => { e.target.src = 'https://via.placeholder.com/100?text=Event'; }} 
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/100?text=Event'; }}
                           />
                           <div>
                             <Link 
@@ -179,7 +197,7 @@ const EventsPage = () => {
                       </td>
                       <td className="py-2 px-4 border dark:border-gray-700 space-x-2 whitespace-nowrap">
                         <button
-                          onClick={() => openFlagModal(event._id, event.title, event.isFlagged, event.flagReason)}
+                          onClick={() => openFlagModal(event._id, event.title, event.isFlagged || false, event.flagReason || undefined)}
                           className={`px-3 py-1 ${
                             event.isFlagged 
                               ? 'bg-blue-500 hover:bg-blue-600' 
@@ -209,7 +227,7 @@ const EventsPage = () => {
                   {events.length === 0 && (
                     <tr>
                       <td
-                        colSpan="6"
+                        colSpan={6}
                         className="py-4 text-center text-gray-500 dark:text-gray-400"
                       >
                         No events found
