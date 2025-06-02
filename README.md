@@ -17,41 +17,45 @@ A comprehensive platform for youth engagement activities and events with role-ba
 
 ### Frontend
 
--   **React 19** with Vite for fast development
--   **React Router DOM 7** for client-side routing
--   **Tailwind CSS 4** for modern, responsive styling
--   **Headless UI** and **Heroicons** for accessible components
--   **Axios** for API communication
--   **JWT Decode** for token handling
--   **React Datepicker** for date selection
--   **React Dropzone** for file uploads
--   **QRCode.react** for QR code generation
+-   **React 19** with **TypeScript** support and Vite for fast development
+-   **React Router DOM 7.5** for client-side routing
+-   **Tailwind CSS 4.1** for modern, responsive styling with animation support
+-   **Headless UI 2.2** and **Heroicons 2.2** for accessible components
+-   **Axios 1.8** for API communication
+-   **JWT Decode 4.0** for token handling
+-   **React Datepicker 8.4** for date selection
+-   **React Dropzone 14.3** for file uploads
+-   **QRCode.react 4.2** for QR code generation
+-   **Date-fns 4.1** for date utilities
 
 ### Backend
 
--   **Node.js** with **Express.js** framework
--   **MongoDB** with **Mongoose** ODM
--   **JWT** for secure authentication
--   **Google APIs** for OAuth integration
--   **Bcrypt** for password encryption
--   **Express Validator** for request validation
--   **Cloudinary** for cloud-based image storage
--   **Multer** for file upload handling
+-   **Node.js** with **Express.js 4.19** framework
+-   **MongoDB** with **Mongoose 8.2** ODM
+-   **JWT 9.0** for secure authentication
+-   **Google APIs 133.0** for OAuth integration
+-   **Bcrypt 5.1** for password encryption
+-   **Express Validator 7.0** for request validation
+-   **Cloudinary 1.41** for cloud-based image storage
+-   **Multer 1.4** for file upload handling
+-   **Cookie Parser 1.4** for cookie management
+-   **CORS 2.8** for cross-origin resource sharing
 
 ### Development Tools
 
--   **ESLint** for code linting
--   **Prettier** for code formatting
--   **Nodemon** for development server auto-restart
--   **Morgan** for HTTP request logging
+-   **TypeScript 5.8** for type-safe development
+-   **ESLint 9.22** for code linting
+-   **Vite 6.3** for fast build tooling
+-   **Nodemon 3.1** for development server auto-restart
+-   **Morgan 1.10** for HTTP request logging
 
 ## 📁 Project Structure
 
 ```
 YoungMinds Club/
-├── client/                 # Frontend - React application
+├── client/                 # Frontend - React + TypeScript application
 │   ├── public/             # Static files
-│   ├── src/                # Source files
+│   ├── src/                # TypeScript source files
 │   │   ├── assets/         # Images, fonts, etc.
 │   │   ├── components/     # React components
 │   │   │   ├── admin/      # Admin-specific components
@@ -66,8 +70,10 @@ YoungMinds Club/
 │   │   │   └── user/       # User dashboard pages
 │   │   ├── styles/         # Global CSS files
 │   │   └── utils/          # Utility functions
+│   ├── dist/               # Production build output
 │   ├── package.json        # Frontend dependencies
-│   ├── vite.config.js      # Vite configuration
+│   ├── tsconfig.json       # TypeScript configuration
+│   ├── vite.config.ts      # Vite configuration
 │   ├── vercel.json         # Vercel deployment config
 │   └── .env                # Environment variables
 │
@@ -94,7 +100,7 @@ YoungMinds Club/
 
 ### Prerequisites
 
--   **Node.js** (v16 or higher)
+-   **Node.js** (v18 or higher)
 -   **npm** or **yarn**
 -   **MongoDB** (local installation or MongoDB Atlas)
 -   **Git** for version control
@@ -105,7 +111,7 @@ YoungMinds Club/
 
     ```bash
     git clone <repository-url>
-    cd YoungMinds-Club
+    cd "YoungMinds Club"
     ```
 
 2. **Install backend dependencies**
@@ -205,7 +211,7 @@ This project is configured for deployment on **Vercel** with separate deployment
 ### Frontend Deployment
 
 -   Automatically deploys from the `client` directory
--   Uses Vite build system for optimized production builds
+-   Uses Vite build system with TypeScript support for optimized production builds
 -   SPA routing handled by `vercel.json` configuration
 
 ### Backend Deployment
@@ -261,10 +267,10 @@ This project is configured for deployment on **Vercel** with separate deployment
 ### Frontend (client)
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
+npm run dev      # Start development server with TypeScript
+npm run build    # Build for production (includes type checking)
 npm run preview  # Preview production build
-npm run lint     # Run ESLint
+npm run lint     # Run ESLint with TypeScript support
 ```
 
 ### Backend (server)
@@ -275,6 +281,15 @@ npm start        # Start production server
 npm test         # Run tests (placeholder)
 ```
 
+## 🛠️ TypeScript Support
+
+The frontend is built with **TypeScript** for enhanced development experience:
+
+-   **Type Safety**: Catch errors at compile time
+-   **Better IntelliSense**: Enhanced autocompletion and documentation
+-   **Refactoring Support**: Safe code transformations
+-   **Modern ES Features**: Latest JavaScript features with backward compatibility
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -283,16 +298,24 @@ npm test         # Run tests (placeholder)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Development Guidelines
+
+-   Follow TypeScript best practices for frontend development
+-   Use ESLint configuration for consistent code style
+-   Write meaningful commit messages
+-   Add proper type annotations for new components and functions
+
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
--   Built with ❤️ using the MERN stack
+-   Built with ❤️ using the MERN stack + TypeScript
 -   UI components powered by Tailwind CSS and Headless UI
 -   Cloud storage provided by Cloudinary
 -   Deployed on Vercel platform
+-   Fast development experience with Vite
 
 ---
 
