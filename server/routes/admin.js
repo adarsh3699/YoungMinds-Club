@@ -49,6 +49,7 @@ router.get('/top-organizers', adminController.getTopOrganizers);
 
 // Event management routes
 router.get('/events', adminController.getAllEvents);
+router.put('/events/:id', upload.single('poster'), adminController.updateEvent);
 router.put('/events/:id/flag', 
     [body('isFlagged').isBoolean().withMessage('isFlagged must be a boolean')], 
     adminController.toggleEventFlag

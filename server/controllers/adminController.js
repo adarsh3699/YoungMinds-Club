@@ -3,6 +3,7 @@ const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
 const UserActivity = require('../models/UserActivity');
 const Announcement = require('../models/Announcement');
+const { cloudinary } = require('../config/cloudinary');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 
@@ -459,6 +460,54 @@ exports.deleteEvent = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to delete event',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Update event (Admin only)
+exports.updateEvent = async (req, res) => {
+    try {
+        // Check if the event exists
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        // Update event data
+        const updateData = { ...req.body };
+        
+        // If there's a new poster file
+        if (req.file) {
+            updateData.poster = req.file.path;
+            
+            // Delete old poster image from Cloudinary if it exists
+            if (event.poster && event.poster.includes('cloudinary')) {
+                const publicId = event.poster.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(publicId);
+            }
+        }
+
+        const updatedEvent = await Event.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        ).populate('organizer', 'name email');
+
+        res.status(200).json({
+            success: true,
+            message: 'Event updated successfully',
+            event: updatedEvent
+        });
+    } catch (error) {
+        console.error('Admin update event error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update event',
             error: process.env.NODE_ENV === 'development' ? error.message : null
         });
     }

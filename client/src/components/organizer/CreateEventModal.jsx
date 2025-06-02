@@ -14,7 +14,7 @@ import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
 import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip } from '../common';
 
-const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false }) => {
+const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false, apiEndpoint = null }) => {
 	const [formData, setFormData] = useState({
 		title: '',
 		shortDescription: '',
@@ -331,8 +331,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 				eventFormData.append('poster', posterFile);
 			}
 
-			// Send request
-			const url = isEditing ? `/organizer/events/${eventToEdit._id}` : '/organizer/events';
+			// Send request - use custom apiEndpoint if provided, otherwise use default organizer endpoint
+			const url = apiEndpoint || (isEditing ? `/organizer/events/${eventToEdit._id}` : '/organizer/events');
 
 			const method = isEditing ? 'put' : 'post';
 

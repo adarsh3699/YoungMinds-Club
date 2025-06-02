@@ -16,19 +16,32 @@ import {
   TrashIcon,
   EyeIcon,
   DocumentCheckIcon,
-  SparklesIcon
+  SparklesIcon,
+  PencilIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 import { AdminEventData } from '@/types';
+import Modal from "../../components/common/Modal";
+import CreateEventModal from "../../components/organizer/CreateEventModal";
 
-// Simple modal state type
+// Enhanced modal state type to include edit
 type EventModalState = {
   isOpen: boolean;
-  type: 'delete' | 'flag' | null;
+  type: 'delete' | 'flag' | 'edit' | null;
   eventId: string | null;
   eventTitle: string;
   isFlagged: boolean;
   flagReason: string;
+  eventData?: AdminEventData | null;
 };
+
+// Extended interface for editing with additional fields
+interface AdminEventEditData extends AdminEventData {
+  description?: string;
+  shortDescription?: string;
+  type?: string;
+  price?: number;
+}
 
 const EventsManagement: React.FC = () => {
   // State
@@ -44,7 +57,8 @@ const EventsManagement: React.FC = () => {
     eventId: null,
     eventTitle: '',
     isFlagged: false,
-    flagReason: ''
+    flagReason: '',
+    eventData: null
   });
 
   // Filter options
@@ -232,19 +246,25 @@ const EventsManagement: React.FC = () => {
   }, [modal.eventId, modal.isFlagged, modal.flagReason]);
 
   // Modal handlers
-  const openModal = useCallback((type: 'delete' | 'flag', event: AdminEventData) => {
+  const openModal = useCallback((type: 'delete' | 'flag' | 'edit', event: AdminEventData) => {
     setModal({
       isOpen: true,
       type,
       eventId: event._id,
       eventTitle: event.title,
       isFlagged: event.isFlagged || false,
-      flagReason: event.flagReason || ''
+      flagReason: event.flagReason || '',
+      eventData: type === 'edit' ? event : null
     });
   }, []);
 
   const closeModal = useCallback(() => {
-    setModal(prev => ({ ...prev, isOpen: false }));
+    setModal(prev => ({ 
+      ...prev, 
+      isOpen: false, 
+      type: null, 
+      eventData: null 
+    }));
   }, []);
 
   const handleConfirm = useCallback(() => {
@@ -253,7 +273,18 @@ const EventsManagement: React.FC = () => {
     } else if (modal.type === 'flag') {
       toggleFlag();
     }
+    // Edit is handled by the CreateEventModal's onSuccess callback
   }, [modal.type, deleteEvent, toggleFlag]);
+
+  const handleEditSuccess = useCallback((updatedEvent: any) => {
+    // Update the event in the local state
+    setEvents(prev =>
+      prev.map(event =>
+        event._id === updatedEvent._id ? { ...event, ...updatedEvent } : event
+      )
+    );
+    closeModal();
+  }, [closeModal]);
 
   // Optimized render function
   const renderEventRow = useCallback((event: AdminEventData, index: number) => (
@@ -335,6 +366,14 @@ const EventsManagement: React.FC = () => {
       {/* Actions */}
       <td className="py-4 px-6">
         <div className="flex space-x-2">
+          <button
+            onClick={() => openModal('edit', event)}
+            className="px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all border border-primary/20"
+          >
+            <PencilIcon className="w-3 h-3 mr-1 inline" />
+            Edit
+          </button>
+          
           <button
             onClick={() => openModal('flag', event)}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
@@ -430,8 +469,8 @@ const EventsManagement: React.FC = () => {
 
         {/* Admin Confirmation Modal */}
         <AdminConfirmationModal
-          modalType={modal.type || 'delete'}
-          isOpen={modal.isOpen}
+          modalType={modal.type === 'edit' ? 'delete' : (modal.type || 'delete')}
+          isOpen={modal.isOpen && modal.type !== 'edit'}
           onClose={closeModal}
           userName={modal.eventTitle}
           isFlagged={modal.isFlagged}
@@ -439,6 +478,21 @@ const EventsManagement: React.FC = () => {
           onFlagReasonChange={(e) => setModal(prev => ({ ...prev, flagReason: e.target.value }))}
           onConfirm={handleConfirm}
         />
+
+        {/* Edit Event Modal */}
+        {modal.isOpen && modal.type === 'edit' && modal.eventData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40">
+            <div className="ym-bg-card rounded-xl shadow-xl w-full max-w-5xl mx-auto overflow-hidden">
+              <CreateEventModal
+                onClose={closeModal}
+                onSuccess={handleEditSuccess}
+                eventToEdit={modal.eventData as any}
+                isEditing={true}
+                apiEndpoint={modal.eventData._id ? `/admin/events/${modal.eventData._id}` : null as any}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
