@@ -74,7 +74,7 @@ const AppRoutes: React.FC = () => {
 
 					<div className="min-h-screen flex flex-col ym-bg-card">
 						<Navigation />
-						<main className="flex-grow flex flex-col min-h-screen">
+						<main className="flex-grow flex flex-col min-h-screen" style={{ minHeight: 'calc(100vh)' }}>
 							<Suspense
 								fallback={
 									<div className="flex flex-col justify-center items-center h-[70vh]">

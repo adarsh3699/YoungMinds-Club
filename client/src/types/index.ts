@@ -378,16 +378,68 @@ export interface TabsProps {
   onTabChange?: (tabId: string) => void;
 }
 
-// Search and Filter Types
-export interface SearchFilters {
-  query?: string;
-  category?: string;
-  location?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  priceMin?: number;
-  priceMax?: number;
-  status?: string;
+// Search and Filter Configuration Types
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
+export interface SearchFilterConfig {
+  searchPlaceholder: string;
+  itemType: string; // 'users', 'events', 'organizers', etc.
+  categoryOptions?: FilterOption[]; // For events: Technology, Business, etc.
+  statusOptions?: FilterOption[]; // For all types: Active, Suspended, etc.
+  roleOptions?: FilterOption[]; // For users: Admin, User, Organizer
+  customFilters?: {
+    name: string;
+    options: FilterOption[];
+    placeholder?: string;
+  }[];
+  showCategory?: boolean;
+  showRole?: boolean;
+  showStatus?: boolean;
+}
+
+// Generic Search Filters Props - replaces UserSearchFiltersProps
+export interface GenericSearchFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  filteredCount: number;
+  totalCount: number;
+  animationDelay?: string;
+  config: SearchFilterConfig;
+  // Optional filters
+  roleFilter?: string;
+  setRoleFilter?: (role: string) => void;
+  categoryFilter?: string;
+  setCategoryFilter?: (category: string) => void;
+  customFilters?: Record<string, string>;
+  setCustomFilter?: (filterName: string, value: string) => void;
+}
+
+// Backward compatibility interface
+export interface UserSearchFiltersProps {
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  roleFilter?: string;
+  setRoleFilter?: (role: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  filteredCount: number;
+  totalCount: number;
+  animationDelay?: string;
+  // Dynamic props for different data types
+  categoryFilter?: string;
+  setCategoryFilter?: (category: string) => void;
+  itemType?: string;
+  searchPlaceholder?: string;
+  statusOptions?: FilterOption[];
+  roleOptions?: FilterOption[];
+  categoryOptions?: FilterOption[];
+  showRole?: boolean;
+  showCategory?: boolean;
 }
 
 // Notification Types
@@ -628,18 +680,6 @@ export interface AdminConfirmationModalProps {
   onConfirm: () => void;
 }
 
-export interface UserSearchFiltersProps {
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  roleFilter?: string;
-  setRoleFilter?: (role: string) => void;
-  statusFilter: string;
-  setStatusFilter: (status: string) => void;
-  filteredCount: number;
-  totalCount: number;
-  animationDelay?: string;
-}
-
 export interface StatusOption {
   value: string;
   label: string;
@@ -668,9 +708,6 @@ export interface ModalConfiguration {
   };
   getConfirmText?: (param: boolean) => string;
 }
-
-// Dashboard Header Props
-export interface DashboardHeaderProps {}
 
 // Stats Card Props
 export interface StatsCardProps {
@@ -706,7 +743,55 @@ export interface UserCardProps {
 // Loading Component Props
 export interface LoadingComponentProps {}
 
-// Users Table Props
+// Admin Table Header Configuration
+export interface AdminTableColumn {
+  key: string;
+  label: string;
+  className?: string;
+}
+
+// Admin Table Props (formerly UsersTableProps)
+export interface AdminTableProps {
+  loading: boolean;
+  filteredItems: any[];
+  searchTerm: string;
+  roleFilter?: string;
+  statusFilter: string;
+  renderRow: (item: any, index: number) => React.ReactNode;
+  columns: AdminTableColumn[];
+  emptyStateConfig?: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    noFiltersDescription: string;
+  };
+  className?: string;
+  'aria-label'?: string;
+}
+
+// Empty State Props
+export interface EmptyStateProps {
+  hasFilters: boolean;
+  emptyStateConfig?: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    noFiltersDescription: string;
+  };
+  colSpan: number;
+}
+
+// Table Header Props
+export interface TableHeaderProps {
+  columns: AdminTableColumn[];
+}
+
+// Loading Spinner Props  
+export interface LoadingSpinnerProps {
+  loadingText?: string;
+}
+
+// Backward compatibility - deprecated, use AdminTableProps instead
 export interface UsersTableProps {
   loading: boolean;
   filteredUsers: any[];
@@ -714,19 +799,7 @@ export interface UsersTableProps {
   roleFilter?: string;
   statusFilter: string;
   renderUserRow: (userData: any, index: number) => React.ReactNode;
-  animationDelay?: string;
 }
-
-// Empty State Props
-export interface EmptyStateProps {
-  hasFilters: boolean;
-}
-
-// Table Header Props
-export interface TableHeaderProps {}
-
-// Loading Spinner Props  
-export interface LoadingSpinnerProps {}
 
 // Admin Section Card Props
 export interface AdminSectionCardProps {

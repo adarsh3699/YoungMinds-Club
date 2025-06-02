@@ -10,6 +10,7 @@ import {
 	ChartBarIcon,
 	ShieldCheckIcon,
 	MegaphoneIcon,
+	SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 // Import dashboard components
@@ -18,7 +19,6 @@ import {
 	AdminSectionCard,
 	AnnouncementForm,
 	TopOrganizers,
-	DashboardHeader,
 	ActiveUsers,
 	LoadingComponent,
 } from '../../components/admin/dashboard';
@@ -252,10 +252,17 @@ const AdminDashboard: React.FC = () => {
 	if (loading) return <LoadingComponent />;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background">
+		<div className="min-h-screen bg-gradient-to-br from-background via-surface-secondary to-background py-12">
 			<div className="container mx-auto px-4 py-8">
-				<div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden backdrop-blur-sm animate-fade-in mt-10">
-					<DashboardHeader />
+				<div className="bg-card rounded-2xl shadow-xl border border-border/50 overflow-hidden backdrop-blur-sm animate-fade-in">
+					{/* Dashboard Header */}
+					<div className="bg-gradient-to-r from-primary/10 via-brand-light to-accent/20 p-8 border-b border-border/30">
+						<div className="flex items-center space-x-3">
+							<SparklesIcon className="h-8 w-8 text-primary" />
+							<h1 className="text-3xl font-bold text-card-foreground">Admin Control Panel</h1>
+						</div>
+						<p className="text-muted-foreground mt-2">Manage your platform with comprehensive admin tools</p>
+					</div>
 
 					<div className="p-8">
 						{/* Enhanced Stats Overview */}
