@@ -16,7 +16,7 @@ import {
 	FilterOption,
 	OrganizerDashboardApiResponse,
 	OrganizerEventsApiResponse,
-	OrganizerFeedbackApiResponse
+	OrganizerFeedbackApiResponse,
 } from '@/types';
 
 const Dashboard: React.FC = () => {
@@ -41,7 +41,9 @@ const Dashboard: React.FC = () => {
 				setEvents(Array.isArray(eventsResponse.data.events) ? eventsResponse.data.events : []);
 
 				// Fetch feedback summary
-				const feedbackResponse: AxiosResponse<OrganizerFeedbackApiResponse> = await axios.get('/organizer/feedback/summary');
+				const feedbackResponse: AxiosResponse<OrganizerFeedbackApiResponse> = await axios.get(
+					'/organizer/feedback/summary'
+				);
 				if (feedbackResponse.data.success) {
 					setFeedbackSummary(feedbackResponse.data.summary);
 				}

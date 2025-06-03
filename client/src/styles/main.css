@@ -321,16 +321,19 @@ a {
    ============================================== */
 /* Admin Section Opacity Backgrounds */
 .bg-primary-5 { background-color: rgba(245, 158, 11, 0.05); }
+.bg-primary-10 { background-color: rgba(245, 158, 11, 0.1); }
+.bg-primary-20 { background-color: rgba(245, 158, 11, 0.2); }
 .bg-success-5 { background-color: rgba(16, 185, 129, 0.05); }
 .bg-success-10 { background-color: rgba(16, 185, 129, 0.1); }
 .bg-warning-5 { background-color: rgba(245, 158, 11, 0.05); }
 .bg-warning-10 { background-color: rgba(245, 158, 11, 0.1); }
+.bg-warning-80 { background-color: rgba(245, 158, 11, 0.8); }
+.bg-destructive-5 { background-color: rgba(239, 68, 68, 0.05); }
 .bg-destructive-10 { background-color: rgba(239, 68, 68, 0.1); }
-.bg-indigo-10 { background-color: rgba(99, 102, 241, 0.1); }
-.bg-purple-10 { background-color: rgba(147, 51, 234, 0.1); }
-.bg-cyan-10 { background-color: rgba(6, 182, 212, 0.1); }
-.bg-teal-10 { background-color: rgba(20, 184, 166, 0.1); }
-.bg-pink-10 { background-color: rgba(236, 72, 153, 0.1); }
+.bg-destructive-80 { background-color: rgba(239, 68, 68, 0.8); }
+.bg-accent-50 { background-color: rgba(254, 243, 199, 0.5); }
+.bg-info-80 { background-color: rgba(59, 130, 246, 0.8); }
+.bg-black-40 { background-color: rgba(0, 0, 0, 0.4); }
 
 /* White Opacity Backgrounds */
 .bg-white-20 {
@@ -355,7 +358,6 @@ a {
 
 /* Admin Section Text Colors */
 .text-indigo { color: rgb(99, 102, 241); }
-.text-purple { color: rgb(147, 51, 234); }
 .text-cyan { color: rgb(6, 182, 212); }
 .text-teal { color: rgb(20, 184, 166); }
 .text-pink { color: rgb(236, 72, 153); }
@@ -425,10 +427,19 @@ a {
 .bg-info { background-color: var(--info); }
 .text-info { color: var(--info); }
 .border-info { border-color: var(--info); }
+.bg-purple { background-color: var(--purple); }
+.text-purple { color: var(--purple); }
+.border-purple { border-color: var(--purple); }
 
 /* Border Colors */
 .border-primary { border-color: var(--primary); }
+.border-primary-20 { border-color: rgba(245, 158, 11, 0.2); }
 .border-destructive { border-color: var(--destructive); }
+.border-destructive-20 { border-color: rgba(239, 68, 68, 0.2); }
+.border-success-20 { border-color: rgba(16, 185, 129, 0.2); }
+.border-warning-20 { border-color: rgba(245, 158, 11, 0.2); }
+.border-purple-20 { border-color: rgba(147, 51, 234, 0.2); }
+.border-accent-30 { border-color: rgba(254, 243, 199, 0.3); }
 .border-brand-primary { border-color: var(--brand-primary); }
 .border-brand-tertiary { border-color: var(--brand-tertiary); }
 
@@ -746,6 +757,7 @@ main > div {
 .dark .bg-destructive-10 { background-color: rgba(220, 38, 38, 0.15); }
 .dark .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.15); }
 .dark .bg-purple-10 { background-color: rgba(147, 51, 234, 0.15); }
+.dark .bg-purple-30 { background-color: rgba(147, 51, 234, 0.3); }
 .dark .bg-cyan-10 { background-color: rgba(6, 182, 212, 0.15); }
 .dark .bg-teal-10 { background-color: rgba(20, 184, 166, 0.15); }
 .dark .bg-pink-10 { background-color: rgba(236, 72, 153, 0.15); }
@@ -873,3 +885,20 @@ main > div {
   border-color: var(--ring);
   box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.1);
 }
+
+.bg-destructive-80 { background-color: rgba(239, 68, 68, 0.8); }
+.bg-accent-50 { background-color: rgba(254, 243, 199, 0.5); }
+.bg-info-80 { background-color: rgba(59, 130, 246, 0.8); }
+.bg-indigo-10 { background-color: rgba(99, 102, 241, 0.1); }
+.bg-purple-10 { background-color: rgba(147, 51, 234, 0.1); }
+.bg-purple-30 { background-color: rgba(147, 51, 234, 0.3); }
+.bg-cyan-10 { background-color: rgba(6, 182, 212, 0.1); }
+.bg-teal-10 { background-color: rgba(20, 184, 166, 0.1); }
+.bg-pink-10 { background-color: rgba(236, 72, 153, 0.1); }
+
+.bg-gray-100 { background-color: #f3f4f6; }
+.text-gray-400 { color: #9ca3af; }
+
+.dark .bg-pink-10 { background-color: rgba(236, 72, 153, 0.15); }
+.dark .bg-gray-100 { background-color: rgba(55, 65, 81, 0.3); }
+.dark .text-gray-400 { color: rgba(156, 163, 175, 0.8); }

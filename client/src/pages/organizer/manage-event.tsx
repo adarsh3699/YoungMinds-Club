@@ -14,13 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
 import { Modal, Tabs } from '../../components/common';
-import {
-	ManageEventData,
-	AttendeeData,
-	EventManageApiResponse,
-	AttendeesApiResponse,
-	TabItem
-} from '@/types';
+import { ManageEventData, AttendeeData, EventManageApiResponse, AttendeesApiResponse, TabItem } from '@/types';
 
 // Custom tab item interface to allow JSX labels
 interface EventTabItem {
@@ -47,11 +41,15 @@ const EventManagePage: React.FC = () => {
 			try {
 				setLoading(true);
 				// Fetch event details
-				const eventResponse: AxiosResponse<EventManageApiResponse> = await axios.get(`/organizer/events/${eventId}`);
+				const eventResponse: AxiosResponse<EventManageApiResponse> = await axios.get(
+					`/organizer/events/${eventId}`
+				);
 				setEvent(eventResponse.data.event);
 
 				// Fetch attendees
-				const attendeesResponse: AxiosResponse<AttendeesApiResponse> = await axios.get(`/organizer/events/${eventId}/attendees`);
+				const attendeesResponse: AxiosResponse<AttendeesApiResponse> = await axios.get(
+					`/organizer/events/${eventId}/attendees`
+				);
 				setAttendees(attendeesResponse.data.attendees);
 
 				setLoading(false);
@@ -80,7 +78,7 @@ const EventManagePage: React.FC = () => {
 
 	const handleDuplicateEvent = (): void => {
 		if (!event) return;
-		
+
 		const eventToDuplicate = { ...event };
 		// Remove specific fields
 		delete (eventToDuplicate as any)._id;
@@ -96,7 +94,7 @@ const EventManagePage: React.FC = () => {
 
 	const downloadCSV = (): void => {
 		if (!event) return;
-		
+
 		// Format attendees data for CSV
 		const csvContent = [
 			// CSV Header
@@ -125,7 +123,7 @@ const EventManagePage: React.FC = () => {
 
 	const downloadQRCode = (): void => {
 		if (!event) return;
-		
+
 		const canvas = document.getElementById('event-qrcode') as HTMLCanvasElement;
 		if (canvas) {
 			const link = document.createElement('a');
@@ -492,11 +490,7 @@ const EventManagePage: React.FC = () => {
 
 			{/* Tabs */}
 			<div className="bg-gray-800 shadow-md overflow-hidden border-0">
-				<Tabs
-					tabs={tabs}
-					activeTab={activeTab}
-					onTabChange={setActiveTab}
-				/>
+				<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 			</div>
 
 			{/* Edit Event Modal */}

@@ -230,6 +230,7 @@ export interface FormInputProps {
   name: string;
   value: string | number;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   label?: string;
   error?: string;
   placeholder?: string;
@@ -242,6 +243,7 @@ export interface FormInputProps {
   step?: string | number;
   tooltip?: string;
   disabled?: boolean;
+  allowNegative?: boolean;
 }
 
 // Select Option Interface

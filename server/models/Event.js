@@ -51,19 +51,19 @@ const eventSchema = new mongoose.Schema({
         },
         city: {
             type: String,
-            required: function() { return this.location.type === 'offline'; }
+            required: false
         },
         venue: {
             type: String,
-            required: function() { return this.location.type === 'offline'; }
+            required: false
         },
         address: {
             type: String,
-            required: function() { return this.location.type === 'offline'; }
+            required: false
         },
         onlineUrl: {
             type: String,
-            required: function() { return this.location.type === 'online'; }
+            required: false
         },
         coordinates: {
             type: [Number], // [longitude, latitude]
@@ -134,6 +134,77 @@ const eventSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
+});
+
+// Pre-save hook for location validation
+eventSchema.pre('save', function(next) {
+    if (this.location && this.location.type) {
+        if (this.location.type === 'offline') {
+            if (!this.location.city || !this.location.venue || !this.location.address) {
+                const error = new Error('City, venue, and address are required for offline events');
+                error.name = 'ValidationError';
+                return next(error);
+            }
+        } else if (this.location.type === 'online') {
+            if (!this.location.onlineUrl) {
+                const error = new Error('Online URL is required for online events');
+                error.name = 'ValidationError';
+                return next(error);
+            }
+        }
+    }
+    next();
+});
+
+// Pre-update hook for location validation
+eventSchema.pre('findOneAndUpdate', async function(next) {
+    const update = this.getUpdate();
+    
+    // Check if location is being updated
+    if (update.location || update['location.type'] || update['location.city'] || update['location.venue'] || update['location.address'] || update['location.onlineUrl']) {
+        try {
+            // Get the current document to check existing values
+            const currentDoc = await this.model.findOne(this.getQuery());
+            
+            // Determine the location type (from update or existing document)
+            const locationType = update['location.type'] || 
+                                (update.location && update.location.type) || 
+                                (currentDoc && currentDoc.location && currentDoc.location.type);
+            
+            if (locationType === 'offline') {
+                const city = update['location.city'] || 
+                           (update.location && update.location.city) || 
+                           (currentDoc && currentDoc.location && currentDoc.location.city);
+                           
+                const venue = update['location.venue'] || 
+                            (update.location && update.location.venue) || 
+                            (currentDoc && currentDoc.location && currentDoc.location.venue);
+                            
+                const address = update['location.address'] || 
+                              (update.location && update.location.address) || 
+                              (currentDoc && currentDoc.location && currentDoc.location.address);
+                
+                if (!city || !venue || !address) {
+                    const error = new Error('City, venue, and address are required for offline events');
+                    error.name = 'ValidationError';
+                    return next(error);
+                }
+            } else if (locationType === 'online') {
+                const onlineUrl = update['location.onlineUrl'] || 
+                                (update.location && update.location.onlineUrl) || 
+                                (currentDoc && currentDoc.location && currentDoc.location.onlineUrl);
+                
+                if (!onlineUrl) {
+                    const error = new Error('Online URL is required for online events');
+                    error.name = 'ValidationError';
+                    return next(error);
+                }
+            }
+        } catch (err) {
+            return next(err);
+        }
+    }
+    next();
 });
 
 // Index for search functionality

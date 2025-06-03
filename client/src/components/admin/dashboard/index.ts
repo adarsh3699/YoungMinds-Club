@@ -6,7 +6,6 @@ export { default as TopOrganizers } from './TopOrganizers';
 export { default as ActiveUsers } from './ActiveUsers';
 export { default as LoadingComponent } from './LoadingComponent';
 export { default as UserStatsCards } from './UserStatsCards';
-export { default as UserSearchFilters } from './UserSearchFilters';
 export { default as AdminTable, UsersTable } from './AdminTable';
 export { default as AdminConfirmationModal } from './AdminConfirmationModal';
 export { default as AdminPageHeader } from './AdminPageHeader'; 

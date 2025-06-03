@@ -54,6 +54,10 @@ router.put('/events/:id/flag',
     [body('isFlagged').isBoolean().withMessage('isFlagged must be a boolean')], 
     adminController.toggleEventFlag
 );
+router.put('/events/:id/feature', 
+    [body('isFeatured').isBoolean().withMessage('isFeatured must be a boolean')], 
+    adminController.toggleEventFeature
+);
 router.delete('/events/:id', adminController.deleteEvent);
 
 // Moderation routes

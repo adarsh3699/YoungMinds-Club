@@ -8,6 +8,7 @@ const FormInput: React.FC<FormInputProps> = ({
 	name,
 	value,
 	onChange,
+	onKeyDown,
 	label,
 	error,
 	placeholder = '',
@@ -18,7 +19,23 @@ const FormInput: React.FC<FormInputProps> = ({
 	className = '',
 	step,
 	tooltip = null,
+	allowNegative = true,
 }) => {
+	// Handle input change with negative value prevention for number inputs
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (type === 'number' && !allowNegative) {
+			const value = e.target.value;
+			// Allow empty string, and only positive numbers (including decimals)
+			if (value === '' || (Number(value) >= 0 && !isNaN(Number(value)))) {
+				onChange(e);
+			}
+			// If negative or invalid, don't call onChange (blocks the input)
+		} else {
+			// For non-number inputs or when negative is allowed, pass through normally
+			onChange(e);
+		}
+	};
+
 	return (
 		<div className={className}>
 			{label && (
@@ -50,7 +67,14 @@ const FormInput: React.FC<FormInputProps> = ({
 					id={id}
 					name={name}
 					value={value}
-					onChange={onChange}
+					onChange={handleChange}
+					onKeyDown={onKeyDown}
+					onWheel={(e) => {
+						// Prevent number input from changing on scroll
+						if (type === 'number') {
+							e.currentTarget.blur();
+						}
+					}}
 					placeholder={placeholder}
 					min={min}
 					max={max}
@@ -72,4 +96,4 @@ const FormInput: React.FC<FormInputProps> = ({
 	);
 };
 
-export default FormInput; 
+export default FormInput;

@@ -133,7 +133,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 				{/* Modern Dropdown with improved animations */}
 				{isOpen && (
 					<div
-						className="absolute z-50 mt-2 w-full"
+						className="absolute z-[9999] mt-2 w-full"
 						style={{
 							animation: 'fadeInUpFast 150ms ease-out forwards',
 						}}
@@ -144,6 +144,10 @@ const SelectInput: React.FC<SelectInputProps> = ({
 							overflow-hidden ring-1 ring-black/5 dark:ring-white/10
 							border-0
 						"
+							style={{
+								position: 'relative',
+								zIndex: 9999
+							}}
 						>
 							<div className="py-2 overflow-auto max-h-60">
 								{options.map((option, index) => (

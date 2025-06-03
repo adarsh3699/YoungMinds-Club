@@ -436,6 +436,39 @@ exports.toggleEventFlag = async (req, res) => {
     }
 };
 
+// Toggle event feature
+exports.toggleEventFeature = async (req, res) => {
+    try {
+        const { isFeatured } = req.body;
+
+        const event = await Event.findByIdAndUpdate(
+            req.params.id,
+            { isFeatured },
+            { new: true, runValidators: true }
+        );
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Event ${isFeatured ? 'featured' : 'unfeatured'} successfully`,
+            event
+        });
+    } catch (error) {
+        console.error('Toggle event feature error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update event feature status',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
 // Delete event
 exports.deleteEvent = async (req, res) => {
     try {

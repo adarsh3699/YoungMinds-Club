@@ -3,11 +3,11 @@ import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import {
 	UserStatsCards,
-	UserSearchFilters,
 	AdminTable,
 	AdminConfirmationModal,
 	AdminPageHeader,
 } from '../../components/admin/dashboard';
+import { searchAndFillter as SearchAndFillter } from '../../components/common';
 import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
@@ -391,7 +391,7 @@ const UserManagement: React.FC = () => {
 				<UserStatsCards userStats={userStats} />
 
 				{/* Search and Filters */}
-				<UserSearchFilters
+				<SearchAndFillter
 					searchTerm={searchTerm}
 					setSearchTerm={setSearchTerm}
 					roleFilter={roleFilter}
