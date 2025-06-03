@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Logo from './Logo';
+import logoImg from '../../assets/brandLogo_1.png';
 
 const Footer: React.FC = () => {
 	return (
@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
 					{/* Logo and Description */}
 					<div className="md:col-span-1">
 						<div className="mb-4">
-							<Logo className="h-10 w-auto" />
+							<img src={logoImg} alt="YMs Club Logo" className="h-16 w-auto object-contain" />
 						</div>
 						<p className="mb-4 font-light" style={{ color: 'var(--footer-text-muted)' }}>
 							Connecting young minds with opportunities that matter. Building the future, one event at a
@@ -202,4 +202,4 @@ const Footer: React.FC = () => {
 	);
 };
 
-export default Footer; 
+export default Footer;
