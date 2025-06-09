@@ -13,7 +13,7 @@ export { default as Tabs } from './Tabs';
 export { default as Switch } from './Switch';
 export { default as Accordion } from './Accordion';
 export { default as EventCard } from './EventCard';
-export { default as searchAndFillter } from './searchAndFillter';
+export { default as SearchAndFilter } from './SearchAndFilter';
 
 // Layout Components
 export { default as Footer } from './Footer';

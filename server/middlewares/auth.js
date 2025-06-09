@@ -71,7 +71,45 @@ const authorizeRoles = (...roles) => {
     };
 };
 
+// Optional authentication middleware - sets user if logged in, but doesn't fail if not
+const optionalAuth = async (req, res, next) => {
+    try {
+        let token;
+
+        // Get token from Authorization header or cookies
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } else if (req.cookies && req.cookies.token) {
+            token = req.cookies.token;
+        }
+
+        // If no token, continue without setting user
+        if (!token) {
+            return next();
+        }
+
+        // Verify token
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return next(); // Continue without user if token is invalid
+        }
+
+        // Find user with token's ID
+        const user = await User.findById(decoded.id);
+        if (user) {
+            req.user = user; // Set user if found
+        }
+
+        next();
+    } catch (error) {
+        console.error('Optional authentication error:', error);
+        // Continue without user if there's an error
+        next();
+    }
+};
+
 module.exports = {
     isAuthenticated,
-    authorizeRoles
+    authorizeRoles,
+    optionalAuth
 }; 

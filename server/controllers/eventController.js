@@ -83,12 +83,8 @@ exports.getAllEvents = async (req, res) => {
 // Get a single event by ID
 exports.getEventById = async (req, res) => {
     try {
-        const event = await Event.findOne({
-            _id: req.params.id,
-            // Only show published and non-flagged events to public
-            isPublished: true,
-            isFlagged: false
-        }).populate('organizer', 'name email');
+        // First, try to find the event without any visibility restrictions
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
             
         if (!event) {
             return res.status(404).json({
@@ -96,11 +92,46 @@ exports.getEventById = async (req, res) => {
                 message: 'Event not found'
             });
         }
-        
-        res.status(200).json({
-            success: true,
-            event
+
+        // Check if the event is published and not flagged (public access)
+        if (event.isPublished && !event.isFlagged) {
+            return res.status(200).json({
+                success: true,
+                event
+            });
+        }
+
+        // For draft or flagged events, check user permissions
+        // If user is not authenticated, they can't view draft/flagged events
+        if (!req.user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Event not found'
+            });
+        }
+
+        // Allow admin to view any event
+        if (req.user.role === 'admin') {
+            return res.status(200).json({
+                success: true,
+                event
+            });
+        }
+
+        // Allow organizer to view their own events (even if draft or flagged)
+        if (req.user.role === 'organizer' && event.organizer._id.toString() === req.user._id.toString()) {
+            return res.status(200).json({
+                success: true,
+                event
+            });
+        }
+
+        // For all other cases, deny access
+        return res.status(404).json({
+            success: false,
+            message: 'Event not found'
         });
+        
     } catch (error) {
         console.error('Error getting event:', error);
         res.status(500).json({

@@ -976,6 +976,9 @@ export interface EventDetailsData {
   tags?: string[];
   requirements?: string[];
   status: 'draft' | 'published' | 'cancelled' | 'completed';
+  isPublished: boolean;
+  isFlagged?: boolean;
+  flagReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }

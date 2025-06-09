@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { AdminPageHeader, AdminTable, AdminConfirmationModal, StatsCard } from '../../components/admin/dashboard';
-import { searchAndFillter as SearchAndFillter } from '../../components/common';
+import { SearchAndFilter } from '../../components/common';
 import {
 	ExclamationTriangleIcon,
 	CalendarIcon,
@@ -13,16 +13,8 @@ import {
 	DocumentCheckIcon,
 	SparklesIcon,
 	PencilIcon,
-	XMarkIcon,
-	ChevronDownIcon,
-	ChevronUpIcon,
-	MapPinIcon,
-	TagIcon,
-	UserGroupIcon,
-	CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { AdminEventData } from '@/types';
-import Modal from '../../components/common/Modal';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
 
 // Enhanced modal state type to include edit
@@ -708,7 +700,7 @@ const EventsManagement: React.FC = () => {
 				</div>
 
 				{/* Enhanced Search and Filters with Advanced Filters */}
-				<SearchAndFillter
+				<SearchAndFilter
 					searchTerm={searchTerm}
 					setSearchTerm={setSearchTerm}
 					statusFilter={statusFilter}

@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import { Disclosure, Transition } from '@headlessui/react';
-import {
-	MagnifyingGlassIcon,
-	FunnelIcon,
-	CalendarIcon,
-	MapPinIcon,
-	ChevronDownIcon,
-	AdjustmentsHorizontalIcon,
-	XMarkIcon,
-} from '@heroicons/react/24/outline';
 import EventCard from '../components/organizer/EventCard';
-import { SelectInput, Switch } from '../components/common';
+import { SearchAndFilter } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -74,8 +64,11 @@ const EventsPage: React.FC = () => {
 	const [dateError, setDateError] = useState<string>('');
 	const [sortBy, setSortBy] = useState<string>('newest');
 
-	// Mobile filters visibility
-	const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
+	// Additional advanced filters
+	const [selectedTags, setSelectedTags] = useState<string>('');
+	const [selectedOrganizer, setSelectedOrganizer] = useState<string>('');
+	const [registrationRange, setRegistrationRange] = useState<{ min: string; max: string }>({ min: '', max: '' });
+	const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({ min: '', max: '' });
 
 	// Fetch events data
 	useEffect(() => {
@@ -135,13 +128,14 @@ const EventsPage: React.FC = () => {
 		if (selectedLocation) {
 			result = result.filter(
 				(event) =>
-					event.location?.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
+					event.location?.city === selectedLocation ||
+					(selectedLocation === 'Online' && event.location?.type === 'online')
 			);
 		}
 
 		// Apply online only filter
 		if (isOnlineOnly) {
-			result = result.filter((event) => event.isOnline);
+			result = result.filter((event) => event.location?.type === 'online');
 		}
 
 		// Apply date range filter
@@ -152,6 +146,42 @@ const EventsPage: React.FC = () => {
 		if (dateRange.end) {
 			const endDate = new Date(dateRange.end);
 			result = result.filter((event) => new Date(event.date) <= endDate);
+		}
+
+		// Apply tags filter
+		if (selectedTags) {
+			const tagsQuery = selectedTags.toLowerCase();
+			result = result.filter(
+				(event) => event.tags && event.tags.some((tag) => tag.toLowerCase().includes(tagsQuery))
+			);
+		}
+
+		// Apply organizer filter
+		if (selectedOrganizer) {
+			const organizerQuery = selectedOrganizer.toLowerCase();
+			result = result.filter(
+				(event) => event.organizer?.name && event.organizer.name.toLowerCase().includes(organizerQuery)
+			);
+		}
+
+		// Apply registration range filter
+		if (registrationRange.min) {
+			const minRegistrations = parseInt(registrationRange.min);
+			result = result.filter((event) => (event.registrationCount || 0) >= minRegistrations);
+		}
+		if (registrationRange.max) {
+			const maxRegistrations = parseInt(registrationRange.max);
+			result = result.filter((event) => (event.registrationCount || 0) <= maxRegistrations);
+		}
+
+		// Apply price range filter
+		if (priceRange.min) {
+			const minPrice = parseFloat(priceRange.min);
+			result = result.filter((event) => (event.price || 0) >= minPrice);
+		}
+		if (priceRange.max) {
+			const maxPrice = parseFloat(priceRange.max);
+			result = result.filter((event) => (event.price || 0) <= maxPrice);
 		}
 
 		// Apply sorting
@@ -173,7 +203,19 @@ const EventsPage: React.FC = () => {
 		}
 
 		setFilteredEvents(result);
-	}, [events, searchQuery, selectedCategory, selectedLocation, isOnlineOnly, dateRange, sortBy]);
+	}, [
+		events,
+		searchQuery,
+		selectedCategory,
+		selectedLocation,
+		isOnlineOnly,
+		dateRange,
+		sortBy,
+		selectedTags,
+		selectedOrganizer,
+		registrationRange,
+		priceRange,
+	]);
 
 	const resetFilters = (): void => {
 		setSearchQuery('');
@@ -183,48 +225,10 @@ const EventsPage: React.FC = () => {
 		setDateRange({ start: '', end: '' });
 		setDateError('');
 		setSortBy('newest');
-	};
-
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		setSearchQuery(e.target.value);
-	};
-
-	const handleCategoryChange = (e: { target: { name: string; value: string | number } }) => {
-		setSelectedCategory(e.target.value as string);
-	};
-
-	const handleLocationChange = (e: { target: { name: string; value: string | number } }) => {
-		setSelectedLocation(e.target.value as string);
-	};
-
-	const handleOnlineToggle = (e: { target: { checked: boolean } }): void => {
-		setIsOnlineOnly(e.target.checked);
-	};
-
-	const handleSortChange = (e: { target: { name: string; value: string | number } }) => {
-		setSortBy(e.target.value as string);
-	};
-
-	const handleDateChange = (field: DateChangeField, value: string): void => {
-		// Create a new date range object
-		const newDateRange = { ...dateRange, [field]: value };
-
-		// Clear previous errors
-		setDateError('');
-
-		// Validate that end date is not before start date
-		if (newDateRange.start && newDateRange.end) {
-			const startDate = new Date(newDateRange.start);
-			const endDate = new Date(newDateRange.end);
-
-			if (endDate < startDate) {
-				setDateError('To Date cannot be earlier than From Date');
-				// Still update the date but show error
-			}
-		}
-
-		// Update the date range
-		setDateRange(newDateRange);
+		setSelectedTags('');
+		setSelectedOrganizer('');
+		setRegistrationRange({ min: '', max: '' });
+		setPriceRange({ min: '', max: '' });
 	};
 
 	// Handle saving/unsaving event
@@ -279,294 +283,64 @@ const EventsPage: React.FC = () => {
 				</div>
 
 				{/* Search and Filter Section */}
-				<div className="mb-8">
-					{/* Main Search Bar */}
-					<div className="ym-bg-card rounded-xl shadow-lg border ym-border-card p-6 mb-4">
-						<div className="flex flex-col lg:flex-row gap-4">
-							{/* Search Input */}
-							<div className="relative flex-grow h-fit">
-								<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-									<MagnifyingGlassIcon className="h-5 w-5 ym-text-yellow-600" />
-								</div>
-								<input
-									type="text"
-									className="block w-full pl-12 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm text-base"
-									placeholder="Search events by title, description, or tags..."
-									value={searchQuery}
-									onChange={handleSearchChange}
-								/>
-							</div>
-
-							{/* Sort Dropdown */}
-							<div className="w-full lg:w-56">
-								<SelectInput
-									id="sort"
-									name="sort"
-									value={sortBy}
-									onChange={handleSortChange}
-									options={SORT_OPTIONS}
-									className="ym-bg-card"
-									placeholder="Sort by"
-								/>
-							</div>
-
-							{/* Mobile Filter Button */}
-							<button
-								type="button"
-								className="lg:hidden inline-flex items-center justify-center px-6 py-3 border ym-border-card rounded-lg shadow-sm text-base font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
-								onClick={() => setShowMobileFilters(true)}
-							>
-								<FunnelIcon className="h-5 w-5 mr-2 ym-text-yellow-600" aria-hidden="true" />
-								Filters
-							</button>
-						</div>
-					</div>
-
-					{/* Desktop Advanced Filters */}
-					<Disclosure as="div" className="hidden lg:block">
-						{({ open }) => (
-							<>
-								<Disclosure.Button className="w-full flex justify-between items-center px-6 py-4 text-base font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover rounded-xl transition-all shadow-md hover:shadow-lg border ym-border-card">
-									<div className="flex items-center">
-										<AdjustmentsHorizontalIcon className="mr-3 h-6 w-6 ym-text-yellow-600" />
-										<span>Advanced Filters</span>
-									</div>
-									<ChevronDownIcon
-										className={`${
-											open ? 'rotate-180 transform' : ''
-										} h-5 w-5 ym-text-yellow-600 transition-transform duration-200`}
-									/>
-								</Disclosure.Button>
-
-								<Transition
-									enter="transition duration-200 ease-out"
-									enterFrom="transform scale-95 opacity-0"
-									enterTo="transform scale-100 opacity-100"
-									leave="transition duration-150 ease-in"
-									leaveFrom="transform scale-100 opacity-100"
-									leaveTo="transform scale-95 opacity-0"
-								>
-									<Disclosure.Panel className="mt-4 ym-bg-card rounded-xl p-6 shadow-lg border ym-border-card">
-										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-											{/* Category Filter */}
-											<div>
-												<SelectInput
-													id="category"
-													name="category"
-													label="Category"
-													value={selectedCategory}
-													onChange={handleCategoryChange}
-													options={EVENT_CATEGORIES}
-													className="ym-bg-card"
-												/>
-											</div>
-
-											{/* Location Filter */}
-											<div>
-												<SelectInput
-													id="location"
-													name="location"
-													label="Location"
-													value={selectedLocation}
-													onChange={handleLocationChange}
-													options={LOCATIONS}
-													className="ym-bg-card"
-												/>
-											</div>
-
-											{/* From Date */}
-											<div>
-												<label className="block ym-text-primary font-semibold mb-3">
-													From Date
-												</label>
-												<div className="relative">
-													<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-														<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
-													</div>
-													<input
-														type="date"
-														className="block w-full pl-10 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
-														value={dateRange.start}
-														onChange={(e) => handleDateChange('start', e.target.value)}
-													/>
-												</div>
-											</div>
-
-											{/* To Date */}
-											<div>
-												<label className="block ym-text-primary font-semibold mb-3">
-													To Date
-												</label>
-												<div className="relative">
-													<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-														<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
-													</div>
-													<input
-														type="date"
-														className={`block w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm
-														${dateError ? 'border-red-500 ym-bg-card ym-text-card' : 'ym-border-card ym-bg-card'} 
-														ym-text-card`}
-														value={dateRange.end}
-														onChange={(e) => handleDateChange('end', e.target.value)}
-													/>
-												</div>
-												{dateError && (
-													<p className="mt-2 text-sm text-red-600 font-medium">{dateError}</p>
-												)}
-											</div>
-										</div>
-
-										<div className="flex items-center justify-between mt-8 pt-6 border-t ym-border-card">
-											<div>
-												<Switch
-													enabled={isOnlineOnly}
-													onChange={handleOnlineToggle}
-													label="Online Events Only"
-													name="online-only"
-												/>
-											</div>
-											<button
-												type="button"
-												onClick={resetFilters}
-												className="inline-flex items-center px-6 py-2.5 border border-red-300 rounded-lg text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 hover:text-red-800 transition-all shadow-sm hover:shadow-md"
-											>
-												Reset Filters
-											</button>
-										</div>
-									</Disclosure.Panel>
-								</Transition>
-							</>
-						)}
-					</Disclosure>
-				</div>
-
-				{/* Mobile Filters Modal */}
-				{showMobileFilters && (
-					<div className="fixed inset-0 z-40 overflow-y-auto lg:hidden">
-						<div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-							{/* Backdrop */}
-							<div
-								className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-								onClick={() => setShowMobileFilters(false)}
-							></div>
-
-							{/* Modal Content */}
-							<div className="inline-block align-bottom ym-bg-card rounded-t-2xl sm:rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border ym-border-card">
-								{/* Header */}
-								<div className="px-6 pt-6 pb-4 border-b ym-border-card">
-									<div className="flex justify-between items-center">
-										<h3 className="text-xl font-bold ym-text-primary">Filter Events</h3>
-										<button
-											type="button"
-											className="ym-bg-card rounded-lg p-2 ym-text-muted hover:ym-text-secondary hover:ym-bg-card-hover focus:outline-none transition-colors"
-											onClick={() => setShowMobileFilters(false)}
-										>
-											<span className="sr-only">Close</span>
-											<XMarkIcon className="h-6 w-6" aria-hidden="true" />
-										</button>
-									</div>
-								</div>
-
-								{/* Filters */}
-								<div className="px-6 py-6 space-y-6">
-									{/* Category Filter */}
-									<div>
-										<SelectInput
-											id="category-mobile"
-											name="category"
-											label="Category"
-											value={selectedCategory}
-											onChange={handleCategoryChange}
-											options={EVENT_CATEGORIES}
-											className="ym-bg-card"
-										/>
-									</div>
-
-									{/* Location Filter */}
-									<div>
-										<SelectInput
-											id="location-mobile"
-											name="location"
-											label="Location"
-											value={selectedLocation}
-											onChange={handleLocationChange}
-											options={LOCATIONS}
-											className="ym-bg-card"
-										/>
-									</div>
-
-									{/* Date Range */}
-									<div className="space-y-4">
-										<div>
-											<label className="block ym-text-primary font-semibold mb-3">
-												From Date
-											</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-													<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
-												</div>
-												<input
-													type="date"
-													className="block w-full pl-10 pr-4 py-3 border ym-border-card rounded-lg ym-bg-card ym-text-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm"
-													value={dateRange.start}
-													onChange={(e) => handleDateChange('start', e.target.value)}
-												/>
-											</div>
-										</div>
-
-										<div>
-											<label className="block ym-text-primary font-semibold mb-3">To Date</label>
-											<div className="relative">
-												<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-													<CalendarIcon className="h-5 w-5 ym-text-yellow-600" />
-												</div>
-												<input
-													type="date"
-													className={`block w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-sm
-													${dateError ? 'border-red-500 ym-bg-card ym-text-card' : 'ym-border-card ym-bg-card'} 
-													ym-text-card`}
-													value={dateRange.end}
-													onChange={(e) => handleDateChange('end', e.target.value)}
-												/>
-											</div>
-											{dateError && (
-												<p className="mt-2 text-sm text-red-600 font-medium">{dateError}</p>
-											)}
-										</div>
-									</div>
-
-									{/* Online Events Toggle */}
-									<div className="pt-4 border-t ym-border-card">
-										<Switch
-											enabled={isOnlineOnly}
-											onChange={handleOnlineToggle}
-											label="Online Events Only"
-											name="online-only"
-										/>
-									</div>
-								</div>
-
-								{/* Footer Buttons */}
-								<div className="ym-bg-yellow-100 px-6 py-4 sm:flex sm:flex-row-reverse gap-3">
-									<button
-										type="button"
-										className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-6 py-3 gradient-bg text-base font-semibold ym-text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:w-auto transition-all"
-										onClick={() => setShowMobileFilters(false)}
-									>
-										Apply Filters
-									</button>
-									<button
-										type="button"
-										className="mt-3 w-full inline-flex justify-center rounded-lg border border-red-300 shadow-sm px-6 py-3 bg-red-50 text-base font-medium text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto transition-colors"
-										onClick={resetFilters}
-									>
-										Reset
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
+				<SearchAndFilter
+					searchTerm={searchQuery}
+					setSearchTerm={setSearchQuery}
+					statusFilter={sortBy}
+					setStatusFilter={setSortBy}
+					categoryFilter={selectedCategory}
+					setCategoryFilter={setSelectedCategory}
+					filteredCount={filteredEvents.length}
+					totalCount={events.length}
+					itemType="events"
+					searchPlaceholder="Search events by title, description, or tags..."
+					animationDelay="0.1s"
+					statusOptions={SORT_OPTIONS.map((opt) => ({ value: opt.value as string, label: opt.label }))}
+					categoryOptions={EVENT_CATEGORIES.map((opt) => ({ value: opt.value as string, label: opt.label }))}
+					showRole={false}
+					showCategory={true}
+					advancedFilters={{
+						showAdvancedFilters: true,
+						dateRange: {
+							startDate: dateRange.start,
+							endDate: dateRange.end,
+							setStartDate: (date: string) => setDateRange((prev) => ({ ...prev, start: date })),
+							setEndDate: (date: string) => setDateRange((prev) => ({ ...prev, end: date })),
+						},
+						location: {
+							value: selectedLocation,
+							setValue: setSelectedLocation,
+							options: LOCATIONS.map((loc) => loc.label).filter((label) => label !== 'All Locations'),
+						},
+						tags: {
+							value: selectedTags,
+							setValue: setSelectedTags,
+						},
+						organizer: {
+							value: selectedOrganizer,
+							setValue: setSelectedOrganizer,
+						},
+						registrationRange: {
+							min: registrationRange.min,
+							max: registrationRange.max,
+							setMin: (min: string) => setRegistrationRange((prev) => ({ ...prev, min })),
+							setMax: (max: string) => setRegistrationRange((prev) => ({ ...prev, max })),
+						},
+						priceRange: {
+							min: priceRange.min,
+							max: priceRange.max,
+							setMin: (min: string) => setPriceRange((prev) => ({ ...prev, min })),
+							setMax: (max: string) => setPriceRange((prev) => ({ ...prev, max })),
+						},
+						toggleFilters: {
+							isOnlineOnly: {
+								value: isOnlineOnly,
+								setValue: setIsOnlineOnly,
+							},
+						},
+						onResetAllFilters: resetFilters,
+					}}
+				/>
 
 				{/* Events Grid */}
 				<div>

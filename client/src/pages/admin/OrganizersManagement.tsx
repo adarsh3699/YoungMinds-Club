@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { StatsCard, AdminTable, AdminConfirmationModal, AdminPageHeader } from '../../components/admin/dashboard';
-import { searchAndFillter as SearchAndFillter } from '../../components/common';
+import { SearchAndFilter } from '../../components/common';
 import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
@@ -400,7 +400,7 @@ const OrganizersManagement: React.FC = () => {
 				</div>
 
 				{/* Search and Filters */}
-				<SearchAndFillter
+				<SearchAndFilter
 					searchTerm={searchTerm}
 					setSearchTerm={setSearchTerm}
 					statusFilter={statusFilter}

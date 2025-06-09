@@ -32,8 +32,8 @@ import {
 	AdminAnnouncementApiResponse,
 	UserCardData,
 	AdminSection,
-	StatsCardProps
-} from '@/types';
+	StatsCardProps,
+} from '../../types';
 
 // Constants
 const INITIAL_STATS: AdminDashboardStats = {
@@ -219,16 +219,22 @@ const AdminDashboard: React.FC = () => {
 		fetchDashboardData();
 	}, [fetchDashboardData]);
 
-	const handleAnnouncementChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
-		const { name, value } = e.target;
-		setAnnouncement((prev) => ({ ...prev, [name]: value }));
-	}, []);
+	const handleAnnouncementChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+			const { name, value } = e.target;
+			setAnnouncement((prev) => ({ ...prev, [name]: value }));
+		},
+		[]
+	);
 
 	const submitAnnouncement = useCallback(
 		async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
 			e.preventDefault();
 			try {
-				const response: AxiosResponse<AdminAnnouncementApiResponse> = await axios.post('/admin/announcements', announcement);
+				const response: AxiosResponse<AdminAnnouncementApiResponse> = await axios.post(
+					'/admin/announcements',
+					announcement
+				);
 				if (response.data.success) {
 					setAnnouncement(INITIAL_ANNOUNCEMENT);
 					setShowAnnouncementForm(false);
@@ -261,7 +267,9 @@ const AdminDashboard: React.FC = () => {
 							<SparklesIcon className="h-8 w-8 text-primary" />
 							<h1 className="text-3xl font-bold text-card-foreground">Admin Control Panel</h1>
 						</div>
-						<p className="text-muted-foreground mt-2">Manage your platform with comprehensive admin tools</p>
+						<p className="text-muted-foreground mt-2">
+							Manage your platform with comprehensive admin tools
+						</p>
 					</div>
 
 					<div className="p-8">

@@ -1,5 +1,5 @@
 const express = require('express');
-const { isAuthenticated, authorizeRoles } = require('../middlewares/auth');
+const { isAuthenticated, authorizeRoles, optionalAuth } = require('../middlewares/auth');
 const eventController = require('../controllers/eventController');
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 // Public routes
 router.get('/', eventController.getAllEvents);
 router.get('/recommended', isAuthenticated, eventController.getRecommendedEvents);
-router.get('/:id', eventController.getEventById);
+router.get('/:id', optionalAuth, eventController.getEventById);
 
 // Protected routes
 router.post('/', isAuthenticated, authorizeRoles(['organizer', 'admin']), eventController.createEvent);
