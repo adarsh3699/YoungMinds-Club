@@ -10,7 +10,11 @@ exports.getAllEvents = async (req, res) => {
         const skip = (page - 1) * limit;
         
         // Build filter object based on query params
-        const filter = {};
+        const filter = {
+            // Only show published and non-flagged events to public
+            isPublished: true,
+            isFlagged: false
+        };
         
         // Filter by category
         if (req.query.category) {
@@ -79,8 +83,12 @@ exports.getAllEvents = async (req, res) => {
 // Get a single event by ID
 exports.getEventById = async (req, res) => {
     try {
-        const event = await Event.findById(req.params.id)
-            .populate('organizer', 'name email');
+        const event = await Event.findOne({
+            _id: req.params.id,
+            // Only show published and non-flagged events to public
+            isPublished: true,
+            isFlagged: false
+        }).populate('organizer', 'name email');
             
         if (!event) {
             return res.status(404).json({
@@ -368,7 +376,10 @@ exports.getRecommendedEvents = async (req, res) => {
         // In a real system, you'd use tags, categories, and past registrations to find similar events
         
         let recommendedEvents = await Event.find({
-            date: { $gte: new Date() } // Only future events
+            date: { $gte: new Date() }, // Only future events
+            // Only show published and non-flagged events
+            isPublished: true,
+            isFlagged: false
         })
         .sort({ date: 1 }) // Upcoming events first
         .limit(6)

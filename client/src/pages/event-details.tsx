@@ -4,12 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import axios, { AxiosResponse } from 'axios';
 import { formatDate } from '../utils/formatDate';
 import { Tabs, MsgAlert } from '../components/common';
-import { 
-	EventDetailsData, 
-	EventRegistrationResponse, 
-	EventSaveResponse, 
+import {
+	EventDetailsData,
+	EventRegistrationResponse,
+	EventSaveResponse,
 	UserEventsResponse,
-	ApiResponse 
+	ApiResponse,
 } from '@/types';
 
 const EventDetails: React.FC = () => {
@@ -34,7 +34,9 @@ const EventDetails: React.FC = () => {
 		const queryParams = new URLSearchParams(location.search);
 		if (queryParams.get('registered') === 'true') {
 			setRegistrationSuccess(true);
-			setSuccessMessage('You have successfully registered for this event. You earned 10 XP for registering. Keep it up!');
+			setSuccessMessage(
+				'You have successfully registered for this event. You earned 10 XP for registering. Keep it up!'
+			);
 			// Clear the URL parameter without refreshing the page
 			const newUrl = window.location.pathname;
 			window.history.replaceState({}, '', newUrl);
@@ -45,10 +47,12 @@ const EventDetails: React.FC = () => {
 	useEffect(() => {
 		const fetchEventDetails = async () => {
 			if (!id) return;
-			
+
 			setLoading(true);
 			try {
-				const response: AxiosResponse<{ success: boolean; event: EventDetailsData }> = await axios.get(`/events/${id}`);
+				const response: AxiosResponse<{ success: boolean; event: EventDetailsData }> = await axios.get(
+					`/events/${id}`
+				);
 				setEvent(response.data.event || null);
 
 				// If user is authenticated, check if they've saved or registered for this event
@@ -110,7 +114,11 @@ const EventDetails: React.FC = () => {
 			setIsRegistered(true);
 			setRegistrationSuccess(true);
 			setXpEarned(response.data.xp || null);
-			setSuccessMessage(`Registration successful! You have successfully registered for this event.${response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ''}`);
+			setSuccessMessage(
+				`Registration successful! You have successfully registered for this event.${
+					response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ''
+				}`
+			);
 			setRegistrationError(null);
 		} catch (error: any) {
 			console.error('Error registering for event:', error);
@@ -186,21 +194,9 @@ const EventDetails: React.FC = () => {
 	return (
 		<div className="min-h-screen ym-features-bg">
 			{/* Message Alerts */}
-			<MsgAlert 
-				message={successMessage} 
-				type="success" 
-				onClose={() => setSuccessMessage(null)} 
-			/>
-			<MsgAlert 
-				message={registrationError} 
-				type="error" 
-				onClose={() => setRegistrationError(null)} 
-			/>
-			<MsgAlert 
-				message={error} 
-				type="error" 
-				onClose={() => setError(null)} 
-			/>
+			<MsgAlert message={successMessage} type="success" onClose={() => setSuccessMessage(null)} />
+			<MsgAlert message={registrationError} type="error" onClose={() => setRegistrationError(null)} />
+			<MsgAlert message={error} type="error" onClose={() => setError(null)} />
 
 			<div className="container mx-auto px-4 py-12 mt-12">
 				<div className="flex flex-col md:flex-row gap-8">
@@ -464,7 +460,9 @@ const EventDetails: React.FC = () => {
 														) : (
 															<>
 																{event.location.venue && <p>{event.location.venue}</p>}
-																{event.location.address && <p>{event.location.address}</p>}
+																{event.location.address && (
+																	<p>{event.location.address}</p>
+																)}
 																{event.location.city && <p>{event.location.city}</p>}
 															</>
 														)}

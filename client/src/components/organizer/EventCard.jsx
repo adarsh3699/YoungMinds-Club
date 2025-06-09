@@ -116,6 +116,11 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 		return `₹${event.price}`;
 	};
 
+	// Check if event is past
+	const isEventPast = () => {
+		return new Date(event.date) < new Date();
+	};
+
 	// Get category color gradient
 	const categoryColorGradient = getCategoryColor(event.type);
 
@@ -197,8 +202,8 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 						)}
 					</div>
 
-					{/* Countdown Timer */}
-					{new Date(event.date) > new Date() && (
+					{/* Countdown Timer or Past Event Indicator */}
+					{!isEventPast() ? (
 						<div className="mb-3">
 							<p className="text-xs ym-text-muted mb-1">Event starts in:</p>
 							<div className="flex space-x-2">
@@ -218,6 +223,12 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 									<span className="ym-text-yellow-700 text-sm font-bold">{countdown.seconds}</span>
 									<p className="ym-text-muted text-xs">secs</p>
 								</div>
+							</div>
+						</div>
+					) : (
+						<div className="mb-3">
+							<div className="bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-lg">
+								<p className="text-xs ym-text-muted text-center">This event has ended</p>
 							</div>
 						</div>
 					)}
@@ -249,26 +260,41 @@ const EventCard = ({ event, isFeatured = false, isOrganizer = false, onManage, o
 						</div>
 					</div>
 
-					{/* Registration Stats */}
+					{/* Registration Stats - Only show for upcoming events */}
 					<div className="mt-auto">
-						<div className="w-full ym-bg-yellow-100 rounded-full h-2 mb-2">
-							<div
-								className={`h-2 rounded-full gradient-bg`}
-								style={{ width: `${Math.min(100, (event.registrationCount / event.capacity) * 100)}%` }}
-							></div>
-						</div>
-						<div className="flex justify-between text-xs ym-text-muted mb-3">
-							<span>{event.registrationCount} registered</span>
-							<span>{event.capacity - event.registrationCount} spots left</span>
-						</div>
+						{!isEventPast() && (
+							<>
+								<div className="w-full ym-bg-yellow-100 rounded-full h-2 mb-2">
+									<div
+										className={`h-2 rounded-full gradient-bg`}
+										style={{
+											width: `${Math.min(
+												100,
+												(event.registrationCount / event.capacity) * 100
+											)}%`,
+										}}
+									></div>
+								</div>
+								<div className="flex justify-between text-xs ym-text-muted mb-3">
+									<span>{event.registrationCount} registered</span>
+									<span>{event.capacity - event.registrationCount} spots left</span>
+								</div>
+							</>
+						)}
 
-						{/* Register Button */}
-						<Link
-							to={`/event/${event.id || event._id}`}
-							className="block w-full py-2.5 text-center font-bold ym-text-white gradient-bg hover:shadow-lg rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md"
-						>
-							Register Now
-						</Link>
+						{/* Register Button - Different states based on event timing */}
+						{isEventPast() ? (
+							<div className="w-full py-2.5 text-center font-bold bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed shadow-sm border ym-border-card">
+								Event Ended
+							</div>
+						) : (
+							<Link
+								to={`/event/${event.id || event._id}`}
+								className="block w-full py-2.5 text-center font-bold ym-text-white gradient-bg hover:shadow-lg rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md"
+							>
+								Register Now
+							</Link>
+						)}
 					</div>
 				</div>
 			</div>

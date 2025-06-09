@@ -15,13 +15,13 @@ import { SelectInput, Switch } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { 
-	EventDiscoverData, 
-	EventsApiResponse, 
-	DateRange, 
-	DateChangeField, 
+import {
+	EventDiscoverData,
+	EventsApiResponse,
+	DateRange,
+	DateChangeField,
 	SelectOption,
-	EventSaveResponse 
+	EventSaveResponse,
 } from '@/types';
 
 // Categories
@@ -57,7 +57,7 @@ const SORT_OPTIONS: SelectOption[] = [
 const EventsPage: React.FC = () => {
 	const { isAuthenticated } = useAuth();
 	const navigate = useNavigate();
-	
+
 	// State for events data
 	const [events, setEvents] = useState<EventDiscoverData[]>([]);
 	const [filteredEvents, setFilteredEvents] = useState<EventDiscoverData[]>([]);
@@ -134,7 +134,8 @@ const EventsPage: React.FC = () => {
 		// Apply location filter
 		if (selectedLocation) {
 			result = result.filter(
-				(event) => event.location?.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
+				(event) =>
+					event.location?.city === selectedLocation || (selectedLocation === 'Online' && event.isOnline)
 			);
 		}
 

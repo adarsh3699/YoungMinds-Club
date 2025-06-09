@@ -70,14 +70,14 @@ const useCountdown = (targetDate: string): CountdownTime => {
 	return countdown;
 };
 
-const EventCard: React.FC<EventCardProps> = ({ 
-	event, 
-	isFeatured = false, 
-	isOrganizer = false, 
-	onManage, 
-	onEdit, 
-	onDelete, 
-	onSaveToggle 
+const EventCard: React.FC<EventCardProps> = ({
+	event,
+	isFeatured = false,
+	isOrganizer = false,
+	onManage,
+	onEdit,
+	onDelete,
+	onSaveToggle,
 }) => {
 	const navigate = useNavigate();
 	const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -331,4 +331,4 @@ const EventCard: React.FC<EventCardProps> = ({
 	);
 };
 
-export default EventCard; 
+export default EventCard;
