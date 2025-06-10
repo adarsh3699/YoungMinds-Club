@@ -713,6 +713,7 @@ const EventsManagement: React.FC = () => {
 					flagReason={modal.flagReason}
 					onFlagReasonChange={(e) => setModal((prev) => ({ ...prev, flagReason: e.target.value }))}
 					onConfirm={handleConfirm}
+					context="event"
 				/>
 
 				{/* Edit Event Modal */}

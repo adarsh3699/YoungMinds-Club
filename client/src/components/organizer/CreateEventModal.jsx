@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
-import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip } from '../common';
+import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip, MsgAlert } from '../common';
 
 const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false, apiEndpoint = null }) => {
 	const [formData, setFormData] = useState({
@@ -44,6 +44,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [submitType, setSubmitType] = useState(null);
+	const [alertMessage, setAlertMessage] = useState(null);
+	const [alertType, setAlertType] = useState('error');
 
 	// If editing, populate form with event data
 	useEffect(() => {
@@ -181,7 +183,7 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 		() => ({
 			onDrop,
 			accept: {
-				'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
+				'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.avif'],
 			},
 			maxSize: 5242880, // 5MB
 			multiple: false,
@@ -227,7 +229,6 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			date: 'Start date and time is required',
 			endDate: 'End date and time is required',
 			capacity: 'Capacity is required',
-			price: 'Ticket price is required',
 			registrationDeadline: 'Registration deadline is required',
 		};
 
@@ -235,6 +236,11 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 		Object.entries(requiredFields).forEach(([field, message]) => {
 			if (!formData[field]) newErrors[field] = message;
 		});
+
+		// Special validation for price (0 is allowed for free events)
+		if (formData.price === null || formData.price === undefined || formData.price === '') {
+			newErrors.price = 'Ticket price is required';
+		}
 
 		// Enhanced Date validation checks
 		if (formData.date) {
@@ -310,29 +316,23 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 				isPublished: publishStatus,
 			};
 
-			const appendToFormData = (obj, prefix = '') => {
-				Object.entries(obj).forEach(([key, value]) => {
-					const formKey = prefix ? `${prefix}[${key}]` : key;
-
-					if (value !== null && typeof value === 'object' && !(value instanceof File)) {
-						if (Array.isArray(value)) {
-							// Handle arrays
-							value.forEach((item) => {
-								eventFormData.append(`${formKey}[]`, item);
-							});
-						} else {
-							// Handle nested objects
-							appendToFormData(value, formKey);
-						}
-					} else {
-						// Handle primitive values
-						eventFormData.append(formKey, value);
-					}
-				});
-			};
-
-			// Add form data
-			appendToFormData(dataToSubmit);
+			// Handle form data properly for multipart submission
+			Object.entries(dataToSubmit).forEach(([key, value]) => {
+				if (key === 'location' && value && typeof value === 'object') {
+					// Handle location object specially
+					Object.entries(value).forEach(([locKey, locValue]) => {
+						eventFormData.append(`location.${locKey}`, locValue || '');
+					});
+				} else if (Array.isArray(value)) {
+					// Handle arrays
+					value.forEach((item) => {
+						eventFormData.append(`${key}[]`, item);
+					});
+				} else {
+					// Handle primitive values
+					eventFormData.append(key, value || '');
+				}
+			});
 
 			// Add poster file if available
 			if (posterFile) {
@@ -358,7 +358,13 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			if (error.response?.data?.errors) {
 				setErrors(error.response.data.errors);
 			} else {
-				alert('Failed to save event. Please try again.');
+				// Use MsgAlert instead of basic alert
+				const errorMessage =
+					error.response?.data?.error ||
+					error.response?.data?.message ||
+					'Failed to save event. Please try again.';
+				setAlertMessage(errorMessage);
+				setAlertType('error');
 			}
 		} finally {
 			setLoading(false);
@@ -389,6 +395,9 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 
 	return (
 		<>
+			{/* Message Alert */}
+			<MsgAlert message={alertMessage} type={alertType} onClose={() => setAlertMessage(null)} />
+
 			{/* Enhanced Header with YoungMinds Gradient - Mobile Optimized */}
 			<div className="gradient-bg text-white z-10 flex justify-between items-center p-3 sm:p-6 sm:rounded-t-xl shadow-lg">
 				<div className="flex items-center min-w-0 flex-1">
@@ -607,7 +616,7 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 														Drag & drop an image, or click to browse
 													</p>
 													<p className="text-xs ym-text-muted mt-1">
-														PNG, JPG, GIF up to 5MB
+														PNG, JPG, GIF, WebP, AVIF up to 5MB
 													</p>
 												</div>
 											</div>

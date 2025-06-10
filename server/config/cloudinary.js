@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'youngminds-events',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'],
     transformation: [{ width: 800, crop: 'limit' }]
   }
 });

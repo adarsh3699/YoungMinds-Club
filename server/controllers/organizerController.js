@@ -228,6 +228,26 @@ exports.createEvent = async (req, res) => {
             organizer: req.user._id
         };
         
+        // Reconstruct location object from dot-notation properties
+        const location = {};
+        Object.keys(req.body).forEach(key => {
+            if (key.startsWith('location.')) {
+                const locationKey = key.split('.')[1];
+                location[locationKey] = req.body[key];
+            }
+        });
+        
+        if (Object.keys(location).length > 0) {
+            eventData.location = location;
+            
+            // Remove dot-notation location properties
+            Object.keys(eventData).forEach(key => {
+                if (key.startsWith('location.')) {
+                    delete eventData[key];
+                }
+            });
+        }
+        
         // If there's a poster file, the URL should already be in req.file.path from multer-cloudinary
         if (req.file) {
             eventData.poster = req.file.path;
@@ -324,6 +344,26 @@ exports.updateEvent = async (req, res) => {
 
         // Update event data
         const updateData = { ...req.body };
+        
+        // Reconstruct location object from dot-notation properties
+        const location = {};
+        Object.keys(req.body).forEach(key => {
+            if (key.startsWith('location.')) {
+                const locationKey = key.split('.')[1];
+                location[locationKey] = req.body[key];
+            }
+        });
+        
+        if (Object.keys(location).length > 0) {
+            updateData.location = location;
+            
+            // Remove dot-notation location properties
+            Object.keys(updateData).forEach(key => {
+                if (key.startsWith('location.')) {
+                    delete updateData[key];
+                }
+            });
+        }
         
         // If there's a new poster file
         if (req.file) {

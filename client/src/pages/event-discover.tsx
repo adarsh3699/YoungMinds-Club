@@ -10,12 +10,12 @@ import { EventDiscoverData, EventsApiResponse, DateRange, SelectOption } from '@
 // Categories
 const EVENT_CATEGORIES: SelectOption[] = [
 	{ label: 'All Categories', value: '' },
-	{ label: 'Model United Nations', value: 'MUN' },
 	{ label: 'Debate', value: 'Debate' },
 	{ label: 'Hackathon', value: 'Hackathon' },
 	{ label: 'Workshop', value: 'Workshop' },
 	{ label: 'Competition', value: 'Competition' },
 	{ label: 'Conference', value: 'Conference' },
+	{ label: 'Model United Nations', value: 'MUN' },
 ];
 
 // Locations

@@ -106,7 +106,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 				onInput={handleInput}
 				rows={expandable ? minRows : rows}
 				maxLength={maxLength}
-				className={`w-full px-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm resize-none border ${
+				className={`w-full px-4 py-3 text-sm rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm resize-none border ${
 					error
 						? 'input-error'
 						: 'ym-bg-card border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg'
@@ -151,4 +151,4 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 	);
 };
 
-export default TextareaField; 
+export default TextareaField;

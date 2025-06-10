@@ -11,56 +11,75 @@ const MODAL_TYPES = {
 	DEMOTE: 'demote' as const,
 } as const;
 
-type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
+type ModalType = (typeof MODAL_TYPES)[keyof typeof MODAL_TYPES];
 
-const MODAL_CONFIGURATIONS: Record<ModalType, ModalConfiguration> = {
-	[MODAL_TYPES.DELETE]: {
-		title: 'Delete User',
-		iconBg: 'bg-destructive/10',
-		headerTitle: 'Delete User Account',
-		baseMessage: 'Are you sure you want to delete "{userName}"? This action cannot be undone.',
-		confirmClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/80',
-		getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
-		getConfirmText: (deleteAllData: boolean) => (deleteAllData ? 'Delete Everything' : 'Delete User Only'),
-	},
-	[MODAL_TYPES.STATUS]: {
-		iconBg: 'bg-warning/10',
-		confirmClass: '',
-		getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-warning" />,
-		getConfig: (isActivating: boolean) => ({
-			title: isActivating ? 'Activate User' : 'Suspend User',
-			headerTitle: isActivating ? 'Activate User Account' : 'Suspend User Account',
-			message: isActivating
-				? 'Are you sure you want to reactivate "{userName}"? They will regain access to the platform.'
-				: 'Are you sure you want to suspend "{userName}"? They will not be able to login until reactivated.',
-			confirmText: isActivating ? 'Activate' : 'Suspend',
-			confirmClass: isActivating
-				? 'bg-success text-white hover:bg-success/80'
-				: 'bg-warning text-white hover:bg-warning/80',
-		}),
-	},
-	[MODAL_TYPES.FLAG]: {
-		iconBg: 'bg-info/10',
-		confirmClass: 'bg-info text-white hover:bg-info/80',
-		getIcon: () => <FlagIcon className="w-8 h-8 text-info" />,
-		getConfig: (isFlagged: boolean) => ({
-			title: isFlagged ? 'Unflag User' : 'Flag User',
-			headerTitle: isFlagged ? 'Remove Flag' : 'Flag User',
-			message: isFlagged
-				? 'Are you sure you want to remove the flag from "{userName}"?'
-				: 'Please specify a reason for flagging "{userName}":',
-			confirmText: isFlagged ? 'Remove Flag' : 'Flag User',
-		}),
-	},
-	[MODAL_TYPES.DEMOTE]: {
-		title: 'Demote Organizer',
-		iconBg: 'bg-warning/10',
-		headerTitle: 'Demote to Regular User',
-		baseMessage: 'Are you sure you want to demote "{userName}" to a regular user?',
-		confirmText: 'Demote to User',
-		confirmClass: 'bg-warning text-white hover:bg-warning/80',
-		getIcon: () => <ArrowDownIcon className="w-8 h-8 text-warning" />,
-	},
+// Context-aware configuration factory
+const getModalConfigurations = (context: 'user' | 'event' = 'user'): Record<ModalType, ModalConfiguration> => {
+	const isEvent = context === 'event';
+	const entityType = isEvent ? 'Event' : 'User';
+
+	return {
+		[MODAL_TYPES.DELETE]: {
+			title: `Delete ${entityType}`,
+			iconBg: 'bg-destructive/10',
+			headerTitle: `Delete ${entityType}${isEvent ? '' : ' Account'}`,
+			baseMessage: `Are you sure you want to delete "${
+				isEvent ? '{userName}' : '{userName}'
+			}"? This action cannot be undone.`,
+			confirmClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/80',
+			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
+			getConfirmText: (deleteAllData: boolean) =>
+				deleteAllData ? 'Delete Everything' : `Delete ${entityType} Only`,
+		},
+		[MODAL_TYPES.STATUS]: {
+			iconBg: 'bg-warning/10',
+			confirmClass: '',
+			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-warning" />,
+			getConfig: (isActivating: boolean) => ({
+				title: isActivating ? `Activate ${entityType}` : `Suspend ${entityType}`,
+				headerTitle: isActivating
+					? `Activate ${entityType}${isEvent ? '' : ' Account'}`
+					: `Suspend ${entityType}${isEvent ? '' : ' Account'}`,
+				message: isActivating
+					? `Are you sure you want to reactivate "${isEvent ? '{userName}' : '{userName}'}"? ${
+							isEvent
+								? 'The event will be visible to users again.'
+								: 'They will regain access to the platform.'
+					  }`
+					: `Are you sure you want to suspend "${isEvent ? '{userName}' : '{userName}'}"? ${
+							isEvent
+								? 'The event will be hidden from users.'
+								: 'They will not be able to login until reactivated.'
+					  }`,
+				confirmText: isActivating ? 'Activate' : 'Suspend',
+				confirmClass: isActivating
+					? 'bg-success text-white hover:bg-success/80'
+					: 'bg-warning text-white hover:bg-warning/80',
+			}),
+		},
+		[MODAL_TYPES.FLAG]: {
+			iconBg: 'bg-info/10',
+			confirmClass: 'bg-info text-white hover:bg-info/80',
+			getIcon: () => <FlagIcon className="w-8 h-8 text-info" />,
+			getConfig: (isFlagged: boolean) => ({
+				title: isFlagged ? `Unflag ${entityType}` : `Flag ${entityType}`,
+				headerTitle: isFlagged ? 'Remove Flag' : `Flag ${entityType}`,
+				message: isFlagged
+					? `Are you sure you want to remove the flag from "${isEvent ? '{userName}' : '{userName}'}"?`
+					: `Please specify a reason for flagging "${isEvent ? '{userName}' : '{userName}'}":`,
+				confirmText: isFlagged ? 'Remove Flag' : `Flag ${entityType}`,
+			}),
+		},
+		[MODAL_TYPES.DEMOTE]: {
+			title: 'Demote Organizer',
+			iconBg: 'bg-warning/10',
+			headerTitle: 'Demote to Regular User',
+			baseMessage: 'Are you sure you want to demote "{userName}" to a regular user?',
+			confirmText: 'Demote to User',
+			confirmClass: 'bg-warning text-white hover:bg-warning/80',
+			getIcon: () => <ArrowDownIcon className="w-8 h-8 text-warning" />,
+		},
+	};
 };
 
 const BASE_BUTTON_CLASSES = 'flex-1 px-4 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg';
@@ -88,10 +107,11 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 		flagReason = '',
 		onFlagReasonChange,
 		onConfirm,
+		context = 'user', // Default to 'user' for backward compatibility
 	}) => {
 		// Memoized modal configuration with optimized logic
 		const config = useMemo((): ExtendedConfig => {
-			const baseConfig = MODAL_CONFIGURATIONS[modalType];
+			const baseConfig = getModalConfigurations(context)[modalType];
 			if (!baseConfig) return {} as ExtendedConfig;
 
 			const message = (baseConfig.baseMessage || baseConfig.message || '').replace('{userName}', userName);
@@ -140,7 +160,7 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 				default:
 					return baseConfig as ExtendedConfig;
 			}
-		}, [modalType, userName, deleteAllData, currentStatus, isFlagged]);
+		}, [modalType, userName, deleteAllData, currentStatus, isFlagged, context]);
 
 		// Optimized disabled state calculation
 		const isDisabled = useMemo(
@@ -154,43 +174,60 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 			return `${BASE_BUTTON_CLASSES} ${config.confirmClass} ${ACTIVE_BUTTON_TRANSFORM}`;
 		}, [isDisabled, config.confirmClass]);
 
-		// Optimized content renderers
+		// Optimized content renderers - Update delete content for events
 		const renderDeleteContent = useCallback(
 			() => (
 				<>
 					<p className="text-muted-foreground mb-6">{config.message}</p>
-					<div className="bg-muted/50 rounded-xl p-4 mb-6">
-						<div className="flex items-start gap-3">
-							<input
-								type="checkbox"
-								id="deleteAllData"
-								checked={deleteAllData}
-								onChange={onToggleDeleteAllData}
-								className="w-4 h-4 text-primary bg-card rounded border-border focus:ring-primary focus:ring-2 mt-0.5"
-							/>
-							<label htmlFor="deleteAllData" className="text-sm text-secondary-foreground text-left">
-								<span className="font-medium">Also delete all user data</span>
-								<br />
-								<span className="text-muted-foreground">Events, registrations, activities, etc.</span>
-							</label>
+					{context === 'user' && (
+						<>
+							<div className="bg-muted/50 rounded-xl p-4 mb-6">
+								<div className="flex items-start gap-3">
+									<input
+										type="checkbox"
+										id="deleteAllData"
+										checked={deleteAllData}
+										onChange={onToggleDeleteAllData}
+										className="w-4 h-4 text-primary bg-card rounded border-border focus:ring-primary focus:ring-2 mt-0.5"
+									/>
+									<label
+										htmlFor="deleteAllData"
+										className="text-sm text-secondary-foreground text-left"
+									>
+										<span className="font-medium">Also delete all user data</span>
+										<br />
+										<span className="text-muted-foreground">
+											Events, registrations, activities, etc.
+										</span>
+									</label>
+								</div>
+							</div>
+							<div
+								className={`p-4 rounded-xl ${
+									deleteAllData
+										? 'bg-destructive/10 border border-destructive/20'
+										: 'bg-warning/10 border border-warning/20'
+								}`}
+							>
+								<p className={`text-sm ${deleteAllData ? 'text-destructive' : 'text-warning'}`}>
+									{deleteAllData
+										? "⚠️ All user data will be permanently deleted, including events they've created, registrations, and activity history."
+										: 'ℹ️ The user account will be deleted, but their data will remain in the system.'}
+								</p>
+							</div>
+						</>
+					)}
+					{context === 'event' && (
+						<div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl">
+							<p className="text-sm text-destructive">
+								⚠️ This will permanently delete the event and all associated data, including
+								registrations and activity history.
+							</p>
 						</div>
-					</div>
-					<div
-						className={`p-4 rounded-xl ${
-							deleteAllData
-								? 'bg-destructive/10 border border-destructive/20'
-								: 'bg-warning/10 border border-warning/20'
-						}`}
-					>
-						<p className={`text-sm ${deleteAllData ? 'text-destructive' : 'text-warning'}`}>
-							{deleteAllData
-								? "⚠️ All user data will be permanently deleted, including events they've created, registrations, and activity history."
-								: 'ℹ️ The user account will be deleted, but their data will remain in the system.'}
-						</p>
-					</div>
+					)}
 				</>
 			),
-			[config.message, deleteAllData, onToggleDeleteAllData]
+			[config.message, deleteAllData, onToggleDeleteAllData, context]
 		);
 
 		const renderFlagContent = useCallback(
@@ -206,19 +243,20 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 								onChange={onFlagReasonChange}
 								className="input-base w-full px-4 py-3 rounded-xl border-2 focus:border-primary transition-all duration-200 resize-none"
 								rows={4}
-								placeholder="Enter reason for flagging this user..."
+								placeholder={`Enter reason for flagging this ${context}...`}
 								autoFocus
 							/>
 							{!flagReason?.trim() && (
 								<p className="text-sm text-muted-foreground mt-2 italic">
-									⚠️ Please provide a reason to enable the Flag User button
+									⚠️ Please provide a reason to enable the Flag{' '}
+									{context === 'event' ? 'Event' : 'User'} button
 								</p>
 							)}
 						</>
 					)}
 				</>
 			),
-			[config.message, isFlagged, flagReason, onFlagReasonChange]
+			[config.message, isFlagged, flagReason, onFlagReasonChange, context]
 		);
 
 		const renderDemoteContent = useCallback(
@@ -298,4 +336,4 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 
 AdminConfirmationModal.displayName = 'AdminConfirmationModal';
 
-export default AdminConfirmationModal; 
+export default AdminConfirmationModal;

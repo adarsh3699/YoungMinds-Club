@@ -1,4 +1,3 @@
-
 import type { UserCardData } from './user.types';
 
 // Admin Component Types
@@ -23,6 +22,7 @@ export interface AdminConfirmationModalProps {
   flagReason?: string;
   onFlagReasonChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onConfirm: () => void;
+  context?: 'user' | 'event';
 }
 
 export interface StatusOption {
