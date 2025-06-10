@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios, { AxiosResponse } from 'axios';
 import { format } from 'date-fns';
-import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import {
 	ArrowLeftIcon,
 	PencilIcon,
@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
 import { Modal, Tabs } from '../../components/common';
-import { ManageEventData, AttendeeData, EventManageApiResponse, AttendeesApiResponse, TabItem } from '@/types';
+import { ManageEventData, AttendeeData, EventManageApiResponse, AttendeesApiResponse } from '@/types';
 
 // Custom tab item interface to allow JSX labels
 interface EventTabItem {

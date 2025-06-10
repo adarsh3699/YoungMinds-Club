@@ -5,14 +5,7 @@ import { SearchAndFilter } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import {
-	EventDiscoverData,
-	EventsApiResponse,
-	DateRange,
-	DateChangeField,
-	SelectOption,
-	EventSaveResponse,
-} from '@/types';
+import { EventDiscoverData, EventsApiResponse, DateRange, SelectOption } from '@/types';
 
 // Categories
 const EVENT_CATEGORIES: SelectOption[] = [
@@ -53,7 +46,6 @@ const EventsPage: React.FC = () => {
 	const [filteredEvents, setFilteredEvents] = useState<EventDiscoverData[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-	const [savedEventIds, setSavedEventIds] = useState<string[]>([]);
 
 	// State for filters and search
 	const [searchQuery, setSearchQuery] = useState<string>('');
@@ -61,7 +53,6 @@ const EventsPage: React.FC = () => {
 	const [selectedLocation, setSelectedLocation] = useState<string>('');
 	const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
 	const [dateRange, setDateRange] = useState<DateRange>({ start: '', end: '' });
-	const [dateError, setDateError] = useState<string>('');
 	const [sortBy, setSortBy] = useState<string>('newest');
 
 	// Additional advanced filters
@@ -223,7 +214,6 @@ const EventsPage: React.FC = () => {
 		setSelectedLocation('');
 		setIsOnlineOnly(false);
 		setDateRange({ start: '', end: '' });
-		setDateError('');
 		setSortBy('newest');
 		setSelectedTags('');
 		setSelectedOrganizer('');
@@ -232,7 +222,7 @@ const EventsPage: React.FC = () => {
 	};
 
 	// Handle saving/unsaving event
-	const handleSaveToggle = async (eventId: string, isSaved: boolean): Promise<void> => {
+	const handleSaveToggle = async (eventId: string): Promise<void> => {
 		if (!isAuthenticated) {
 			// Redirect to login if not authenticated
 			navigate('/login');
@@ -241,17 +231,7 @@ const EventsPage: React.FC = () => {
 
 		try {
 			// Always use POST method, as the server endpoint handles both save and unsave
-			const response: AxiosResponse<EventSaveResponse> = await axios.post(`/events/${eventId}/save`);
-
-			// Get updated saved status from server response
-			const { isSaved: newSavedStatus } = response.data;
-
-			// Update saved events list
-			if (newSavedStatus) {
-				setSavedEventIds((prev) => [...prev, eventId]);
-			} else {
-				setSavedEventIds((prev) => prev.filter((id) => id !== eventId));
-			}
+			await axios.post(`/events/${eventId}/save`);
 		} catch (error) {
 			console.error('Error toggling saved event:', error);
 		}

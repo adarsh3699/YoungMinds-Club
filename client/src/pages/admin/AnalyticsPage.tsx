@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import {
-	AnalyticsData,
-	AnalyticsApiResponse,
-	AnalyticsBadgeInfo,
-	TopEventData,
-	TopOrganizerData,
-	TopUserData,
-} from '@/types';
+import { AnalyticsData, AnalyticsApiResponse, AnalyticsBadgeInfo } from '@/types';
 
 const AnalyticsPage: React.FC = () => {
 	const [analytics, setAnalytics] = useState<AnalyticsData>({
 		topEvents: [],
 		topOrganizers: [],
-		topUsers: []
+		topUsers: [],
 	});
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -154,11 +147,6 @@ const AnalyticsPage: React.FC = () => {
 							<div className="space-y-4">
 								{analytics.topUsers && analytics.topUsers.length > 0 ? (
 									analytics.topUsers.map((userData, index) => {
-										const badgeInfo =
-											userData.badges && userData.badges.length > 0
-												? getBadgeInfo(userData.badges[userData.badges.length - 1])
-												: getBadgeInfo('');
-
 										return (
 											<div key={userData._id} className="flex items-start">
 												<div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300 rounded-full font-bold">

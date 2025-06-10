@@ -3,19 +3,16 @@ import { format } from 'date-fns';
 import {
 	CalendarIcon,
 	MapPinIcon,
-	UserGroupIcon,
 	PencilIcon,
 	TrashIcon,
 	ArrowRightIcon,
-	VideoCameraIcon,
 	ClockIcon,
 	BookmarkIcon,
 	UserIcon,
 } from '@heroicons/react/24/outline';
 import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
-import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { EventCardProps, EventCardData, CountdownTime } from '@/types';
+import { EventCardProps, CountdownTime } from '@/types';
 
 // Vibrant colors for different event types
 const getCategoryColor = (type: string): string => {
@@ -79,8 +76,6 @@ const EventCard: React.FC<EventCardProps> = ({
 	onDelete,
 	onSaveToggle,
 }) => {
-	const navigate = useNavigate();
-	const [isHovered, setIsHovered] = useState<boolean>(false);
 	const [isSaved, setIsSaved] = useState<boolean>(event.isSaved || false);
 
 	// Get countdown
@@ -145,11 +140,7 @@ const EventCard: React.FC<EventCardProps> = ({
 	const capacity = event.capacity || event.maxAttendees || 100;
 
 	return (
-		<div
-			className="relative rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 group"
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
-		>
+		<div className="relative rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 group">
 			{/* Card Container */}
 			<div className="ym-bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border ym-border-card">
 				{/* Image Section with Overlay */}

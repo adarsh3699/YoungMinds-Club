@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Tab } from '@headlessui/react';
 import { TabsProps } from '@/types';
 
@@ -46,4 +46,4 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
 	);
 };
 
-export default Tabs; 
+export default Tabs;

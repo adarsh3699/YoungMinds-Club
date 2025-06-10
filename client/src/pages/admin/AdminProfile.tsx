@@ -3,7 +3,6 @@ import { useAuth } from '../../context/AuthContext';
 import axios, { AxiosResponse } from 'axios';
 import {
 	CameraIcon,
-	UserIcon,
 	EnvelopeIcon,
 	ShieldCheckIcon,
 	ClockIcon,
@@ -17,7 +16,7 @@ import {
 	AdminProfileApiResponse,
 	AdminLogsApiResponse,
 	AdminTeamApiResponse,
-	AdminProfilePictureResponse
+	AdminProfilePictureResponse,
 } from '@/types';
 
 const Profile: React.FC = () => {
@@ -76,11 +75,15 @@ const Profile: React.FC = () => {
 		formData.append('profilePicture', file);
 
 		try {
-			const response: AxiosResponse<AdminProfilePictureResponse> = await axios.post('/admin/profile/picture', formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
+			const response: AxiosResponse<AdminProfilePictureResponse> = await axios.post(
+				'/admin/profile/picture',
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
 
 			if (response.data.success) {
 				setAdminProfile({

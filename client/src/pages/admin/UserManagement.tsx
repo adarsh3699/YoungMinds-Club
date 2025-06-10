@@ -7,8 +7,6 @@ import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
 	ChevronDownIcon,
-	UserIcon,
-	ShieldCheckIcon,
 	TrashIcon,
 	EyeSlashIcon,
 	EyeIcon,
@@ -261,7 +259,7 @@ const UserManagement: React.FC = () => {
 
 	// Optimized render function
 	const renderUserRow = useCallback(
-		(userData: UserData, index: number) => {
+		(userData: UserData) => {
 			const statusStyle = getStatusBadgeStyle(userData.status);
 			const canModify = userData._id !== user?._id && userData.role !== 'admin';
 			const isProtected = userData._id === user?._id || userData.role === 'admin';

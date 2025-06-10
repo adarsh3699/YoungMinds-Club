@@ -92,7 +92,7 @@ exports.getEventById = async (req, res) => {
                 message: 'Event not found'
             });
         }
-
+        
         // Check if the event is published and not flagged (public access)
         if (event.isPublished && !event.isFlagged) {
             return res.status(200).json({
@@ -121,9 +121,9 @@ exports.getEventById = async (req, res) => {
         // Allow organizer to view their own events (even if draft or flagged)
         if (req.user.role === 'organizer' && event.organizer._id.toString() === req.user._id.toString()) {
             return res.status(200).json({
-                success: true,
-                event
-            });
+            success: true,
+            event
+        });
         }
 
         // For all other cases, deny access

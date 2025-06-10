@@ -47,14 +47,6 @@ interface AdvancedFiltersState {
 	isFeaturedOnly: boolean;
 }
 
-// Extended interface for editing with additional fields
-interface AdminEventEditData extends AdminEventData {
-	description?: string;
-	shortDescription?: string;
-	type?: string;
-	price?: number;
-}
-
 const EventsManagement: React.FC = () => {
 	// State
 	const [events, setEvents] = useState<AdminEventData[]>([]);
@@ -103,33 +95,6 @@ const EventsManagement: React.FC = () => {
 		{ value: 'Music', label: 'Music' },
 		{ value: 'Sports', label: 'Sports' },
 		{ value: 'Other', label: 'Other' },
-	];
-
-	// Location options (popular cities)
-	const locationOptions = [
-		'Mumbai',
-		'Delhi',
-		'Bangalore',
-		'Chennai',
-		'Kolkata',
-		'Hyderabad',
-		'Pune',
-		'Ahmedabad',
-		'Jaipur',
-		'Lucknow',
-		'Kanpur',
-		'Nagpur',
-		'Indore',
-		'Thane',
-		'Bhopal',
-		'Visakhapatnam',
-		'Pimpri-Chinchwad',
-		'Patna',
-		'Vadodara',
-		'Ghaziabad',
-		'Ludhiana',
-		'Agra',
-		'Nashik',
 	];
 
 	// Table columns
@@ -423,7 +388,7 @@ const EventsManagement: React.FC = () => {
 
 	// Optimized render function
 	const renderEventRow = useCallback(
-		(event: AdminEventData, index: number) => (
+		(event: AdminEventData) => (
 			<tr
 				key={event._id}
 				className={`group hover:bg-card-hover transition-colors ${

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import axios, { AxiosResponse } from 'axios';
 import {
 	PencilIcon,
@@ -16,7 +15,6 @@ import {
 	BriefcaseIcon,
 	ChatBubbleLeftRightIcon,
 	CameraIcon as InstagramIcon,
-	CalendarIcon
 } from '@heroicons/react/24/outline';
 import { FormInput, TextareaField } from '../../components/common';
 import {
@@ -25,11 +23,9 @@ import {
 	OrganizerFeedbackSummary,
 	OrganizerProfileApiResponse,
 	OrganizerProfilePictureResponse,
-	SocialLinks
 } from '@/types';
 
 const Profile: React.FC = () => {
-	const { user } = useAuth();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [saving, setSaving] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -55,7 +51,9 @@ const Profile: React.FC = () => {
 			setLoading(true);
 			try {
 				// Get organizer profile data
-				const profileResponse: AxiosResponse<OrganizerProfileApiResponse> = await axios.get('/organizer/profile');
+				const profileResponse: AxiosResponse<OrganizerProfileApiResponse> = await axios.get(
+					'/organizer/profile'
+				);
 				if (profileResponse.data.success) {
 					const profileData = profileResponse.data.profile;
 					setOrganizerProfile(profileData);
@@ -76,7 +74,9 @@ const Profile: React.FC = () => {
 				}
 
 				// Get feedback summary
-				const feedbackResponse: AxiosResponse<{ summary: OrganizerFeedbackSummary }> = await axios.get('/organizer/feedback/summary');
+				const feedbackResponse: AxiosResponse<{ summary: OrganizerFeedbackSummary }> = await axios.get(
+					'/organizer/feedback/summary'
+				);
 				setFeedbackSummary(feedbackResponse.data.summary);
 			} catch (error) {
 				console.error('Error fetching profile data:', error);
@@ -131,7 +131,10 @@ const Profile: React.FC = () => {
 		e.preventDefault();
 		setSaving(true);
 		try {
-			const response: AxiosResponse<OrganizerProfileApiResponse> = await axios.put('/organizer/profile', formValues);
+			const response: AxiosResponse<OrganizerProfileApiResponse> = await axios.put(
+				'/organizer/profile',
+				formValues
+			);
 
 			if (response.data.success) {
 				setOrganizerProfile({
@@ -164,11 +167,15 @@ const Profile: React.FC = () => {
 
 		setSaving(true);
 		try {
-			const response: AxiosResponse<OrganizerProfilePictureResponse> = await axios.post('/organizer/profile/picture', formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
+			const response: AxiosResponse<OrganizerProfilePictureResponse> = await axios.post(
+				'/organizer/profile/picture',
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
 
 			if (response.data.success) {
 				setOrganizerProfile({
@@ -675,7 +682,10 @@ const Profile: React.FC = () => {
 												</h3>
 												<div className="space-y-3">
 													{[5, 4, 3, 2, 1].map((rating) => {
-														const count = feedbackSummary.ratingDistribution[rating as keyof typeof feedbackSummary.ratingDistribution] || 0;
+														const count =
+															feedbackSummary.ratingDistribution[
+																rating as keyof typeof feedbackSummary.ratingDistribution
+															] || 0;
 														const percentage = feedbackSummary.totalFeedbacks
 															? Math.round((count / feedbackSummary.totalFeedbacks) * 100)
 															: 0;

@@ -4,13 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import axios, { AxiosResponse } from 'axios';
 import { formatDate } from '../utils/formatDate';
 import { Tabs, MsgAlert } from '../components/common';
-import {
-	EventDetailsData,
-	EventRegistrationResponse,
-	EventSaveResponse,
-	UserEventsResponse,
-	ApiResponse,
-} from '@/types';
+import { EventDetailsData, EventRegistrationResponse, EventSaveResponse, UserEventsResponse } from '@/types';
 
 const EventDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -23,8 +17,6 @@ const EventDetails: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [isSaved, setIsSaved] = useState<boolean>(false);
 	const [isRegistered, setIsRegistered] = useState<boolean>(false);
-	const [registrationSuccess, setRegistrationSuccess] = useState<boolean>(false);
-	const [xpEarned, setXpEarned] = useState<number | null>(null);
 	const [registrationError, setRegistrationError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState<string>('details');
@@ -33,7 +25,6 @@ const EventDetails: React.FC = () => {
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
 		if (queryParams.get('registered') === 'true') {
-			setRegistrationSuccess(true);
 			setSuccessMessage(
 				'You have successfully registered for this event. You earned 10 XP for registering. Keep it up!'
 			);
@@ -112,8 +103,6 @@ const EventDetails: React.FC = () => {
 		try {
 			const response: AxiosResponse<EventRegistrationResponse> = await axios.post(`/events/${id}/register`);
 			setIsRegistered(true);
-			setRegistrationSuccess(true);
-			setXpEarned(response.data.xp || null);
 			setSuccessMessage(
 				`Registration successful! You have successfully registered for this event.${
 					response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ''

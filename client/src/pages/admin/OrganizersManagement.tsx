@@ -265,7 +265,7 @@ const OrganizersManagement: React.FC = () => {
 
 	// Optimized render function
 	const renderOrganizerRow = useCallback(
-		(organizer: OrganizerData, index: number) => {
+		(organizer: OrganizerData) => {
 			const isActive = organizer.status === 'active' || !organizer.status;
 			const isSuspended = organizer.status === 'suspended';
 

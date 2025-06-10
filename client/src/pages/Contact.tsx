@@ -17,8 +17,6 @@ const Contact: React.FC = () => {
 	});
 
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
-	const [loading, setLoading] = useState<boolean>(false);
-	const [submitted, setSubmitted] = useState<boolean>(false);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
 		const { name, value } = e.target;
@@ -33,31 +31,6 @@ const Contact: React.FC = () => {
 				[name]: '',
 			});
 		}
-	};
-
-	const validateForm = (): boolean => {
-		const newErrors: { [key: string]: string } = {};
-
-		if (!formData.fullName.trim()) {
-			newErrors.fullName = 'Full name is required';
-		}
-
-		if (!formData.email.trim()) {
-			newErrors.email = 'Email is required';
-		} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-			newErrors.email = 'Please enter a valid email';
-		}
-
-		if (!formData.subject.trim()) {
-			newErrors.subject = 'Subject is required';
-		}
-
-		if (!formData.message.trim()) {
-			newErrors.message = 'Message is required';
-		}
-
-		setErrors(newErrors);
-		return Object.keys(newErrors).length === 0;
 	};
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

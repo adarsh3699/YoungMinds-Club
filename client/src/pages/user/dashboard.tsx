@@ -8,15 +8,10 @@ import {
 	UserDashboardProfile,
 	Announcement,
 	EventCardData,
-	DashboardEventFilters,
-	UserDashboardApiResponse,
 	AnnouncementsApiResponse,
 	RecommendedEventsApiResponse,
-	DashboardBadgeInfo,
-	BadgeType,
 	AnnouncementType,
 	SelectOption,
-	PaginationData
 } from '@/types';
 
 const UserDashboard: React.FC = () => {
@@ -93,7 +88,10 @@ const UserDashboard: React.FC = () => {
 		...indianStates.map((state) => ({ value: state, label: state })),
 	];
 
-	const tagOptions: SelectOption[] = [{ value: '', label: 'All Tags' }, ...popularTags.map((tag) => ({ value: tag, label: tag }))];
+	const tagOptions: SelectOption[] = [
+		{ value: '', label: 'All Tags' },
+		...popularTags.map((tag) => ({ value: tag, label: tag })),
+	];
 
 	// Load user profile and events
 	useEffect(() => {
@@ -101,18 +99,24 @@ const UserDashboard: React.FC = () => {
 			setLoading(true);
 			try {
 				// Get user profile with XP and badge
-				const profileResponse: AxiosResponse<{ profile: UserDashboardProfile }> = await axios.get('/user/dashboard');
+				const profileResponse: AxiosResponse<{ profile: UserDashboardProfile }> = await axios.get(
+					'/user/dashboard'
+				);
 				setUserProfile(profileResponse.data.profile);
 
 				// Get recommended events
-				const recommendedResponse: AxiosResponse<RecommendedEventsApiResponse> = await axios.get('/events/recommended');
+				const recommendedResponse: AxiosResponse<RecommendedEventsApiResponse> = await axios.get(
+					'/events/recommended'
+				);
 				setRecommendedEvents(recommendedResponse.data.events);
 
 				// Get all events with default filters
 				await fetchEvents();
 
 				// Fetch active announcements
-				const announcementsResponse: AxiosResponse<AnnouncementsApiResponse> = await axios.get('/user/announcements');
+				const announcementsResponse: AxiosResponse<AnnouncementsApiResponse> = await axios.get(
+					'/user/announcements'
+				);
 				if (announcementsResponse.data.success) {
 					setAnnouncements(announcementsResponse.data.announcements);
 				}
@@ -197,24 +201,6 @@ const UserDashboard: React.FC = () => {
 	const handleManage = () => {};
 	const handleEdit = () => {};
 	const handleDelete = () => {};
-
-	// Badge mapping for badge icons and colors
-	const getBadgeInfo = (badgeName: string): DashboardBadgeInfo => {
-		switch (badgeName as BadgeType) {
-			case 'Newbie':
-				return { color: 'ym-bg-amber-100 ym-text-yellow-700', icon: '🌱' };
-			case 'Regular':
-				return { color: 'ym-bg-success bg-opacity-10 ym-text-success', icon: '🌟' };
-			case 'Champ':
-				return { color: 'ym-bg-orange-400 text-white', icon: '🏆' };
-			case 'Veteran':
-				return { color: 'ym-bg-amber-400 text-white', icon: '🔥' };
-			case 'Master':
-				return { color: 'gradient-bg text-white', icon: '👑' };
-			default:
-				return { color: 'ym-bg-card ym-text-card border ym-border-card', icon: '❓' };
-		}
-	};
 
 	// Announcement type styling
 	const getAnnouncementStyle = (type: AnnouncementType): string => {

@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import axios, { AxiosResponse } from 'axios';
 import { ShieldCheckIcon, CogIcon, KeyIcon } from '@heroicons/react/24/outline';
 import Switch from '../../components/common/Switch';
-import {
-	OrganizerSettings,
-	MessageState,
-	OrganizerSettingsApiResponse
-} from '@/types';
+import { OrganizerSettings, MessageState } from '@/types';
 
 const Settings: React.FC = () => {
-	const { user } = useAuth();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [saving, setSaving] = useState<boolean>(false);
 	const [message, setMessage] = useState<MessageState>({ type: '', text: '' });
@@ -98,7 +91,7 @@ const Settings: React.FC = () => {
 			...prev,
 			[category]: {
 				...prev[category],
-				[setting]: !prev[category][setting as keyof typeof prev[typeof category]],
+				[setting]: !prev[category][setting as keyof (typeof prev)[typeof category]],
 			},
 		}));
 	};

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { CalendarIcon, UsersIcon, StarIcon } from '@heroicons/react/24/outline';
 import { StatItem } from '@/types';
 
 const HeroSection: React.FC = () => {
-	const { isAuthenticated } = useAuth();
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -136,4 +134,4 @@ const HeroSection: React.FC = () => {
 	);
 };
 
-export default HeroSection; 
+export default HeroSection;
