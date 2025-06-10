@@ -1,0 +1,29 @@
+/* ==============================================
+   PAGE-SPECIFIC STYLES
+   ============================================== */
+/* Auth Page Styles */
+.auth-page {
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.auth-pattern-bg {
+  background-image: radial-gradient(circle at 1px 1px, rgba(251, 191, 36, 0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.auth-hero-shadow { text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+.auth-card-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+.enhanced-hero-bg {
+  background: var(--gradient-auth);
+  position: relative;
+}
+
+.enhanced-hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+} 

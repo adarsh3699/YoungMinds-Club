@@ -1,0 +1,166 @@
+/* ==============================================
+   GRADIENT BACKGROUNDS
+   ============================================== */
+/* Admin Dashboard Gradients */
+.bg-gradient-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
+.bg-gradient-success-light { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
+.bg-gradient-brand-tertiary-light { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); }
+.bg-gradient-brand-primary-light { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); }
+.bg-gradient-indigo-light { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05)); }
+
+/* General Gradients */
+.gradient-bg { background: var(--gradient-primary); }
+.gradient-text,
+.yellow-gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-bg { background: var(--gradient-hero); }
+.auth-bg { background: var(--gradient-auth); }
+.hero-image-bg { background: var(--gradient-hero-image); }
+.hero-image-overlay { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2)); }
+
+/* ==============================================
+   OPACITY BACKGROUND COLORS
+   ============================================== */
+/* Admin Section Opacity Backgrounds */
+.bg-primary-5 { background-color: rgba(245, 158, 11, 0.05); }
+.bg-primary-10 { background-color: rgba(245, 158, 11, 0.1); }
+.bg-primary-20 { background-color: rgba(245, 158, 11, 0.2); }
+.bg-success-5 { background-color: rgba(16, 185, 129, 0.05); }
+.bg-success-10 { background-color: rgba(16, 185, 129, 0.1); }
+.bg-warning-5 { background-color: rgba(245, 158, 11, 0.05); }
+.bg-warning-10 { background-color: rgba(245, 158, 11, 0.1); }
+.bg-warning-80 { background-color: rgba(245, 158, 11, 0.8); }
+.bg-destructive-5 { background-color: rgba(239, 68, 68, 0.05); }
+.bg-destructive-10 { background-color: rgba(239, 68, 68, 0.1); }
+.bg-destructive-80 { background-color: rgba(239, 68, 68, 0.8); }
+.bg-accent-50 { background-color: rgba(254, 243, 199, 0.5); }
+.bg-info-80 { background-color: rgba(59, 130, 246, 0.8); }
+.bg-black-40 { background-color: rgba(0, 0, 0, 0.4); }
+.bg-indigo-10 { background-color: rgba(99, 102, 241, 0.1); }
+.bg-purple-10 { background-color: rgba(147, 51, 234, 0.1); }
+.bg-purple-30 { background-color: rgba(147, 51, 234, 0.3); }
+.bg-cyan-10 { background-color: rgba(6, 182, 212, 0.1); }
+.bg-teal-10 { background-color: rgba(20, 184, 166, 0.1); }
+.bg-pink-10 { background-color: rgba(236, 72, 153, 0.1); }
+.bg-gray-100 { background-color: #f3f4f6; }
+
+/* White Opacity Backgrounds */
+.bg-white-20 {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+.bg-white-90 { background-color: rgba(255, 255, 255, 0.9); }
+
+/* ==============================================
+   COLOR UTILITY CLASSES
+   ============================================== */
+/* Text Colors */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-brand { color: var(--brand-dark); }
+.text-brand-primary { color: var(--brand-primary); }
+.text-brand-secondary { color: var(--brand-secondary); }
+.text-brand-tertiary { color: var(--brand-tertiary); }
+.text-brand-dark { color: var(--brand-darker); }
+.text-brand-dark:hover { color: #92400e !important; }
+.text-gray-400 { color: #9ca3af; }
+
+/* Admin Section Text Colors */
+.text-indigo { color: rgb(99, 102, 241); }
+.text-cyan { color: rgb(6, 182, 212); }
+.text-teal { color: rgb(20, 184, 166); }
+.text-pink { color: rgb(236, 72, 153); }
+
+/* White Text Variants */
+.text-white,
+.contrast-text-white {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+}
+
+.text-white-bold,
+.contrast-text-white-bold {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-white-80 {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-white-90 {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Background Colors */
+.bg-brand-light { background-color: var(--brand-light); }
+.bg-brand { background-color: var(--brand-secondary); }
+.bg-brand:hover { background-color: var(--brand-dark); }
+.bg-brand-tertiary { background-color: var(--brand-tertiary); }
+
+/* Surface & Page Backgrounds */
+.features-bg { background-color: var(--surface-primary); }
+.events-bg { background-color: var(--surface-secondary); }
+.faq-bg { background-color: var(--surface-primary); }
+
+/* Card & Surface Colors */
+.bg-card { background-color: var(--card); }
+.bg-card-hover { background-color: var(--muted); }
+.border-card { border-color: var(--border); }
+.text-card { color: var(--card-foreground); }
+
+/* Core Theme Utility Classes */
+.bg-primary { background-color: var(--primary); }
+.text-primary-foreground { color: var(--primary-foreground); }
+.bg-secondary { background-color: var(--secondary); }
+.text-secondary-foreground { color: var(--secondary-foreground); }
+.bg-accent { background-color: var(--accent); }
+.text-accent-foreground { color: var(--accent-foreground); }
+.bg-destructive { background-color: var(--destructive); }
+.text-destructive-foreground { color: var(--destructive-foreground); }
+
+/* Status Colors */
+.bg-success { background-color: var(--success); }
+.text-success { color: var(--success); }
+.border-success { border-color: var(--success); }
+.bg-error { background-color: var(--error); }
+.text-error { color: var(--error); }
+.border-error { border-color: var(--error); }
+.bg-warning { background-color: var(--warning); }
+.text-warning { color: var(--warning); }
+.border-warning { border-color: var(--warning); }
+.bg-info { background-color: var(--info); }
+.text-info { color: var(--info); }
+.border-info { border-color: var(--info); }
+.bg-purple { background-color: var(--purple); }
+.text-purple { color: var(--purple); }
+.border-purple { border-color: var(--purple); }
+
+/* Border Colors */
+.border-primary { border-color: var(--primary); }
+.border-primary-20 { border-color: rgba(245, 158, 11, 0.2); }
+.border-destructive { border-color: var(--destructive); }
+.border-destructive-20 { border-color: rgba(239, 68, 68, 0.2); }
+.border-success-20 { border-color: rgba(16, 185, 129, 0.2); }
+.border-warning-20 { border-color: rgba(245, 158, 11, 0.2); }
+.border-purple-20 { border-color: rgba(147, 51, 234, 0.2); }
+.border-accent-30 { border-color: rgba(254, 243, 199, 0.3); }
+.border-brand-primary { border-color: var(--brand-primary); }
+.border-brand-tertiary { border-color: var(--brand-tertiary); }
+
+/* Footer Colors */
+.footer-bg { background-color: var(--footer-bg); }
+.footer-text { color: var(--footer-text); }
+.footer-text-muted { color: var(--footer-text-muted); }
+.footer-text-muted:hover { color: var(--footer-text); }
+.footer-border { border-color: var(--footer-border); } 

@@ -1,0 +1,202 @@
+/* ==============================================
+   LEGACY COMPATIBILITY CLASSES
+   ============================================== */
+.ym-hero-bg { background: var(--gradient-hero); }
+.ym-auth-bg { background: var(--gradient-auth); }
+.ym-hero-image-bg { background: var(--gradient-hero-image); }
+.ym-hero-image-overlay {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2));
+}
+.ym-features-bg { background-color: var(--surface-primary); }
+.ym-events-bg { background-color: var(--surface-secondary); }
+.ym-faq-bg { background-color: var(--surface-primary); }
+.ym-text-primary { color: var(--text-primary); }
+.ym-text-secondary { color: var(--text-secondary); }
+.ym-text-muted { color: var(--text-muted); }
+.ym-text-yellow-600 { color: var(--brand-dark); }
+.ym-text-yellow-700 { color: var(--brand-darker); }
+.ym-text-yellow-700:hover { color: #92400e !important; }
+.ym-bg-yellow-100 { background-color: var(--brand-light); }
+.ym-bg-amber-100 { background-color: var(--brand-light); }
+.ym-bg-amber-400 { background-color: var(--brand-secondary); }
+.ym-bg-amber-400:hover { background-color: var(--brand-dark); }
+.ym-bg-orange-400 { background-color: var(--brand-tertiary); }
+.ym-bg-card { background-color: var(--card); }
+.ym-bg-card-hover { background-color: var(--muted); }
+.ym-border-card { border-color: var(--border); }
+.ym-text-card { color: var(--card-foreground); }
+.ym-text-white { color: #ffffff !important; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); font-weight: 500; }
+.ym-text-white-bold { color: #ffffff !important; font-weight: 700 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
+.ym-text-white-80 { color: rgba(255, 255, 255, 0.9) !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.ym-text-white-90 { color: rgba(255, 255, 255, 0.95) !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.ym-bg-white-20 { background-color: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); }
+.ym-bg-white-90 { background-color: rgba(255, 255, 255, 0.9); }
+.ym-btn-secondary { background-color: var(--secondary); color: var(--secondary-foreground); border: 1px solid var(--border); }
+.ym-btn-secondary:hover { background-color: var(--muted); }
+.ym-bg-success { background-color: var(--success); }
+.ym-text-success { color: var(--success); }
+.ym-footer-bg { background-color: var(--footer-bg); }
+.ym-footer-text { color: var(--footer-text); }
+.ym-footer-text-muted { color: var(--footer-text-muted); }
+.ym-footer-text-muted:hover { color: var(--footer-text); }
+.ym-footer-border { border-color: var(--footer-border); }
+
+/* ==============================================
+   DARK MODE ENHANCEMENTS
+   ============================================== */
+/* Enhanced background gradients for dark mode */
+.dark .bg-gradient-primary-light { 
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 
+}
+.dark .bg-gradient-success-light { 
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.1)); 
+}
+.dark .bg-gradient-brand-tertiary-light { 
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.1)); 
+}
+.dark .bg-gradient-brand-primary-light { 
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); 
+}
+.dark .bg-gradient-indigo-light { 
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.1)); 
+}
+
+/* Enhanced opacity backgrounds for dark mode */
+.dark .bg-primary-5 { background-color: rgba(251, 191, 36, 0.08); }
+.dark .bg-success-5 { background-color: rgba(16, 185, 129, 0.08); }
+.dark .bg-success-10 { background-color: rgba(16, 185, 129, 0.15); }
+.dark .bg-warning-5 { background-color: rgba(245, 158, 11, 0.08); }
+.dark .bg-warning-10 { background-color: rgba(245, 158, 11, 0.15); }
+.dark .bg-destructive-10 { background-color: rgba(220, 38, 38, 0.15); }
+.dark .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.15); }
+.dark .bg-purple-10 { background-color: rgba(147, 51, 234, 0.15); }
+.dark .bg-purple-30 { background-color: rgba(147, 51, 234, 0.3); }
+.dark .bg-cyan-10 { background-color: rgba(6, 182, 212, 0.15); }
+.dark .bg-teal-10 { background-color: rgba(20, 184, 166, 0.15); }
+.dark .bg-pink-10 { background-color: rgba(236, 72, 153, 0.15); }
+.dark .bg-gray-100 { background-color: rgba(55, 65, 81, 0.3); }
+.dark .text-gray-400 { color: rgba(156, 163, 175, 0.8); }
+
+/* Enhanced admin dashboard specific styling */
+.dark .bg-card { 
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+.dark .bg-card-hover:hover { 
+  background-color: var(--muted);
+  transition: background-color 0.2s ease;
+}
+
+/* Enhanced gradient backgrounds for main page areas */
+.dark .min-h-screen.bg-gradient-to-br {
+  background: linear-gradient(135deg, var(--background) 0%, var(--surface-secondary) 25%, var(--surface-primary) 75%, var(--background) 100%);
+}
+
+/* Better contrast for admin section cards */
+.dark .backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Enhanced border styling for dark mode */
+.dark .border-border\/50 {
+  border-color: rgba(55, 65, 81, 0.5);
+}
+
+.dark .border-border\/30 {
+  border-color: rgba(55, 65, 81, 0.3);
+}
+
+.dark .border-border\/20 {
+  border-color: rgba(55, 65, 81, 0.2);
+}
+
+/* Enhanced admin dashboard header styling */
+.dark .bg-gradient-to-r.from-primary\/10.via-brand-light.to-accent\/20 {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.12) 0%, var(--brand-light) 50%, rgba(124, 45, 18, 0.25) 100%);
+}
+
+/* Better shadow and glow effects for dark mode */
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced button styling for dark mode */
+.dark .btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--brand-secondary) 100%);
+  box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.2);
+}
+
+.dark .btn-primary:hover {
+  background: linear-gradient(135deg, var(--brand-dark) 0%, var(--primary) 100%);
+  box-shadow: 0 6px 20px 0 rgba(251, 191, 36, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Enhanced error alert styling for dark mode */
+.dark .bg-destructive\/10 {
+  background-color: rgba(220, 38, 38, 0.12);
+}
+
+.dark .text-destructive {
+  color: #fca5a5;
+}
+
+.dark .border-destructive\/30 {
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Enhanced transitions for dark mode */
+.dark * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Better loading spinner contrast in dark mode */
+.dark .border-primary\/30 {
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.dark .border-t-primary {
+  border-top-color: var(--primary);
+}
+
+.dark .border-t-brand-secondary {
+  border-top-color: var(--brand-secondary);
+}
+
+/* Enhanced admin stats card styling */
+.dark .group:hover {
+  background-color: rgba(55, 65, 81, 0.1);
+}
+
+/* Better text contrast for card elements */
+.dark .text-card-foreground {
+  color: var(--card-foreground);
+}
+
+.dark .text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+/* Enhanced focus states for dark mode */
+.dark .focus-ring:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Better input styling for dark mode */
+.dark .input-base {
+  background-color: var(--input);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.dark .input-base:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.1);
+} 

@@ -1,0 +1,86 @@
+/* ==============================================
+   LAYOUT COMPONENTS
+   ============================================== */
+.container {
+  max-width: 1200px;
+  margin: initial auto;
+  padding: 0 1rem;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+main {
+  min-height: calc(100vh - 144px);
+  display: flex;
+  flex-direction: column;
+}
+
+main > div {
+  min-height: calc(100vh - 144px);
+}
+
+/* ==============================================
+   UTILITY CLASSES
+   ============================================== */
+/* Overflow Classes */
+.overflow-x-auto { overflow-x: auto; }
+.overflow-x-scroll { overflow-x: scroll; }
+
+.table-container { width: 100%; overflow-x: auto; }
+.table-scroll {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Line Clamping */
+.line-clamp-1,
+.line-clamp-2,
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-1 { -webkit-line-clamp: 1; }
+.line-clamp-2 { -webkit-line-clamp: 2; }
+.line-clamp-3 { -webkit-line-clamp: 3; }
+
+/* ==============================================
+   SCROLLBAR STYLING
+   ============================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 10px;
+  border: 2px solid var(--muted);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+::-webkit-scrollbar-corner { background: transparent; }
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-secondary) var(--muted);
+}
+
+@supports (scrollbar-gutter: stable) {
+  body { scrollbar-gutter: stable; }
+} 

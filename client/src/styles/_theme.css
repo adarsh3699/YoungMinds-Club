@@ -1,0 +1,208 @@
+/* Theme Configuration - Tailwind CSS v4 compatible */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ==============================================
+   TAILWIND V4 THEME CONFIGURATION
+   ============================================== */
+@theme {
+  --font-inter: 'Inter', sans-serif;
+  
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #fbbf24;
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  
+  --color-primary: #f59e0b;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #1e293b;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-accent: #fef3c7;
+  --color-accent-foreground: #b45309;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/* ==============================================
+   CSS CUSTOM PROPERTIES - THEME SYSTEM
+   ============================================== */
+:root {
+  /* Core Theme Colors */
+  --background: #f1f1f1;
+  --foreground: #0f172a;
+  --background-secondary: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #f59e0b;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #fef3c7;
+  --accent-foreground: #b45309;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #fbbf24;
+  --radius: 0.5rem;
+  
+  /* Sidebar Colors */
+  --sidebar-background: #fafafa;
+  --sidebar-foreground: #525252;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #d4d4d8;
+  --sidebar-ring: #3b82f6;
+
+  /* Brand Colors - Generic Names */
+  --brand-primary: #f59e0b;
+  --brand-secondary: #fbbf24;
+  --brand-tertiary: #f97316;
+  --brand-light: #fef3c7;
+  --brand-lighter: #fefce8;
+  --brand-lightest: #fff7ed;
+  --brand-dark: #d97706;
+  --brand-darker: #b45309;
+  
+  /* Surface Colors */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f9fafb;
+  --surface-accent: #fde68a;
+  
+  /* Text Colors */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  
+  /* Footer Colors */
+  --footer-bg: #111827;
+  --footer-text: #ffffff;
+  --footer-text-muted: #9ca3af;
+  --footer-border: #1f2937;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --indigo: #6366f1;
+  --purple: #9333ea;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --gradient-hero: linear-gradient(135deg, #fef3c7 0%, #fefce8 50%, #fff7ed 100%);
+  --gradient-auth: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f97316 100%);
+  --gradient-hero-image: linear-gradient(135deg, #fde047 0%, #fde68a 100%);
+}
+
+/* Dark Mode Theme */
+.dark {
+  --background: #0a0f1c;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --primary: #fbbf24;
+  --primary-foreground: #1e293b;
+  --secondary: #374151;
+  --secondary-foreground: #f1f5f9;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #7c2d12;
+  --accent-foreground: #fde047;
+  --destructive: #dc2626;
+  --destructive-foreground: #f1f5f9;
+  --border: #374151;
+  --input: #374151;
+  --ring: #fde047;
+  
+  /* Sidebar - Dark Mode */
+  --sidebar-background: #111827;
+  --sidebar-foreground: #f3f4f6;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1f2937;
+  --sidebar-accent-foreground: #f3f4f6;
+  --sidebar-border: #374151;
+  --sidebar-ring: #3b82f6;
+
+  /* Brand Colors - Dark Mode */
+  --brand-light: #7c2d12;
+  --brand-lighter: #451a03;
+  --brand-lightest: #292524;
+  --brand-primary: #fbbf24;
+  --brand-secondary: #f59e0b;
+  --brand-tertiary: #f97316;
+  --brand-dark: #fde047;
+  --brand-darker: #facc15;
+  
+  /* Surface Colors - Dark Mode */
+  --surface-primary: #111827;
+  --surface-secondary: #1f2937;
+  --surface-accent: #7c2d12;
+  
+  /* Text Colors - Dark Mode */
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  
+  /* Footer Colors - Dark Mode */
+  --footer-bg: #0f172a;
+  --footer-text: #f9fafb;
+  --footer-text-muted: #9ca3af;
+  --footer-border: #374151;
+  
+  /* Status Colors - Dark Mode */
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --indigo: #6366f1;
+  --purple: #9333ea;
+  
+  /* Enhanced Gradients for Dark Mode */
+  --gradient-primary: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --gradient-text: linear-gradient(135deg, #fde047 0%, #fbbf24 100%);
+  --gradient-hero: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0a0f1c 100%);
+  --gradient-auth: linear-gradient(135deg, #1e293b 0%, #374151 50%, #1f2937 100%);
+  --gradient-hero-image: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+}
+
+/* ==============================================
+   BASE STYLES
+   ============================================== */
+* {
+  border-color: var(--border);
+}
+
+html, body {
+  margin: 0;
+  padding: 0 !important;
+  height: 100%;
+  overflow: auto !important;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+} 
