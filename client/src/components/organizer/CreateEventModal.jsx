@@ -51,16 +51,47 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 	useEffect(() => {
 		if (!isEditing || !eventToEdit) return;
 
-		// Format date fields correctly for the datetime-local input
-		const formatDatesForForm = (event) => ({
-			...event,
-			date: formatDateForInput(event.date),
-			endDate: event.endDate ? formatDateForInput(event.endDate) : '',
-			registrationDeadline: event.registrationDeadline ? formatDateForInput(event.registrationDeadline) : '',
-			isPublished: event.isPublished || false,
-		});
+		// Extract only the fields that should be in the form
+		const {
+			title,
+			shortDescription,
+			description,
+			type,
+			category,
+			date,
+			endDate,
+			location,
+			capacity,
+			tags,
+			price,
+			registrationDeadline,
+			isPublished,
+			poster,
+		} = eventToEdit;
 
-		const formattedEvent = formatDatesForForm(eventToEdit);
+		// Format date fields correctly for the datetime-local input
+		const formattedEvent = {
+			title: title || '',
+			shortDescription: shortDescription || '',
+			description: description || '',
+			type: type || 'Workshop',
+			category: category || 'Technology',
+			date: formatDateForInput(date),
+			endDate: endDate ? formatDateForInput(endDate) : '',
+			location: location || {
+				type: 'offline',
+				city: '',
+				venue: '',
+				address: '',
+				onlineUrl: '',
+			},
+			capacity: capacity || 50,
+			tags: tags || [],
+			price: price || 0,
+			registrationDeadline: registrationDeadline ? formatDateForInput(registrationDeadline) : '',
+			isPublished: isPublished || false,
+		};
+
 		setFormData(formattedEvent);
 
 		// Set poster preview if one exists
@@ -146,6 +177,26 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			if (deadlineDate <= startDate && (isEditing || deadlineDate > now)) {
 				const newErrors = { ...errors };
 				delete newErrors.registrationDeadline;
+				setErrors(newErrors);
+			}
+		}
+
+		// Clear price error when price is changed and valid
+		if (name === 'price' && value !== '') {
+			const numericPrice = Number(value);
+			if (!isNaN(numericPrice) && numericPrice >= 0) {
+				const newErrors = { ...errors };
+				delete newErrors.price;
+				setErrors(newErrors);
+			}
+		}
+
+		// Clear capacity error when capacity is changed and valid
+		if (name === 'capacity' && value !== '') {
+			const numericCapacity = Number(value);
+			if (!isNaN(numericCapacity) && numericCapacity > 0 && Number.isInteger(numericCapacity)) {
+				const newErrors = { ...errors };
+				delete newErrors.capacity;
 				setErrors(newErrors);
 			}
 		}
@@ -238,8 +289,33 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 		});
 
 		// Special validation for price (0 is allowed for free events)
-		if (formData.price === null || formData.price === undefined || formData.price === '') {
+		const priceValue = formData.price;
+
+		if (priceValue === null || priceValue === undefined || priceValue === '') {
 			newErrors.price = 'Ticket price is required';
+		} else {
+			const numericPrice = Number(priceValue);
+			if (isNaN(numericPrice)) {
+				newErrors.price = 'Ticket price must be a valid number';
+			} else if (numericPrice < 0) {
+				newErrors.price = 'Ticket price cannot be negative';
+			}
+		}
+
+		// Special validation for capacity (must be positive integer > 0)
+		const capacityValue = formData.capacity;
+
+		if (capacityValue === null || capacityValue === undefined || capacityValue === '') {
+			newErrors.capacity = 'Event capacity is required';
+		} else {
+			const numericCapacity = Number(capacityValue);
+			if (isNaN(numericCapacity)) {
+				newErrors.capacity = 'Event capacity must be a valid number';
+			} else if (numericCapacity <= 0) {
+				newErrors.capacity = 'Event capacity must be greater than 0';
+			} else if (!Number.isInteger(numericCapacity)) {
+				newErrors.capacity = 'Event capacity must be a whole number';
+			}
 		}
 
 		// Enhanced Date validation checks
@@ -301,6 +377,16 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 
 	const handleSubmit = async (publishStatus = false) => {
 		if (!validateForm()) {
+			// Count the number of validation errors
+			const errorCount = Object.keys(errors).length;
+			const errorMessage =
+				errorCount === 1
+					? 'Please fix the highlighted field to continue.'
+					: `Please fix the ${errorCount} highlighted fields to continue.`;
+
+			// Show alert message when validation fails
+			setAlertMessage(errorMessage);
+			setAlertType('error');
 			return;
 		}
 
@@ -321,7 +407,9 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 				if (key === 'location' && value && typeof value === 'object') {
 					// Handle location object specially
 					Object.entries(value).forEach(([locKey, locValue]) => {
-						eventFormData.append(`location.${locKey}`, locValue || '');
+						if (locValue !== null && locValue !== undefined && locValue !== '') {
+							eventFormData.append(`location.${locKey}`, locValue);
+						}
 					});
 				} else if (Array.isArray(value)) {
 					// Handle arrays
@@ -329,8 +417,14 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 						eventFormData.append(`${key}[]`, item);
 					});
 				} else {
-					// Handle primitive values
-					eventFormData.append(key, value || '');
+					// Handle primitive values - only append if value is not null/undefined/empty string
+					// But allow 0 and false as valid values
+					if (value !== null && value !== undefined && value !== '') {
+						eventFormData.append(key, value);
+					} else if (value === 0 || value === false) {
+						// Explicitly allow 0 and false as valid values
+						eventFormData.append(key, value);
+					}
 				}
 			});
 
@@ -849,11 +943,12 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 											value={formData.capacity}
 											onChange={handleChange}
 											min="1"
+											step="1"
 											placeholder="Maximum attendees"
 											error={errors.capacity}
 											required
 											icon={<UsersIcon className="h-5 w-5" />}
-											tooltip="Set the maximum number of people who can attend"
+											tooltip="Must be at least 1 person"
 										/>
 									</div>
 
@@ -869,7 +964,6 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 											step="1"
 											placeholder="0"
 											error={errors.price}
-											required
 											icon={
 												<span className="text-lg" style={{ color: '#f59e0b' }}>
 													₹
