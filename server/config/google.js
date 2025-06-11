@@ -107,6 +107,13 @@ const setupGoogleAuth = async (code) => {
         // Find or create user in database
         const user = await findOrCreateGoogleUser(googleUser);
 
+        // Check if user account is suspended
+        if (user.status === 'suspended') {
+            const error = new Error('Your account has been suspended. Please contact support for assistance.');
+            error.isSuspended = true;
+            throw error;
+        }
+
         // Generate JWT token
         const token = generateToken(user._id, user.role);
 
@@ -116,7 +123,8 @@ const setupGoogleAuth = async (code) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                status: user.status
             },
             token
         };

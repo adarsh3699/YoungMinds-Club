@@ -38,6 +38,15 @@ const isAuthenticated = async (req, res, next) => {
             });
         }
 
+        // Check if user account is suspended
+        if (user.status === 'suspended') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account has been suspended. Please contact support for assistance.',
+                isSuspended: true
+            });
+        }
+
         // Attach user to request object
         req.user = user;
         next();

@@ -55,6 +55,7 @@ exports.signup = async (req, res) => {
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
+				status: user.status,
 			},
 		});
 	} catch (error) {
@@ -87,6 +88,15 @@ exports.login = async (req, res) => {
 			return res.status(401).json({
 				success: false,
 				message: 'Invalid email or password',
+			});
+		}
+
+		// Check if user account is suspended
+		if (user.status === 'suspended') {
+			return res.status(403).json({
+				success: false,
+				message: 'Your account has been suspended. Please contact support for assistance.',
+				isSuspended: true
 			});
 		}
 
@@ -127,6 +137,7 @@ exports.login = async (req, res) => {
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
+				status: user.status,
 			},
 		});
 	} catch (error) {
@@ -170,7 +181,17 @@ exports.googleCallback = async (req, res) => {
 		res.redirect(`${clientURL}/auth/success?token=${token}`);
 	} catch (error) {
 		console.error('Google OAuth error:', error);
-		res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/error`);
+		
+		// Get the client URL properly - handle comma-separated URLs
+		const clientURLs = (process.env.CLIENT_URL || 'http://localhost:5173').split(',');
+		const clientURL = clientURLs[0].trim();
+		
+		// For suspended users, redirect to auth success with suspended parameter
+		if (error.isSuspended) {
+			res.redirect(`${clientURL}/auth/success?suspended=true`);
+		} else {
+			res.redirect(`${clientURL}/auth/error`);
+		}
 	}
 };
 
@@ -178,6 +199,15 @@ exports.googleCallback = async (req, res) => {
 exports.getCurrentUser = async (req, res) => {
 	try {
 		const user = await User.findById(req.user._id).select('-password');
+
+		// Check if user account is suspended (double-check)
+		if (user.status === 'suspended') {
+			return res.status(403).json({
+				success: false,
+				message: 'Your account has been suspended. Please contact support for assistance.',
+				isSuspended: true
+			});
+		}
 
 		res.status(200).json({
 			success: true,
@@ -187,6 +217,7 @@ exports.getCurrentUser = async (req, res) => {
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
+				status: user.status,
 			},
 		});
 	} catch (error) {

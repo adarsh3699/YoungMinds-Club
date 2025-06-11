@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const adminController = require('../controllers/adminController');
 const { isAuthenticated, authorizeRoles } = require('../middlewares/auth');
 const { upload } = require('../config/cloudinary');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -77,5 +78,36 @@ router.put('/announcements/:id',
     adminController.updateAnnouncementStatus
 );
 router.delete('/announcements/:id', adminController.deleteAnnouncement);
+
+// Test endpoint to suspend a user (for demonstration)
+router.post('/test-suspend/:id', isAuthenticated, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { status: 'suspended' },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'User suspended for demonstration',
+            user
+        });
+    } catch (error) {
+        console.error('Test suspend error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to suspend user',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+});
 
 module.exports = router; 

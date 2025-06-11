@@ -419,7 +419,9 @@ exports.getRecommendedEvents = async (req, res) => {
         // If user has activity, we can do slightly better recommendations
         if (userActivity && userActivity.registeredEvents.length > 0) {
             // Extract categories and tags from user's registered events
-            const userEvents = userActivity.registeredEvents.map(reg => reg.event).filter(Boolean);
+            const userEvents = userActivity.registeredEvents
+                .map(reg => reg.event)
+                .filter(Boolean); // Filter out null/undefined events
             const userCategories = [...new Set(userEvents.map(event => event.category).filter(Boolean))];
             const userTags = [...new Set(userEvents.flatMap(event => event.tags || []))];
             
@@ -437,10 +439,10 @@ exports.getRecommendedEvents = async (req, res) => {
                     filter.tags = { $in: userTags };
                 }
                 
-                // Exclude events user is already registered for
-                const registeredEventIds = userActivity.registeredEvents.map(
-                    reg => reg.event._id.toString()
-                );
+                // Exclude events user is already registered for (only include valid events)
+                const registeredEventIds = userActivity.registeredEvents
+                    .filter(reg => reg.event && reg.event._id) // Filter out null events
+                    .map(reg => reg.event._id.toString());
                 
                 if (registeredEventIds.length > 0) {
                     filter._id = { $nin: registeredEventIds };

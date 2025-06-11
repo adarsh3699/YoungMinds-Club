@@ -4,6 +4,7 @@ export interface User {
   email: string;
   name: string;
   role: 'user' | 'organizer' | 'admin';
+  status?: 'active' | 'suspended';
   profileImage?: string;
   phoneNumber?: string;
   dateOfBirth?: string;

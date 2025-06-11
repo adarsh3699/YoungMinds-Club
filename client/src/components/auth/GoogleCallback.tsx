@@ -3,18 +3,27 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { AuthMeResponse } from '@/types';
+import SuspendedAccountModal from '../common/SuspendedAccountModal';
 
 const GoogleCallback: React.FC = () => {
 	const [searchParams] = useSearchParams();
 	const [error, setError] = useState<string | null>(null);
+	const [showSuspendedModal, setShowSuspendedModal] = useState<boolean>(false);
 	const { setToken, setUser } = useAuth();
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const token = searchParams.get('token');
+		const suspended = searchParams.get('suspended');
 
 		const processGoogleAuth = async (): Promise<void> => {
 			try {
+				// Check if user was suspended during OAuth
+				if (suspended === 'true') {
+					setShowSuspendedModal(true);
+					return;
+				}
+
 				if (!token) {
 					throw new Error('Authentication failed. No token received.');
 				}
@@ -35,6 +44,14 @@ const GoogleCallback: React.FC = () => {
 					});
 
 					if (response.data?.user) {
+						// Check if user is suspended
+						if (response.data.user.status === 'suspended') {
+							localStorage.removeItem('token');
+							setToken(null);
+							setUser(null);
+							setShowSuspendedModal(true);
+							return;
+						}
 						setUser(response.data.user);
 					}
 				} catch (userError) {
@@ -59,46 +76,55 @@ const GoogleCallback: React.FC = () => {
 		processGoogleAuth();
 	}, [searchParams, setToken, setUser, navigate]);
 
+	const handleCloseSuspendedModal = () => {
+		setShowSuspendedModal(false);
+		navigate('/');
+	};
+
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-center ym-bg-yellow-100">
-			<div className="w-full max-w-md p-8 ym-bg-card rounded-xl shadow-lg text-center border ym-border-card">
-				{error ? (
-					<>
-						<div className="text-red-500 text-xl mb-4">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="h-12 w-12 mx-auto mb-2"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-								/>
-							</svg>
-							Authentication Error
-						</div>
-						<p className="ym-text-secondary mb-4">{error}</p>
-						<p className="ym-text-muted">Redirecting to login...</p>
-					</>
-				) : (
-					<>
-						<div className="ym-text-yellow-600 mb-4">
-							<div
-								className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mx-auto mb-2"
-								style={{ borderTopColor: 'var(--ring)' }}
-							></div>
-							<p className="text-xl font-semibold">Logging you in...</p>
-						</div>
-						<p className="ym-text-secondary">Please wait while we set up your session.</p>
-					</>
-				)}
+		<>
+			<div className="min-h-screen flex flex-col items-center justify-center ym-bg-yellow-100">
+				<div className="w-full max-w-md p-8 ym-bg-card rounded-xl shadow-lg text-center border ym-border-card">
+					{error ? (
+						<>
+							<div className="text-red-500 text-xl mb-4">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-12 w-12 mx-auto mb-2"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+								Authentication Error
+							</div>
+							<p className="ym-text-secondary mb-4">{error}</p>
+							<p className="ym-text-muted">Redirecting to login...</p>
+						</>
+					) : (
+						<>
+							<div className="ym-text-yellow-600 mb-4">
+								<div
+									className="w-16 h-16 border-t-4 border-solid rounded-full animate-spin mx-auto mb-2"
+									style={{ borderTopColor: 'var(--ring)' }}
+								></div>
+								<p className="text-xl font-semibold">Logging you in...</p>
+							</div>
+							<p className="ym-text-secondary">Please wait while we set up your session.</p>
+						</>
+					)}
+				</div>
 			</div>
-		</div>
+
+			<SuspendedAccountModal isOpen={showSuspendedModal} onClose={handleCloseSuspendedModal} />
+		</>
 	);
 };
 
-export default GoogleCallback; 
+export default GoogleCallback;

@@ -1,13 +1,8 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { 
-	User, 
-	AuthContextType, 
-	ApiResponse, 
-	RegisterData, 
-	LoginData 
-} from '@/types';
+import { User, AuthContextType, ApiResponse, RegisterData, LoginData } from '@/types';
+import SuspendedAccountModal from '@/components/common/SuspendedAccountModal';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -29,6 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [token, setToken] = useState<string | null>(localStorage.getItem('token') || null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+	const [showSuspendedModal, setShowSuspendedModal] = useState<boolean>(false);
 
 	// Set up axios defaults
 	axios.defaults.baseURL = API_URL;
@@ -42,6 +38,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			delete axios.defaults.headers.common['Authorization'];
 		}
 	}, [token]);
+
+	// Handle suspended user - clear session and show modal
+	const handleSuspendedUser = () => {
+		localStorage.removeItem('token');
+		setToken(null);
+		setUser(null);
+		setShowSuspendedModal(true);
+	};
+
+	// Close suspended modal and logout
+	const closeSuspendedModal = () => {
+		setShowSuspendedModal(false);
+		// Optional: redirect to home page
+		window.location.href = '/';
+	};
 
 	// Check if token is valid and get user data
 	useEffect(() => {
@@ -66,6 +77,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				const response: AxiosResponse<ApiResponse<User>> = await axios.get('/auth/me');
 
 				if (response.data.success && response.data.user) {
+					// Check if user is suspended
+					if (response.data.user.status === 'suspended') {
+						handleSuspendedUser();
+						setLoading(false);
+						return;
+					}
 					setUser(response.data.user);
 				} else {
 					localStorage.removeItem('token');
@@ -74,6 +91,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				}
 			} catch (error: any) {
 				console.error('Token verification error:', error);
+
+				// Handle suspended user specifically
+				if (error.response?.data?.isSuspended) {
+					handleSuspendedUser();
+					setLoading(false);
+					return;
+				}
+
 				// Don't immediately remove token on network errors
 				// This prevents logout on temporary server issues or connectivity problems
 				if (error.response && (error.response.status === 401 || error.response.status === 403)) {
@@ -105,7 +130,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			return response.data;
 		} catch (error: any) {
-			const errorMessage = error.response?.data?.message ||
+			const errorMessage =
+				error.response?.data?.message ||
 				error.response?.data?.errors?.[0]?.msg ||
 				'Registration failed. Please try again.';
 			setError(errorMessage);
@@ -124,6 +150,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			const response: AxiosResponse<ApiResponse> = await axios.post('/auth/login', userData);
 
 			if (response.data.success && response.data.token && response.data.user) {
+				// Check if user is suspended
+				if (response.data.user.status === 'suspended') {
+					handleSuspendedUser();
+					setLoading(false);
+					throw new Error('Account suspended');
+				}
+
 				localStorage.setItem('token', response.data.token);
 				setToken(response.data.token);
 				setUser(response.data.user);
@@ -131,7 +164,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			return response.data;
 		} catch (error: any) {
-			const errorMessage = error.response?.data?.message ||
+			// Handle suspended user specifically
+			if (error.response?.data?.isSuspended) {
+				handleSuspendedUser();
+				setLoading(false);
+				throw error;
+			}
+
+			const errorMessage =
+				error.response?.data?.message ||
 				error.response?.data?.errors?.[0]?.msg ||
 				'Login failed. Please check your credentials.';
 			setError(errorMessage);
@@ -170,7 +211,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		isOrganizer: user?.role === 'organizer',
 	};
 
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+	return (
+		<AuthContext.Provider value={value}>
+			{children}
+			<SuspendedAccountModal isOpen={showSuspendedModal} onClose={closeSuspendedModal} />
+		</AuthContext.Provider>
+	);
 };
 
 // Custom hook to use the auth context
@@ -182,4 +228,4 @@ export const useAuth = (): AuthContextType => {
 	}
 
 	return context;
-}; 
+};
