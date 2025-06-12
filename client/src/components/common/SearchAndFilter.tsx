@@ -132,35 +132,6 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 				advancedFilters.toggleFilters?.isOnlineOnly?.value ||
 				advancedFilters.toggleFilters?.isFeaturedOnly?.value);
 
-		// Default location options for Indian cities
-		const defaultLocationOptions = [
-			'Mumbai',
-			'Delhi',
-			'Bangalore',
-			'Chennai',
-			'Kolkata',
-			'Hyderabad',
-			'Pune',
-			'Ahmedabad',
-			'Jaipur',
-			'Lucknow',
-			'Kanpur',
-			'Nagpur',
-			'Indore',
-			'Thane',
-			'Bhopal',
-			'Visakhapatnam',
-			'Pimpri-Chinchwad',
-			'Patna',
-			'Vadodara',
-			'Ghaziabad',
-			'Ludhiana',
-			'Agra',
-			'Nashik',
-		];
-
-		const locationOptions = advancedFilters?.location?.options || defaultLocationOptions;
-
 		return (
 			<div
 				className="glass-effect rounded-3xl shadow-xl mb-8 animate-fade-in relative z-20 border border-border/20 backdrop-blur-lg"
@@ -325,23 +296,16 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 								<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 									{/* Location Filter */}
 									{advancedFilters.location && (
-										<div>
-											<FormInput
-												type="text"
-												name="location"
-												label="Location/City"
-												placeholder="Enter city name..."
-												value={advancedFilters.location.value}
-												onChange={(e) => advancedFilters.location?.setValue(e.target.value)}
-												icon={<MapPinIcon className="w-4 h-4" />}
-												className="w-full"
-											/>
-											<datalist id="locations">
-												{locationOptions.map((city) => (
-													<option key={city} value={city} />
-												))}
-											</datalist>
-										</div>
+										<FormInput
+											type="text"
+											name="location"
+											label="Location/City"
+											placeholder="Enter city name..."
+											value={advancedFilters.location.value}
+											onChange={(e) => advancedFilters.location?.setValue(e.target.value)}
+											icon={<MapPinIcon className="w-4 h-4" />}
+											className="w-full"
+										/>
 									)}
 
 									{/* Tags Filter */}

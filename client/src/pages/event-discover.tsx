@@ -18,17 +18,6 @@ const EVENT_CATEGORIES: SelectOption[] = [
 	{ label: 'Model United Nations', value: 'MUN' },
 ];
 
-// Locations
-const LOCATIONS: SelectOption[] = [
-	{ label: 'All Locations', value: '' },
-	{ label: 'Mumbai', value: 'Mumbai' },
-	{ label: 'Delhi', value: 'Delhi' },
-	{ label: 'Bangalore', value: 'Bangalore' },
-	{ label: 'Hyderabad', value: 'Hyderabad' },
-	{ label: 'Chennai', value: 'Chennai' },
-	{ label: 'Online', value: 'Online' },
-];
-
 // Sort options
 const SORT_OPTIONS: SelectOption[] = [
 	{ label: 'Newest', value: 'newest' },
@@ -117,11 +106,19 @@ const EventsPage: React.FC = () => {
 
 		// Apply location filter
 		if (selectedLocation) {
-			result = result.filter(
-				(event) =>
-					event.location?.city === selectedLocation ||
-					(selectedLocation === 'Online' && event.location?.type === 'online')
-			);
+			const locationQuery = selectedLocation.toLowerCase();
+			result = result.filter((event) => {
+				// Handle online events
+				if (selectedLocation === 'Online' && event.location?.type === 'online') {
+					return true;
+				}
+
+				// For text searches, check if the query matches any location field
+				return (
+					event.location?.city?.toLowerCase().includes(locationQuery) ||
+					event.location?.venue?.toLowerCase().includes(locationQuery)
+				);
+			});
 		}
 
 		// Apply online only filter
@@ -290,7 +287,6 @@ const EventsPage: React.FC = () => {
 						location: {
 							value: selectedLocation,
 							setValue: setSelectedLocation,
-							options: LOCATIONS.map((loc) => loc.label).filter((label) => label !== 'All Locations'),
 						},
 						tags: {
 							value: selectedTags,
