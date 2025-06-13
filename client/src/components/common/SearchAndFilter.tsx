@@ -3,7 +3,6 @@ import {
 	MagnifyingGlassIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
-	TagIcon,
 	AdjustmentsHorizontalIcon,
 	MapPinIcon,
 	UserGroupIcon,
@@ -25,9 +24,10 @@ interface AdvancedFiltersConfig {
 		setValue: (location: string) => void;
 		options?: string[];
 	};
-	tags?: {
+	eventType?: {
 		value: string;
-		setValue: (tags: string) => void;
+		setValue: (eventType: string) => void;
+		options: { value: string; label: string }[];
 	};
 	organizer?: {
 		value: string;
@@ -123,7 +123,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 			(advancedFilters.dateRange?.startDate ||
 				advancedFilters.dateRange?.endDate ||
 				advancedFilters.location?.value ||
-				advancedFilters.tags?.value ||
+				advancedFilters.eventType?.value ||
 				advancedFilters.organizer?.value ||
 				advancedFilters.registrationRange?.min ||
 				advancedFilters.registrationRange?.max ||
@@ -141,7 +141,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 				}}
 			>
 				{/* Basic Filters Section */}
-				<div className="p-8 bg-gradient-to-br from-card/95 via-card/90 to-muted/30">
+				<div className="px-8 pt-8 pb-4 bg-gradient-to-br from-card/95 via-card/90 to-muted/30">
 					<div className="flex flex-col lg:flex-row gap-6">
 						{/* Search Input */}
 						<div className="flex-1">
@@ -195,7 +195,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 					</div>
 
 					{/* Results Count */}
-					<div className="mt-6 flex items-center justify-between">
+					<div className="mt-12 flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							<div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 							<span className="text-sm font-medium text-muted-foreground">
@@ -292,8 +292,26 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 									</div>
 								)}
 
-								{/* Location, Tags, and Toggle Filters */}
+								{/* Location, Event Type, and Toggle Filters */}
 								<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+									{/* Event Type Filter */}
+									{advancedFilters.eventType && (
+										<div>
+											<label className="block text-s font-semibold text-card-foreground mb-3">
+												Event Type
+											</label>
+											<SelectInput
+												name="eventType"
+												value={advancedFilters.eventType.value}
+												onChange={(e) =>
+													advancedFilters.eventType?.setValue(e.target.value.toString())
+												}
+												options={advancedFilters.eventType.options}
+												className="w-full"
+											/>
+										</div>
+									)}
+
 									{/* Location Filter */}
 									{advancedFilters.location && (
 										<FormInput
@@ -308,27 +326,13 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 										/>
 									)}
 
-									{/* Tags Filter */}
-									{advancedFilters.tags && (
-										<FormInput
-											type="text"
-											name="tags"
-											label="Tags"
-											placeholder="Enter tags..."
-											value={advancedFilters.tags.value}
-											onChange={(e) => advancedFilters.tags?.setValue(e.target.value)}
-											icon={<TagIcon className="w-4 h-4" />}
-											className="w-full"
-										/>
-									)}
-
 									{/* Toggle Filters */}
 									{advancedFilters.toggleFilters && (
 										<div>
 											<label className="block text-s font-semibold text-card-foreground mb-3">
 												Quick Filters
 											</label>
-											<div className="space-y-3">
+											<div className="flex items-center gap-6 lg:h-[45px]">
 												{advancedFilters.toggleFilters.isOnlineOnly && (
 													<Switch
 														enabled={advancedFilters.toggleFilters.isOnlineOnly.value}

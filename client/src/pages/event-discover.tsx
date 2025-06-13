@@ -6,17 +6,10 @@ import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { EventDiscoverData, EventsApiResponse, DateRange, SelectOption } from '@/types';
+import { EVENT_CATEGORIES as BASE_EVENT_CATEGORIES, EVENT_TYPES } from '../utils/eventConstants';
 
-// Categories
-const EVENT_CATEGORIES: SelectOption[] = [
-	{ label: 'All Categories', value: '' },
-	{ label: 'Debate', value: 'Debate' },
-	{ label: 'Hackathon', value: 'Hackathon' },
-	{ label: 'Workshop', value: 'Workshop' },
-	{ label: 'Competition', value: 'Competition' },
-	{ label: 'Conference', value: 'Conference' },
-	{ label: 'Model United Nations', value: 'MUN' },
-];
+// Categories with "All Categories" option
+const EVENT_CATEGORIES: SelectOption[] = [{ label: 'All Categories', value: '' }, ...BASE_EVENT_CATEGORIES];
 
 // Sort options
 const SORT_OPTIONS: SelectOption[] = [
@@ -39,6 +32,7 @@ const EventsPage: React.FC = () => {
 	// State for filters and search
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('');
+	const [selectedEventType, setSelectedEventType] = useState<string>('');
 	const [selectedLocation, setSelectedLocation] = useState<string>('');
 	const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
 	const [dateRange, setDateRange] = useState<DateRange>({ start: '', end: '' });
@@ -94,14 +88,18 @@ const EventsPage: React.FC = () => {
 			result = result.filter(
 				(event) =>
 					event.title.toLowerCase().includes(query) ||
-					(event.description && event.description.toLowerCase().includes(query)) ||
 					(event.tags && event.tags.some((tag) => tag.toLowerCase().includes(query)))
 			);
 		}
 
 		// Apply category filter
 		if (selectedCategory) {
-			result = result.filter((event) => event.type === selectedCategory);
+			result = result.filter((event) => event.category === selectedCategory);
+		}
+
+		// Apply event type filter
+		if (selectedEventType) {
+			result = result.filter((event) => event.type === selectedEventType);
 		}
 
 		// Apply location filter
@@ -195,6 +193,7 @@ const EventsPage: React.FC = () => {
 		events,
 		searchQuery,
 		selectedCategory,
+		selectedEventType,
 		selectedLocation,
 		isOnlineOnly,
 		dateRange,
@@ -208,6 +207,7 @@ const EventsPage: React.FC = () => {
 	const resetFilters = (): void => {
 		setSearchQuery('');
 		setSelectedCategory('');
+		setSelectedEventType('');
 		setSelectedLocation('');
 		setIsOnlineOnly(false);
 		setDateRange({ start: '', end: '' });
@@ -265,32 +265,34 @@ const EventsPage: React.FC = () => {
 					setSearchTerm={setSearchQuery}
 					statusFilter={sortBy}
 					setStatusFilter={setSortBy}
+					statusOptions={SORT_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
 					categoryFilter={selectedCategory}
 					setCategoryFilter={setSelectedCategory}
+					categoryOptions={EVENT_CATEGORIES.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
 					filteredCount={filteredEvents.length}
 					totalCount={events.length}
 					itemType="events"
-					searchPlaceholder="Search events by title, description, or tags..."
-					animationDelay="0.1s"
-					statusOptions={SORT_OPTIONS.map((opt) => ({ value: opt.value as string, label: opt.label }))}
-					categoryOptions={EVENT_CATEGORIES.map((opt) => ({ value: opt.value as string, label: opt.label }))}
-					showRole={false}
+					searchPlaceholder="Search events by title, or tags..."
 					showCategory={true}
 					advancedFilters={{
 						showAdvancedFilters: true,
 						dateRange: {
 							startDate: dateRange.start,
 							endDate: dateRange.end,
-							setStartDate: (date: string) => setDateRange((prev) => ({ ...prev, start: date })),
-							setEndDate: (date: string) => setDateRange((prev) => ({ ...prev, end: date })),
+							setStartDate: (date) => setDateRange((prev) => ({ ...prev, start: date })),
+							setEndDate: (date) => setDateRange((prev) => ({ ...prev, end: date })),
 						},
 						location: {
 							value: selectedLocation,
 							setValue: setSelectedLocation,
 						},
-						tags: {
-							value: selectedTags,
-							setValue: setSelectedTags,
+						eventType: {
+							value: selectedEventType,
+							setValue: setSelectedEventType,
+							options: [{ value: '', label: 'All Types' }, ...EVENT_TYPES].map((opt) => ({
+								value: opt.value.toString(),
+								label: opt.label,
+							})),
 						},
 						organizer: {
 							value: selectedOrganizer,
@@ -299,14 +301,14 @@ const EventsPage: React.FC = () => {
 						registrationRange: {
 							min: registrationRange.min,
 							max: registrationRange.max,
-							setMin: (min: string) => setRegistrationRange((prev) => ({ ...prev, min })),
-							setMax: (max: string) => setRegistrationRange((prev) => ({ ...prev, max })),
+							setMin: (min) => setRegistrationRange((prev) => ({ ...prev, min })),
+							setMax: (max) => setRegistrationRange((prev) => ({ ...prev, max })),
 						},
 						priceRange: {
 							min: priceRange.min,
 							max: priceRange.max,
-							setMin: (min: string) => setPriceRange((prev) => ({ ...prev, min })),
-							setMax: (max: string) => setPriceRange((prev) => ({ ...prev, max })),
+							setMin: (min) => setPriceRange((prev) => ({ ...prev, min })),
+							setMax: (max) => setPriceRange((prev) => ({ ...prev, max })),
 						},
 						toggleFilters: {
 							isOnlineOnly: {

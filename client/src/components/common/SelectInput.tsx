@@ -69,7 +69,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 	};
 
 	return (
-		<div className="mb-6" ref={dropdownRef}>
+		<div ref={dropdownRef}>
 			{label && (
 				<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
 					{label}
@@ -146,7 +146,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 						"
 							style={{
 								position: 'relative',
-								zIndex: 9999
+								zIndex: 9999,
 							}}
 						>
 							<div className="py-2 overflow-auto max-h-60">
@@ -210,4 +210,4 @@ const SelectInput: React.FC<SelectInputProps> = ({
 	);
 };
 
-export default SelectInput; 
+export default SelectInput;

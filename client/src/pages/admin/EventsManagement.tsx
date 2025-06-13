@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { AdminEventData } from '@/types';
 import CreateEventModal from '../../components/organizer/CreateEventModal';
+import { EVENT_CATEGORIES, EVENT_TYPES } from '../../utils/eventConstants';
 
 // Enhanced modal state type to include edit
 type EventModalState = {
@@ -36,7 +37,7 @@ interface AdvancedFiltersState {
 	};
 	location: string;
 	isOnlineOnly: boolean;
-	tags: string;
+	eventType: string;
 	organizer: string;
 	minRegistrations: string;
 	maxRegistrations: string;
@@ -59,7 +60,7 @@ const EventsManagement: React.FC = () => {
 		dateRange: { startDate: '', endDate: '' },
 		location: '',
 		isOnlineOnly: false,
-		tags: '',
+		eventType: '',
 		organizer: '',
 		minRegistrations: '',
 		maxRegistrations: '',
@@ -83,18 +84,6 @@ const EventsManagement: React.FC = () => {
 		{ value: 'draft', label: 'Draft' },
 		{ value: 'featured', label: 'Featured' },
 		{ value: 'flagged', label: 'Flagged' },
-	];
-
-	const categoryOptions = [
-		{ value: 'all', label: 'All Categories' },
-		{ value: 'Technology', label: 'Technology' },
-		{ value: 'Business', label: 'Business' },
-		{ value: 'Education', label: 'Education' },
-		{ value: 'Arts', label: 'Arts' },
-		{ value: 'Science', label: 'Science' },
-		{ value: 'Music', label: 'Music' },
-		{ value: 'Sports', label: 'Sports' },
-		{ value: 'Other', label: 'Other' },
 	];
 
 	// Table columns
@@ -121,7 +110,8 @@ const EventsManagement: React.FC = () => {
 			const matchesSearch =
 				!searchTerm ||
 				event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				event.organizer?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+				((event as any).tags &&
+					(event as any).tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())));
 
 			const matchesCategory = categoryFilter === 'all' || event.category === categoryFilter;
 
@@ -144,12 +134,7 @@ const EventsManagement: React.FC = () => {
 
 			const matchesOnlineFilter = !advancedFilters.isOnlineOnly || (event as any).location?.type === 'online';
 
-			const matchesTags =
-				!advancedFilters.tags ||
-				((event as any).tags &&
-					(event as any).tags.some((tag: string) =>
-						tag.toLowerCase().includes(advancedFilters.tags.toLowerCase())
-					));
+			const matchesEventType = !advancedFilters.eventType || (event as any).type === advancedFilters.eventType;
 
 			const matchesOrganizer =
 				!advancedFilters.organizer ||
@@ -176,7 +161,7 @@ const EventsManagement: React.FC = () => {
 				matchesDateRange &&
 				matchesLocation &&
 				matchesOnlineFilter &&
-				matchesTags &&
+				matchesEventType &&
 				matchesOrganizer &&
 				matchesMinRegistrations &&
 				matchesMaxRegistrations &&
@@ -542,7 +527,7 @@ const EventsManagement: React.FC = () => {
 			dateRange: { startDate: '', endDate: '' },
 			location: '',
 			isOnlineOnly: false,
-			tags: '',
+			eventType: '',
 			organizer: '',
 			minRegistrations: '',
 			maxRegistrations: '',
@@ -576,13 +561,13 @@ const EventsManagement: React.FC = () => {
 					location,
 				})),
 		},
-		tags: {
-			value: advancedFilters.tags,
-			setValue: (tags: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					tags,
-				})),
+		eventType: {
+			value: advancedFilters.eventType,
+			setValue: (eventType: string) => setAdvancedFilters((prev) => ({ ...prev, eventType })),
+			options: [{ value: '', label: 'All Types' }, ...EVENT_TYPES].map((opt) => ({
+				value: opt.value.toString(),
+				label: opt.label,
+			})),
 		},
 		organizer: {
 			value: advancedFilters.organizer,
@@ -670,15 +655,17 @@ const EventsManagement: React.FC = () => {
 					setSearchTerm={setSearchTerm}
 					statusFilter={statusFilter}
 					setStatusFilter={setStatusFilter}
+					statusOptions={statusOptions.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
 					categoryFilter={categoryFilter}
 					setCategoryFilter={setCategoryFilter}
+					categoryOptions={[{ value: 'all', label: 'All Categories' }, ...EVENT_CATEGORIES].map((opt) => ({
+						value: opt.value.toString(),
+						label: opt.label,
+					}))}
 					filteredCount={filteredEvents.length}
 					totalCount={events.length}
 					itemType="events"
-					searchPlaceholder="Search events by title, organizer, or tags..."
-					statusOptions={statusOptions}
-					categoryOptions={categoryOptions}
-					showRole={false}
+					searchPlaceholder="Search events by title, or tags..."
 					showCategory={true}
 					advancedFilters={advancedFiltersConfig}
 				/>

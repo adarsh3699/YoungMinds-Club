@@ -14,14 +14,15 @@ import {
 import { useDropzone } from 'react-dropzone';
 import './CreateEventModal.css';
 import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip, MsgAlert } from '../common';
+import { EVENT_TYPES, EVENT_CATEGORIES } from '../../utils/eventConstants';
 
 const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = false, apiEndpoint = null }) => {
-	const [formData, setFormData] = useState({
+	const initialFormData = {
 		title: '',
 		shortDescription: '',
 		description: '',
-		type: 'Workshop',
-		category: 'Technology',
+		type: '',
+		category: '',
 		date: '',
 		endDate: '',
 		location: {
@@ -36,6 +37,27 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 		price: 0,
 		registrationDeadline: '',
 		isPublished: false,
+	};
+
+	const [formData, setFormData] = useState({
+		...initialFormData,
+		...eventToEdit,
+		type: eventToEdit?.type || '',
+		category: eventToEdit?.category || '',
+		date: eventToEdit?.date || '',
+		endDate: eventToEdit?.endDate || '',
+		location: eventToEdit?.location || {
+			type: 'offline',
+			city: '',
+			venue: '',
+			address: '',
+			onlineUrl: '',
+		},
+		capacity: eventToEdit?.capacity || 50,
+		tags: eventToEdit?.tags || [],
+		price: eventToEdit?.price || 0,
+		registrationDeadline: eventToEdit?.registrationDeadline || '',
+		isPublished: eventToEdit?.isPublished || false,
 	});
 
 	const [posterFile, setPosterFile] = useState(null);
@@ -51,45 +73,27 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 	useEffect(() => {
 		if (!isEditing || !eventToEdit) return;
 
-		// Extract only the fields that should be in the form
-		const {
-			title,
-			shortDescription,
-			description,
-			type,
-			category,
-			date,
-			endDate,
-			location,
-			capacity,
-			tags,
-			price,
-			registrationDeadline,
-			isPublished,
-			poster,
-		} = eventToEdit;
-
 		// Format date fields correctly for the datetime-local input
 		const formattedEvent = {
-			title: title || '',
-			shortDescription: shortDescription || '',
-			description: description || '',
-			type: type || 'Workshop',
-			category: category || 'Technology',
-			date: formatDateForInput(date),
-			endDate: endDate ? formatDateForInput(endDate) : '',
-			location: location || {
+			...formData,
+			type: eventToEdit.type || '',
+			category: eventToEdit.category || '',
+			date: formatDateForInput(eventToEdit.date),
+			endDate: eventToEdit.endDate ? formatDateForInput(eventToEdit.endDate) : '',
+			location: eventToEdit.location || {
 				type: 'offline',
 				city: '',
 				venue: '',
 				address: '',
 				onlineUrl: '',
 			},
-			capacity: capacity || 50,
-			tags: tags || [],
-			price: price || 0,
-			registrationDeadline: registrationDeadline ? formatDateForInput(registrationDeadline) : '',
-			isPublished: isPublished || false,
+			capacity: eventToEdit.capacity || 50,
+			tags: eventToEdit.tags || [],
+			price: eventToEdit.price || 0,
+			registrationDeadline: eventToEdit.registrationDeadline
+				? formatDateForInput(eventToEdit.registrationDeadline)
+				: '',
+			isPublished: eventToEdit.isPublished || false,
 		};
 
 		setFormData(formattedEvent);
@@ -277,6 +281,8 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 			title: 'Title is required',
 			shortDescription: 'Short description is required',
 			description: 'Description is required',
+			type: 'Event type is required',
+			category: 'Event category is required',
 			date: 'Start date and time is required',
 			endDate: 'End date and time is required',
 			capacity: 'Capacity is required',
@@ -466,26 +472,9 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 		}
 	};
 
-	const eventTypeOptions = [
-		{ value: 'Conference', label: 'Conference' },
-		{ value: 'Workshop', label: 'Workshop' },
-		{ value: 'Meetup', label: 'Meetup' },
-		{ value: 'Hackathon', label: 'Hackathon' },
-		{ value: 'MUN', label: 'MUN' },
-		{ value: 'Concert', label: 'Concert' },
-		{ value: 'Other', label: 'Other' },
-	];
-
-	const categoryOptions = [
-		{ value: 'Technology', label: 'Technology' },
-		{ value: 'Business', label: 'Business' },
-		{ value: 'Education', label: 'Education' },
-		{ value: 'Arts', label: 'Arts' },
-		{ value: 'Science', label: 'Science' },
-		{ value: 'Music', label: 'Music' },
-		{ value: 'Sports', label: 'Sports' },
-		{ value: 'Other', label: 'Other' },
-	];
+	// Using event types and categories from utilities
+	const eventTypeOptions = EVENT_TYPES;
+	const categoryOptions = EVENT_CATEGORIES;
 
 	return (
 		<>
@@ -962,6 +951,7 @@ const CreateEventModal = ({ onClose, onSuccess, eventToEdit = null, isEditing = 
 											onChange={handleChange}
 											min="0"
 											step="1"
+											required
 											placeholder="0"
 											error={errors.price}
 											icon={
