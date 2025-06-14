@@ -29,44 +29,12 @@ type EventModalState = {
 	eventData?: AdminEventData | null;
 };
 
-// Advanced filters state
-interface AdvancedFiltersState {
-	dateRange: {
-		startDate: string;
-		endDate: string;
-	};
-	location: string;
-	isOnlineOnly: boolean;
-	eventType: string;
-	organizer: string;
-	minRegistrations: string;
-	maxRegistrations: string;
-	priceRange: {
-		min: string;
-		max: string;
-	};
-	isFeaturedOnly: boolean;
-}
-
 const EventsManagement: React.FC = () => {
 	// State
 	const [events, setEvents] = useState<AdminEventData[]>([]);
+	const [filteredEvents, setFilteredEvents] = useState<AdminEventData[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
-	const [categoryFilter, setCategoryFilter] = useState('all');
-	const [advancedFilters, setAdvancedFilters] = useState<AdvancedFiltersState>({
-		dateRange: { startDate: '', endDate: '' },
-		location: '',
-		isOnlineOnly: false,
-		eventType: '',
-		organizer: '',
-		minRegistrations: '',
-		maxRegistrations: '',
-		priceRange: { min: '', max: '' },
-		isFeaturedOnly: false,
-	});
 	const [modal, setModal] = useState<EventModalState>({
 		isOpen: false,
 		type: null,
@@ -79,7 +47,7 @@ const EventsManagement: React.FC = () => {
 
 	// Filter options
 	const statusOptions = [
-		{ value: 'all', label: 'All Status' },
+		{ value: '', label: 'All Status' },
 		{ value: 'published', label: 'Published' },
 		{ value: 'draft', label: 'Draft' },
 		{ value: 'featured', label: 'Featured' },
@@ -103,74 +71,6 @@ const EventsManagement: React.FC = () => {
 		description: 'Try adjusting your search or filters',
 		noFiltersDescription: 'No events have been created yet',
 	};
-
-	// Enhanced filtering with advanced filters
-	const filteredEvents = useMemo(() => {
-		return events.filter((event) => {
-			const matchesSearch =
-				!searchTerm ||
-				event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				((event as any).tags &&
-					(event as any).tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())));
-
-			const matchesCategory = categoryFilter === 'all' || event.category === categoryFilter;
-
-			const matchesStatus =
-				statusFilter === 'all' ||
-				(statusFilter === 'published' && event.isPublished) ||
-				(statusFilter === 'draft' && !event.isPublished) ||
-				(statusFilter === 'featured' && event.isFeatured) ||
-				(statusFilter === 'flagged' && event.isFlagged);
-
-			// Advanced filters with optional chaining for properties that might not exist
-			const eventDate = new Date(event.date);
-			const matchesDateRange =
-				(!advancedFilters.dateRange.startDate || eventDate >= new Date(advancedFilters.dateRange.startDate)) &&
-				(!advancedFilters.dateRange.endDate || eventDate <= new Date(advancedFilters.dateRange.endDate));
-
-			const matchesLocation =
-				!advancedFilters.location ||
-				(event as any).location?.city?.toLowerCase().includes(advancedFilters.location.toLowerCase());
-
-			const matchesOnlineFilter = !advancedFilters.isOnlineOnly || (event as any).location?.type === 'online';
-
-			const matchesEventType = !advancedFilters.eventType || (event as any).type === advancedFilters.eventType;
-
-			const matchesOrganizer =
-				!advancedFilters.organizer ||
-				event.organizer?.name?.toLowerCase().includes(advancedFilters.organizer.toLowerCase());
-
-			const registrationCount = (event as any).registrationCount || 0;
-			const matchesMinRegistrations =
-				!advancedFilters.minRegistrations || registrationCount >= parseInt(advancedFilters.minRegistrations);
-			const matchesMaxRegistrations =
-				!advancedFilters.maxRegistrations || registrationCount <= parseInt(advancedFilters.maxRegistrations);
-
-			const eventPrice = (event as any).price || 0;
-			const matchesMinPrice =
-				!advancedFilters.priceRange.min || eventPrice >= parseFloat(advancedFilters.priceRange.min);
-			const matchesMaxPrice =
-				!advancedFilters.priceRange.max || eventPrice <= parseFloat(advancedFilters.priceRange.max);
-
-			const matchesFeaturedFilter = !advancedFilters.isFeaturedOnly || event.isFeatured;
-
-			return (
-				matchesSearch &&
-				matchesCategory &&
-				matchesStatus &&
-				matchesDateRange &&
-				matchesLocation &&
-				matchesOnlineFilter &&
-				matchesEventType &&
-				matchesOrganizer &&
-				matchesMinRegistrations &&
-				matchesMaxRegistrations &&
-				matchesMinPrice &&
-				matchesMaxPrice &&
-				matchesFeaturedFilter
-			);
-		});
-	}, [events, searchTerm, categoryFilter, statusFilter, advancedFilters]);
 
 	// Optimized stats calculation
 	const stats = useMemo(() => {
@@ -237,6 +137,11 @@ const EventsManagement: React.FC = () => {
 		},
 	];
 
+	// Handle filtered data changes from SearchAndFilter component
+	const handleFilteredDataChange = (filtered: any[]) => {
+		setFilteredEvents(filtered as AdminEventData[]);
+	};
+
 	// API functions
 	const fetchEvents = useCallback(async () => {
 		try {
@@ -245,6 +150,7 @@ const EventsManagement: React.FC = () => {
 			const { data } = await axios.get('/admin/events');
 			if (data.success) {
 				setEvents(data.events);
+				setFilteredEvents(data.events);
 			}
 		} catch (error) {
 			console.error('Error fetching events:', error);
@@ -518,114 +424,6 @@ const EventsManagement: React.FC = () => {
 		[openModal, toggleFeature]
 	);
 
-	// Reset all filters
-	const resetAllFilters = useCallback(() => {
-		setSearchTerm('');
-		setStatusFilter('all');
-		setCategoryFilter('all');
-		setAdvancedFilters({
-			dateRange: { startDate: '', endDate: '' },
-			location: '',
-			isOnlineOnly: false,
-			eventType: '',
-			organizer: '',
-			minRegistrations: '',
-			maxRegistrations: '',
-			priceRange: { min: '', max: '' },
-			isFeaturedOnly: false,
-		});
-	}, []);
-
-	// Advanced filters configuration
-	const advancedFiltersConfig = {
-		showAdvancedFilters: true,
-		dateRange: {
-			startDate: advancedFilters.dateRange.startDate,
-			endDate: advancedFilters.dateRange.endDate,
-			setStartDate: (date: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					dateRange: { ...prev.dateRange, startDate: date },
-				})),
-			setEndDate: (date: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					dateRange: { ...prev.dateRange, endDate: date },
-				})),
-		},
-		location: {
-			value: advancedFilters.location,
-			setValue: (location: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					location,
-				})),
-		},
-		eventType: {
-			value: advancedFilters.eventType,
-			setValue: (eventType: string) => setAdvancedFilters((prev) => ({ ...prev, eventType })),
-			options: [{ value: '', label: 'All Types' }, ...EVENT_TYPES].map((opt) => ({
-				value: opt.value.toString(),
-				label: opt.label,
-			})),
-		},
-		organizer: {
-			value: advancedFilters.organizer,
-			setValue: (organizer: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					organizer,
-				})),
-		},
-		registrationRange: {
-			min: advancedFilters.minRegistrations,
-			max: advancedFilters.maxRegistrations,
-			setMin: (min: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					minRegistrations: min,
-				})),
-			setMax: (max: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					maxRegistrations: max,
-				})),
-		},
-		priceRange: {
-			min: advancedFilters.priceRange.min,
-			max: advancedFilters.priceRange.max,
-			setMin: (min: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					priceRange: { ...prev.priceRange, min },
-				})),
-			setMax: (max: string) =>
-				setAdvancedFilters((prev) => ({
-					...prev,
-					priceRange: { ...prev.priceRange, max },
-				})),
-		},
-		toggleFilters: {
-			isOnlineOnly: {
-				value: advancedFilters.isOnlineOnly,
-				setValue: (value: boolean) =>
-					setAdvancedFilters((prev) => ({
-						...prev,
-						isOnlineOnly: value,
-					})),
-			},
-			isFeaturedOnly: {
-				value: advancedFilters.isFeaturedOnly,
-				setValue: (value: boolean) =>
-					setAdvancedFilters((prev) => ({
-						...prev,
-						isFeaturedOnly: value,
-					})),
-			},
-		},
-		onResetAllFilters: resetAllFilters,
-	};
-
 	// Load events on mount
 	useEffect(() => {
 		fetchEvents();
@@ -651,23 +449,22 @@ const EventsManagement: React.FC = () => {
 
 				{/* Enhanced Search and Filters with Advanced Filters */}
 				<SearchAndFilter
-					searchTerm={searchTerm}
-					setSearchTerm={setSearchTerm}
-					statusFilter={statusFilter}
-					setStatusFilter={setStatusFilter}
-					statusOptions={statusOptions.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-					categoryFilter={categoryFilter}
-					setCategoryFilter={setCategoryFilter}
-					categoryOptions={[{ value: 'all', label: 'All Categories' }, ...EVENT_CATEGORIES].map((opt) => ({
-						value: opt.value.toString(),
-						label: opt.label,
-					}))}
-					filteredCount={filteredEvents.length}
-					totalCount={events.length}
+					data={events}
+					onFilteredDataChange={handleFilteredDataChange}
 					itemType="events"
-					searchPlaceholder="Search events by title, or tags..."
+					searchPlaceholder="Search events by title, location, or tags..."
 					showCategory={true}
-					advancedFilters={advancedFiltersConfig}
+					showAdvancedFilters={true}
+					categoryOptions={EVENT_CATEGORIES}
+					statusOptions={statusOptions}
+					eventTypeOptions={EVENT_TYPES}
+					enableDateRange={true}
+					enableEventType={true}
+					enableOrganizer={true}
+					enableRegistrationRange={true}
+					enablePriceRange={true}
+					enableOnlineOnly={true}
+					enableFeaturedOnly={true}
 				/>
 
 				{/* Error Alert */}
@@ -682,9 +479,9 @@ const EventsManagement: React.FC = () => {
 				<AdminTable
 					loading={loading}
 					filteredItems={filteredEvents}
-					searchTerm={searchTerm}
+					searchTerm=""
 					roleFilter="event"
-					statusFilter={statusFilter}
+					statusFilter="all"
 					renderRow={renderEventRow}
 					columns={columns}
 					emptyStateConfig={emptyStateConfig}

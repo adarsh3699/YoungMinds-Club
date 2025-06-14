@@ -1,136 +1,301 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import {
 	MagnifyingGlassIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
 	AdjustmentsHorizontalIcon,
-	MapPinIcon,
 	UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { FormInput, SelectInput, Switch, DateTimePicker } from '.';
-import { UserSearchFiltersProps } from '@/types';
+import { SelectOption } from '@/types';
 
-// Extended props interface for advanced filters
-interface AdvancedFiltersConfig {
-	showAdvancedFilters?: boolean;
-	dateRange?: {
-		startDate: string;
-		endDate: string;
-		setStartDate: (date: string) => void;
-		setEndDate: (date: string) => void;
+// Generic data item interface
+interface DataItem {
+	id?: string;
+	_id?: string;
+	title?: string;
+	name?: string;
+	category?: string;
+	type?: string;
+	tags?: string[];
+	date?: string;
+	endDate?: string;
+	createdAt?: string;
+	registrationCount?: number;
+	price?: number;
+	capacity?: number;
+	organizer?: {
+		name?: string;
 	};
 	location?: {
-		value: string;
-		setValue: (location: string) => void;
-		options?: string[];
+		city?: string;
+		venue?: string;
+		type?: 'online' | 'offline';
 	};
-	eventType?: {
-		value: string;
-		setValue: (eventType: string) => void;
-		options: { value: string; label: string }[];
-	};
-	organizer?: {
-		value: string;
-		setValue: (organizer: string) => void;
-	};
-	registrationRange?: {
-		min: string;
-		max: string;
-		setMin: (min: string) => void;
-		setMax: (max: string) => void;
-	};
-	priceRange?: {
-		min: string;
-		max: string;
-		setMin: (min: string) => void;
-		setMax: (max: string) => void;
-	};
-	toggleFilters?: {
-		isOnlineOnly?: {
-			value: boolean;
-			setValue: (value: boolean) => void;
-		};
-		isFeaturedOnly?: {
-			value: boolean;
-			setValue: (value: boolean) => void;
-		};
-	};
-	onResetAllFilters?: () => void;
+	[key: string]: any; // Allow additional properties
 }
 
-interface EnhancedSearchFiltersProps extends UserSearchFiltersProps {
-	advancedFilters?: AdvancedFiltersConfig;
+// Configuration interface for the component
+interface SearchAndFilterConfig {
+	// Data and filtering
+	data: DataItem[];
+	onFilteredDataChange: (filteredData: DataItem[]) => void;
+
+	// UI Configuration
+	itemType?: string;
+	searchPlaceholder?: string;
+	animationDelay?: string;
+
+	// Filter options
+	categoryOptions?: SelectOption[];
+	statusOptions?: SelectOption[];
+	roleOptions?: SelectOption[];
+	eventTypeOptions?: SelectOption[];
+
+	// Show/hide filters
+	showCategory?: boolean;
+	showRole?: boolean;
+	showAdvancedFilters?: boolean;
+
+	// Advanced filter options
+	enableDateRange?: boolean;
+	enableEventType?: boolean;
+	enableOrganizer?: boolean;
+	enableRegistrationRange?: boolean;
+	enablePriceRange?: boolean;
+	enableOnlineOnly?: boolean;
+	enableFeaturedOnly?: boolean;
 }
 
 /**
- * Enhanced SearchFilters component with advanced filtering capabilities
- * All filter options are passed as props - no hardcoded business logic
+ * Independent SearchAndFilter component that manages its own state and filtering logic
  */
-const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
+const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 	({
-		searchTerm,
-		setSearchTerm,
-		roleFilter,
-		setRoleFilter,
-		statusFilter,
-		setStatusFilter,
-		categoryFilter,
-		setCategoryFilter,
-		filteredCount,
-		totalCount,
-		animationDelay = '0.3s',
-		// Dynamic configuration props
+		data,
+		onFilteredDataChange,
 		itemType = 'items',
 		searchPlaceholder = 'Search...',
-		statusOptions = [{ value: 'all', label: 'All Status' }],
-		roleOptions = [{ value: 'all', label: 'All Roles' }],
-		categoryOptions = [{ value: 'all', label: 'All Categories' }],
-		showRole = true,
+		animationDelay = '0.3s',
+		categoryOptions = [{ label: 'All Categories', value: '' }],
+		statusOptions = [{ label: 'All Status', value: '' }],
+		roleOptions = [{ label: 'All Roles', value: '' }],
+		eventTypeOptions = [{ label: 'All Types', value: '' }],
 		showCategory = false,
-		// Advanced filters
-		advancedFilters,
+		showRole = false,
+		showAdvancedFilters = false,
+		enableDateRange = false,
+		enableEventType = false,
+		enableOrganizer = false,
+		enableRegistrationRange = false,
+		enablePriceRange = false,
+		enableOnlineOnly = false,
+		enableFeaturedOnly = false,
 	}) => {
-		const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+		// Basic filter states
+		const [searchTerm, setSearchTerm] = useState<string>('');
+		const [categoryFilter, setCategoryFilter] = useState<string>('');
+		const [statusFilter, setStatusFilter] = useState<string>('');
+		const [roleFilter, setRoleFilter] = useState<string>('');
 
-		// Event handlers
-		const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-			setSearchTerm(e.target.value);
-		};
+		// Advanced filter states
+		const [showAdvancedFiltersPanel, setShowAdvancedFiltersPanel] = useState(false);
+		const [startDate, setStartDate] = useState<string>('');
+		const [endDate, setEndDate] = useState<string>('');
+		const [eventType, setEventType] = useState<string>('');
+		const [organizer, setOrganizer] = useState<string>('');
+		const [minRegistrations, setMinRegistrations] = useState<string>('');
+		const [maxRegistrations, setMaxRegistrations] = useState<string>('');
+		const [minPrice, setMinPrice] = useState<string>('');
+		const [maxPrice, setMaxPrice] = useState<string>('');
+		const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
+		const [isFeaturedOnly, setIsFeaturedOnly] = useState<boolean>(false);
 
-		const handleRoleChange = (e: { target: { name: string; value: string | number } }): void => {
-			if (setRoleFilter) {
-				setRoleFilter(e.target.value as string);
+		// Filtering logic
+		const filteredData = useMemo(() => {
+			if (!data || data.length === 0) return [];
+
+			let result = [...data];
+
+			// Apply search filter
+			if (searchTerm.trim()) {
+				const query = searchTerm.toLowerCase().trim();
+				result = result.filter((item) => {
+					// Search in title/name
+					const titleMatch = (item.title || item.name || '').toLowerCase().includes(query);
+
+					// Search in email (for organizers)
+					const emailMatch = item.email && item.email.toLowerCase().includes(query);
+
+					// Search in organization name (for organizers)
+					const organizationMatch =
+						item.organizationName && item.organizationName.toLowerCase().includes(query);
+
+					// Search in location fields (for events)
+					const locationMatch =
+						item.location &&
+						((item.location.city && item.location.city.toLowerCase().includes(query)) ||
+							(item.location.venue && item.location.venue.toLowerCase().includes(query)) ||
+							(item.location.type === 'online' && 'online'.includes(query)));
+
+					// Search in tags (for events)
+					const tagsMatch = item.tags && item.tags.some((tag) => tag.toLowerCase().includes(query));
+
+					return titleMatch || emailMatch || organizationMatch || locationMatch || tagsMatch;
+				});
 			}
-		};
 
-		const handleStatusChange = (e: { target: { name: string; value: string | number } }): void => {
-			setStatusFilter(e.target.value as string);
-		};
-
-		const handleCategoryChange = (e: { target: { name: string; value: string | number } }): void => {
-			if (setCategoryFilter) {
-				setCategoryFilter(e.target.value as string);
+			// Apply category filter
+			if (categoryFilter && categoryFilter !== '') {
+				result = result.filter((item) => item.category === categoryFilter);
 			}
-		};
 
-		// Determine which filters to show
-		const shouldShowRole = showRole && roleFilter !== undefined && setRoleFilter !== undefined;
-		const shouldShowCategory = showCategory && categoryFilter !== undefined && setCategoryFilter !== undefined;
+			// Apply role filter
+			if (roleFilter && roleFilter !== '' && roleFilter !== 'all') {
+				result = result.filter((item) => item.role === roleFilter);
+			}
+
+			// Apply event type filter
+			if (eventType && eventType !== '') {
+				result = result.filter((item) => item.type === eventType);
+			}
+
+			// Apply online only filter
+			if (isOnlineOnly) {
+				result = result.filter((item) => item.location?.type === 'online');
+			}
+
+			// Apply date range filter
+			if (startDate) {
+				const startDateObj = new Date(startDate);
+				result = result.filter((item) => item.date && new Date(item.date) >= startDateObj);
+			}
+			if (endDate) {
+				const endDateObj = new Date(endDate);
+				result = result.filter((item) => item.date && new Date(item.date) <= endDateObj);
+			}
+
+			// Apply organizer filter
+			if (organizer.trim()) {
+				const organizerQuery = organizer.toLowerCase();
+				result = result.filter(
+					(item) => item.organizer?.name && item.organizer.name.toLowerCase().includes(organizerQuery)
+				);
+			}
+
+			// Apply registration range filter
+			if (minRegistrations) {
+				const minReg = parseInt(minRegistrations);
+				result = result.filter((item) => (item.registrationCount || 0) >= minReg);
+			}
+			if (maxRegistrations) {
+				const maxReg = parseInt(maxRegistrations);
+				result = result.filter((item) => (item.registrationCount || 0) <= maxReg);
+			}
+
+			// Apply price range filter
+			if (minPrice) {
+				const minPriceNum = parseFloat(minPrice);
+				result = result.filter((item) => (item.price || 0) >= minPriceNum);
+			}
+			if (maxPrice) {
+				const maxPriceNum = parseFloat(maxPrice);
+				result = result.filter((item) => (item.price || 0) <= maxPriceNum);
+			}
+
+			// Apply status-based sorting/filtering
+			if (statusFilter && statusFilter !== '' && statusFilter !== 'all') {
+				const now = new Date();
+				switch (statusFilter) {
+					// Event-specific statuses
+					case 'popular':
+						result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
+						break;
+					case 'upcoming':
+						result.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
+						break;
+					case 'ongoing':
+						result = result.filter((item) => {
+							if (!item.date) return false;
+							const eventDate = new Date(item.date);
+							const endDate = new Date(item.endDate || item.date);
+							return eventDate <= now && now <= endDate;
+						});
+						break;
+					case 'completed':
+						result = result.filter((item) => {
+							if (!item.date) return false;
+							const endDate = new Date(item.endDate || item.date);
+							return endDate < now;
+						});
+						break;
+					// Organizer-specific statuses
+					case 'active':
+						result = result.filter((item) => item.status === 'active' || !item.status);
+						break;
+					case 'suspended':
+						result = result.filter((item) => item.status === 'suspended');
+						break;
+					case 'flagged':
+						result = result.filter((item) => item.isFlagged);
+						break;
+				}
+			}
+
+			return result;
+		}, [
+			data,
+			searchTerm,
+			categoryFilter,
+			statusFilter,
+			roleFilter,
+			startDate,
+			endDate,
+			eventType,
+			organizer,
+			minRegistrations,
+			maxRegistrations,
+			minPrice,
+			maxPrice,
+			isOnlineOnly,
+			isFeaturedOnly,
+		]);
+
+		// Notify parent of filtered data changes
+		useEffect(() => {
+			onFilteredDataChange(filteredData);
+		}, [filteredData, onFilteredDataChange]);
+
+		// Reset all filters
+		const resetAllFilters = () => {
+			setSearchTerm('');
+			setCategoryFilter('');
+			setStatusFilter('');
+			setRoleFilter('');
+			setStartDate('');
+			setEndDate('');
+			setEventType('');
+			setOrganizer('');
+			setMinRegistrations('');
+			setMaxRegistrations('');
+			setMinPrice('');
+			setMaxPrice('');
+			setIsOnlineOnly(false);
+			setIsFeaturedOnly(false);
+		};
 
 		// Check if any advanced filters are active
 		const hasActiveAdvancedFilters =
-			advancedFilters &&
-			(advancedFilters.dateRange?.startDate ||
-				advancedFilters.dateRange?.endDate ||
-				advancedFilters.location?.value ||
-				advancedFilters.eventType?.value ||
-				advancedFilters.organizer?.value ||
-				advancedFilters.registrationRange?.min ||
-				advancedFilters.registrationRange?.max ||
-				advancedFilters.priceRange?.min ||
-				advancedFilters.priceRange?.max ||
-				advancedFilters.toggleFilters?.isOnlineOnly?.value ||
-				advancedFilters.toggleFilters?.isFeaturedOnly?.value);
+			startDate ||
+			endDate ||
+			eventType ||
+			organizer ||
+			minRegistrations ||
+			maxRegistrations ||
+			minPrice ||
+			maxPrice ||
+			isOnlineOnly ||
+			isFeaturedOnly;
 
 		return (
 			<div
@@ -141,7 +306,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 				}}
 			>
 				{/* Basic Filters Section */}
-				<div className="px-8 pt-8 pb-4 bg-gradient-to-br from-card/95 via-card/90 to-muted/30">
+				<div className="px-8 pt-8 pb-4 rounded-t-xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30">
 					<div className="flex flex-col lg:flex-row gap-6">
 						{/* Search Input */}
 						<div className="flex-1">
@@ -150,19 +315,19 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 								name="search"
 								placeholder={searchPlaceholder}
 								value={searchTerm}
-								onChange={handleSearchChange}
+								onChange={(e) => setSearchTerm(e.target.value)}
 								icon={<MagnifyingGlassIcon className="w-5 h-5" />}
 								className="w-full"
 							/>
 						</div>
 
 						{/* Category Filter */}
-						{shouldShowCategory && (
+						{showCategory && (
 							<div className="min-w-[200px]">
 								<SelectInput
 									name="categoryFilter"
 									value={categoryFilter}
-									onChange={handleCategoryChange}
+									onChange={(e) => setCategoryFilter(e.target.value.toString())}
 									options={categoryOptions}
 									className="w-full"
 								/>
@@ -170,12 +335,12 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 						)}
 
 						{/* Role Filter */}
-						{shouldShowRole && (
+						{showRole && (
 							<div className="min-w-[200px]">
 								<SelectInput
 									name="roleFilter"
 									value={roleFilter}
-									onChange={handleRoleChange}
+									onChange={(e) => setRoleFilter(e.target.value.toString())}
 									options={roleOptions}
 									className="w-full"
 								/>
@@ -187,7 +352,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 							<SelectInput
 								name="statusFilter"
 								value={statusFilter}
-								onChange={handleStatusChange}
+								onChange={(e) => setStatusFilter(e.target.value.toString())}
 								options={statusOptions}
 								className="w-full"
 							/>
@@ -199,11 +364,11 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 						<div className="flex items-center gap-3">
 							<div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 							<span className="text-sm font-medium text-muted-foreground">
-								Showing <span className="text-primary font-semibold">{filteredCount}</span> of{' '}
-								<span className="text-card-foreground font-semibold">{totalCount}</span> {itemType}
+								Showing <span className="text-primary font-semibold">{filteredData.length}</span> of{' '}
+								<span className="text-card-foreground font-semibold">{data.length}</span> {itemType}
 							</span>
 						</div>
-						{filteredCount !== totalCount && (
+						{filteredData.length !== data.length && (
 							<div className="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full border border-primary/20">
 								Filtered
 							</div>
@@ -212,12 +377,12 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 				</div>
 
 				{/* Advanced Filters Section */}
-				{advancedFilters?.showAdvancedFilters && (
+				{showAdvancedFilters && (
 					<>
 						{/* Advanced Filters Header */}
 						<div
 							className="px-8 py-6 border-t border-border/30 cursor-pointer group transition-all duration-300 hover:bg-muted/20 bg-gradient-to-r from-muted/10 via-transparent to-muted/10"
-							onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+							onClick={() => setShowAdvancedFiltersPanel(!showAdvancedFiltersPanel)}
 						>
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-4">
@@ -238,7 +403,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 										<button
 											onClick={(e) => {
 												e.stopPropagation();
-												advancedFilters.onResetAllFilters?.();
+												resetAllFilters();
 											}}
 											className="px-4 py-2 text-xs font-semibold bg-warning/15 text-warning border border-warning/30 rounded-lg hover:bg-warning/25 transition-all duration-200 shadow-sm hover:shadow-md"
 										>
@@ -246,7 +411,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 										</button>
 									)}
 									<div className="p-2 rounded-lg bg-muted/20 group-hover:bg-muted/30 transition-all duration-200">
-										{showAdvancedFilters ? (
+										{showAdvancedFiltersPanel ? (
 											<ChevronUpIcon className="w-5 h-5 text-muted-foreground group-hover:text-card-foreground transition-all duration-200 transform group-hover:scale-110" />
 										) : (
 											<ChevronDownIcon className="w-5 h-5 text-muted-foreground group-hover:text-card-foreground transition-all duration-200 transform group-hover:scale-110" />
@@ -257,19 +422,17 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 						</div>
 
 						{/* Advanced Filters Content */}
-						{showAdvancedFilters && (
+						{showAdvancedFiltersPanel && (
 							<div className="px-8 py-6 space-y-6 border-t border-border/20 bg-gradient-to-br from-muted/5 via-transparent to-accent/5 animate-fade-in-up">
 								{/* Date Range */}
-								{advancedFilters.dateRange && (
+								{enableDateRange && (
 									<div>
 										<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 											<DateTimePicker
 												name="startDate"
 												label="Start Date"
-												value={advancedFilters.dateRange.startDate}
-												onChange={(e) =>
-													advancedFilters.dateRange?.setStartDate(e.target.value)
-												}
+												value={startDate}
+												onChange={(e) => setStartDate(e.target.value)}
 												placeholder="Select start date"
 												className="w-full"
 												showTimeSelect={false}
@@ -277,81 +440,53 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 											<DateTimePicker
 												name="endDate"
 												label="End Date"
-												value={advancedFilters.dateRange.endDate}
-												onChange={(e) => advancedFilters.dateRange?.setEndDate(e.target.value)}
+												value={endDate}
+												onChange={(e) => setEndDate(e.target.value)}
 												placeholder="Select end date"
 												className="w-full"
-												minDate={
-													advancedFilters.dateRange.startDate
-														? new Date(advancedFilters.dateRange.startDate)
-														: undefined
-												}
+												minDate={startDate ? new Date(startDate) : undefined}
 												showTimeSelect={false}
 											/>
 										</div>
 									</div>
 								)}
 
-								{/* Location, Event Type, and Toggle Filters */}
+								{/* Event Type and Toggle Filters */}
 								<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 									{/* Event Type Filter */}
-									{advancedFilters.eventType && (
+									{enableEventType && (
 										<div>
 											<label className="block text-s font-semibold text-card-foreground mb-3">
 												Event Type
 											</label>
 											<SelectInput
 												name="eventType"
-												value={advancedFilters.eventType.value}
-												onChange={(e) =>
-													advancedFilters.eventType?.setValue(e.target.value.toString())
-												}
-												options={advancedFilters.eventType.options}
+												value={eventType}
+												onChange={(e) => setEventType(e.target.value.toString())}
+												options={eventTypeOptions}
 												className="w-full"
 											/>
 										</div>
 									)}
 
-									{/* Location Filter */}
-									{advancedFilters.location && (
-										<FormInput
-											type="text"
-											name="location"
-											label="Location/City"
-											placeholder="Enter city name..."
-											value={advancedFilters.location.value}
-											onChange={(e) => advancedFilters.location?.setValue(e.target.value)}
-											icon={<MapPinIcon className="w-4 h-4" />}
-											className="w-full"
-										/>
-									)}
-
 									{/* Toggle Filters */}
-									{advancedFilters.toggleFilters && (
+									{(enableOnlineOnly || enableFeaturedOnly) && (
 										<div>
 											<label className="block text-s font-semibold text-card-foreground mb-3">
 												Quick Filters
 											</label>
 											<div className="flex items-center gap-6 lg:h-[45px]">
-												{advancedFilters.toggleFilters.isOnlineOnly && (
+												{enableOnlineOnly && (
 													<Switch
-														enabled={advancedFilters.toggleFilters.isOnlineOnly.value}
-														onChange={(event) =>
-															advancedFilters.toggleFilters?.isOnlineOnly?.setValue(
-																event.target.checked
-															)
-														}
+														enabled={isOnlineOnly}
+														onChange={(event) => setIsOnlineOnly(event.target.checked)}
 														label="Online Only"
 													/>
 												)}
-												{advancedFilters.toggleFilters.isFeaturedOnly && (
+												{enableFeaturedOnly && (
 													<Switch
-														enabled={advancedFilters.toggleFilters.isFeaturedOnly.value}
-														onChange={(event) =>
-															advancedFilters.toggleFilters?.isFeaturedOnly?.setValue(
-																event.target.checked
-															)
-														}
+														enabled={isFeaturedOnly}
+														onChange={(event) => setIsFeaturedOnly(event.target.checked)}
 														label="Featured Only"
 													/>
 												)}
@@ -363,31 +498,29 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 								{/* Organizer and Registration Range */}
 								<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 									{/* Organizer Filter */}
-									{advancedFilters.organizer && (
+									{enableOrganizer && (
 										<FormInput
 											type="text"
 											name="organizer"
 											label="Organizer Name"
 											placeholder="Search by organizer..."
-											value={advancedFilters.organizer.value}
-											onChange={(e) => advancedFilters.organizer?.setValue(e.target.value)}
+											value={organizer}
+											onChange={(e) => setOrganizer(e.target.value)}
 											icon={<UserGroupIcon className="w-4 h-4" />}
 											className="w-full"
 										/>
 									)}
 
 									{/* Registration Range */}
-									{advancedFilters.registrationRange && (
+									{enableRegistrationRange && (
 										<>
 											<FormInput
 												type="number"
 												name="minRegistrations"
 												label="Min Registrations"
 												placeholder="0"
-												value={advancedFilters.registrationRange.min}
-												onChange={(e) =>
-													advancedFilters.registrationRange?.setMin(e.target.value)
-												}
+												value={minRegistrations}
+												onChange={(e) => setMinRegistrations(e.target.value)}
 												className="w-full"
 												min="0"
 												allowNegative={false}
@@ -397,10 +530,8 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 												name="maxRegistrations"
 												label="Max Registrations"
 												placeholder="∞"
-												value={advancedFilters.registrationRange.max}
-												onChange={(e) =>
-													advancedFilters.registrationRange?.setMax(e.target.value)
-												}
+												value={maxRegistrations}
+												onChange={(e) => setMaxRegistrations(e.target.value)}
 												className="w-full"
 												min="0"
 												allowNegative={false}
@@ -410,7 +541,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 								</div>
 
 								{/* Price Range */}
-								{advancedFilters.priceRange && (
+								{enablePriceRange && (
 									<div>
 										<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 											<FormInput
@@ -418,8 +549,8 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 												name="minPrice"
 												label="Min Price"
 												placeholder="0"
-												value={advancedFilters.priceRange.min}
-												onChange={(e) => advancedFilters.priceRange?.setMin(e.target.value)}
+												value={minPrice}
+												onChange={(e) => setMinPrice(e.target.value)}
 												className="w-full"
 												min="0"
 												allowNegative={false}
@@ -429,8 +560,8 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 												name="maxPrice"
 												label="Max Price"
 												placeholder="∞"
-												value={advancedFilters.priceRange.max}
-												onChange={(e) => advancedFilters.priceRange?.setMax(e.target.value)}
+												value={maxPrice}
+												onChange={(e) => setMaxPrice(e.target.value)}
 												className="w-full"
 												min="0"
 												allowNegative={false}
@@ -446,12 +577,14 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 											<div className="flex items-center gap-2">
 												<div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 												<span className="text-sm font-medium text-card-foreground">
-													<span className="text-primary font-semibold">{filteredCount}</span>{' '}
-													of {totalCount} {itemType} shown
+													<span className="text-primary font-semibold">
+														{filteredData.length}
+													</span>{' '}
+													of {data.length} {itemType} shown
 												</span>
 											</div>
 											<button
-												onClick={() => advancedFilters.onResetAllFilters?.()}
+												onClick={resetAllFilters}
 												className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
 											>
 												Clear All
@@ -463,7 +596,7 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 								{/* Reset Filters Button */}
 								<div className="pt-2 border-t border-border/20">
 									<button
-										onClick={() => advancedFilters.onResetAllFilters?.()}
+										onClick={resetAllFilters}
 										className="w-full px-4 py-2.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-card-foreground rounded-lg transition-all duration-200 font-medium text-sm border border-border/30 hover:border-border"
 									>
 										Reset All Filters
@@ -478,6 +611,6 @@ const searchAndFillter: React.FC<EnhancedSearchFiltersProps> = memo(
 	}
 );
 
-searchAndFillter.displayName = 'searchAndFillter';
+SearchAndFilter.displayName = 'SearchAndFilter';
 
-export default searchAndFillter;
+export default SearchAndFilter;

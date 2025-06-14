@@ -3,95 +3,30 @@ import { useAuth } from '../../context/AuthContext';
 import axios, { AxiosResponse } from 'axios';
 import EventCard from '../../components/organizer/EventCard';
 import XPProgressBar from '../../components/user/XPProgressBar';
-import { Tabs, SelectInput } from '../../components/common';
-import {
-	UserDashboardProfile,
-	Announcement,
-	EventCardData,
-	AnnouncementsApiResponse,
-	RecommendedEventsApiResponse,
-	AnnouncementType,
-	SelectOption,
-} from '@/types';
+import { Tabs, SearchAndFilter } from '../../components/common';
+import { UserDashboardProfile, Announcement, EventCardData, AnnouncementsApiResponse, AnnouncementType } from '@/types';
+import { EVENT_TYPES, EVENT_CATEGORIES } from '../../utils/eventConstants';
 
 const UserDashboard: React.FC = () => {
 	const { user } = useAuth();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [userProfile, setUserProfile] = useState<UserDashboardProfile | null>(null);
-	const [events, setEvents] = useState<EventCardData[]>([]);
-	const [recommendedEvents, setRecommendedEvents] = useState<EventCardData[]>([]);
+	const [registeredEvents, setRegisteredEvents] = useState<EventCardData[]>([]);
+	const [savedEvents, setSavedEvents] = useState<EventCardData[]>([]);
+	const [filteredRegisteredEvents, setFilteredRegisteredEvents] = useState<EventCardData[]>([]);
+	const [filteredSavedEvents, setFilteredSavedEvents] = useState<EventCardData[]>([]);
 	const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-	const [currentPage, setCurrentPage] = useState<number>(1);
-	const [totalPages, setTotalPages] = useState<number>(1);
 	const [activeTab, setActiveTab] = useState<string>('registered');
 
-	// Filters and search state
-	const [searchQuery, setSearchQuery] = useState<string>('');
-	const [category, setCategory] = useState<string>('');
-	const [city, setCity] = useState<string>('');
-	const [dateRange, setDateRange] = useState<{ startDate: string; endDate: string }>({ startDate: '', endDate: '' });
-	const [tag, setTag] = useState<string>('');
+	// Handle filtered data changes from SearchAndFilter component
+	const handleRegisteredEventsFilterChange = (filtered: any[]) => {
+		setFilteredRegisteredEvents(filtered as EventCardData[]);
+	};
 
-	// Categories and tag options
-	const categories: string[] = ['Technology', 'Business', 'Education', 'Arts', 'Science', 'Music', 'Sports', 'Other'];
-	const popularTags: string[] = ['MUN', 'Hackathon', 'Workshop', 'Conference', 'Networking', 'Career'];
-
-	// Indian States and Union Territories
-	const indianStates: string[] = [
-		'Andhra Pradesh',
-		'Arunachal Pradesh',
-		'Assam',
-		'Bihar',
-		'Chhattisgarh',
-		'Goa',
-		'Gujarat',
-		'Haryana',
-		'Himachal Pradesh',
-		'Jharkhand',
-		'Karnataka',
-		'Kerala',
-		'Madhya Pradesh',
-		'Maharashtra',
-		'Manipur',
-		'Meghalaya',
-		'Mizoram',
-		'Nagaland',
-		'Odisha',
-		'Punjab',
-		'Rajasthan',
-		'Sikkim',
-		'Tamil Nadu',
-		'Telangana',
-		'Tripura',
-		'Uttar Pradesh',
-		'Uttarakhand',
-		'West Bengal',
-		'Andaman and Nicobar Islands',
-		'Chandigarh',
-		'Dadra and Nagar Haveli and Daman and Diu',
-		'Delhi',
-		'Jammu and Kashmir',
-		'Ladakh',
-		'Lakshadweep',
-		'Puducherry',
-	];
-
-	// Convert arrays to options format for SelectInput
-	const categoryOptions: SelectOption[] = [
-		{ value: '', label: 'All Categories' },
-		...categories.map((cat) => ({ value: cat, label: cat })),
-	];
-
-	const stateOptions: SelectOption[] = [
-		{ value: '', label: 'All States' },
-		...indianStates.map((state) => ({ value: state, label: state })),
-	];
-
-	const tagOptions: SelectOption[] = [
-		{ value: '', label: 'All Tags' },
-		...popularTags.map((tag) => ({ value: tag, label: tag })),
-	];
+	const handleSavedEventsFilterChange = (filtered: any[]) => {
+		setFilteredSavedEvents(filtered as EventCardData[]);
+	};
 
 	// Load user profile and events
 	useEffect(() => {
@@ -104,14 +39,23 @@ const UserDashboard: React.FC = () => {
 				);
 				setUserProfile(profileResponse.data.profile);
 
-				// Get recommended events
-				const recommendedResponse: AxiosResponse<RecommendedEventsApiResponse> = await axios.get(
-					'/events/recommended'
-				);
-				setRecommendedEvents(recommendedResponse.data.events);
+				// Get user's registered and saved events
+				const userEventsResponse: AxiosResponse<{
+					success: boolean;
+					xp: number;
+					badge: string;
+					savedEvents: EventCardData[];
+					events: EventCardData[];
+				}> = await axios.get('/user/events');
 
-				// Get all events with default filters
-				await fetchEvents();
+				if (userEventsResponse.data.success) {
+					const events = userEventsResponse.data.events || [];
+					const saved = userEventsResponse.data.savedEvents || [];
+					setRegisteredEvents(events);
+					setSavedEvents(saved);
+					setFilteredRegisteredEvents(events);
+					setFilteredSavedEvents(saved);
+				}
 
 				// Fetch active announcements
 				const announcementsResponse: AxiosResponse<AnnouncementsApiResponse> = await axios.get(
@@ -131,70 +75,13 @@ const UserDashboard: React.FC = () => {
 		fetchData();
 	}, []);
 
-	// Fetch events with filters
-	const fetchEvents = async (page: number = 1): Promise<void> => {
-		try {
-			const queryParams = new URLSearchParams();
-
-			// Add filters to query params
-			if (searchQuery) queryParams.append('search', searchQuery);
-			if (category) queryParams.append('category', category);
-			if (city) queryParams.append('city', city);
-			if (dateRange.startDate) queryParams.append('startDate', dateRange.startDate);
-			if (dateRange.endDate) queryParams.append('endDate', dateRange.endDate);
-			if (tag) queryParams.append('tag', tag);
-
-			// Add pagination
-			queryParams.append('page', page.toString());
-			queryParams.append('limit', '9'); // 9 events per page
-
-			const response: AxiosResponse<{
-				events: EventCardData[];
-				currentPage: number;
-				totalPages: number;
-			}> = await axios.get(`/events?${queryParams.toString()}`);
-
-			setEvents(response.data.events);
-			setCurrentPage(response.data.currentPage);
-			setTotalPages(response.data.totalPages);
-		} catch (error) {
-			console.error('Error fetching events:', error);
-			setError('Failed to load events. Please try again.');
-		}
-	};
-
-	// Handle search and filter changes
-	const handleSearch = (e: React.FormEvent<HTMLFormElement>): void => {
-		e.preventDefault();
-		setCurrentPage(1); // Reset to first page
-		fetchEvents(1);
-	};
-
-	// Reset all filters
-	const handleResetFilters = (): void => {
-		setSearchQuery('');
-		setCategory('');
-		setCity('');
-		setDateRange({ startDate: '', endDate: '' });
-		setTag('');
-		setCurrentPage(1);
-		fetchEvents(1);
-	};
-
-	// Handle pagination
-	const handlePageChange = (newPage: number): void => {
-		if (newPage >= 1 && newPage <= totalPages) {
-			setCurrentPage(newPage);
-			fetchEvents(newPage);
-		}
-	};
-
 	// Handle saving/unsaving event
 	const handleSaveToggle = (eventId: string, isSaved: boolean): void => {
-		// Update the UI to reflect saved state
-		setEvents(events.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
+		// Update the saved events UI to reflect saved state
+		setSavedEvents(savedEvents.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
 
-		setRecommendedEvents(recommendedEvents.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
+		// Update registered events UI to reflect saved state
+		setRegisteredEvents(registeredEvents.map((event) => (event._id === eventId ? { ...event, isSaved } : event)));
 	};
 
 	// Dummy handlers for EventCard (since these are not needed for dashboard)
@@ -212,38 +99,31 @@ const UserDashboard: React.FC = () => {
 			case 'success':
 				return 'ym-bg-success bg-opacity-10 border-l-green-400 ym-text-success';
 			case 'error':
-				return 'bg-red-50 border-l-red-400 text-red-700';
+				return 'ym-bg-destructive bg-opacity-10 border-l-red-400 ym-text-destructive';
 			default:
 				return 'ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700';
 		}
 	};
 
-	// Show loading state
 	if (loading) {
 		return (
-			<div className="min-h-screen ym-features-bg">
-				<div className="container mx-auto px-4 py-8">
-					<div className="flex flex-col items-center justify-center h-64">
-						<div
-							className="w-12 h-12 border-t-4 border-solid rounded-full animate-spin mb-4"
-							style={{ borderTopColor: 'var(--ring)' }}
-						></div>
-						<h2 className="text-xl font-semibold ym-text-secondary">Loading your dashboard...</h2>
-					</div>
-				</div>
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
 			</div>
 		);
 	}
 
-	// Show error state
 	if (error) {
 		return (
-			<div className="min-h-screen ym-features-bg">
-				<div className="container mx-auto px-4 py-8">
-					<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative">
-						<strong className="font-bold">Error!</strong>
-						<span className="block sm:inline"> {error}</span>
-					</div>
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="text-center">
+					<p className="text-destructive mb-4">{error}</p>
+					<button
+						onClick={() => window.location.reload()}
+						className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80"
+					>
+						Retry
+					</button>
 				</div>
 			</div>
 		);
@@ -309,7 +189,7 @@ const UserDashboard: React.FC = () => {
 							</div>
 						</div>
 
-						<XPProgressBar xp={userProfile.xp} />
+						<XPProgressBar xp={userProfile.xp || 0} />
 
 						{(userProfile.streakCount || 0) > 0 && (
 							<div className="mt-4 ym-bg-amber-100 rounded-lg p-3 flex items-center">
@@ -345,78 +225,35 @@ const UserDashboard: React.FC = () => {
 							content: (
 								<>
 									{/* Search and Filters Section */}
-									<div className="ym-bg-card p-6 rounded-xl shadow-lg mb-8 border ym-border-card">
-										<h2 className="text-xl font-semibold ym-text-primary mb-4">Find Events</h2>
+									<SearchAndFilter
+										data={registeredEvents}
+										onFilteredDataChange={handleRegisteredEventsFilterChange}
+										itemType="events"
+										animationDelay="0.1s"
+										searchPlaceholder="Search events by title, location, or tags..."
+										statusOptions={[
+											{ value: '', label: 'All Status' },
+											{ value: 'popular', label: 'Most Popular' },
+											{ value: 'upcoming', label: 'Upcoming' },
+											{ value: 'ongoing', label: 'Ongoing' },
+											{ value: 'completed', label: 'Completed' },
+										]}
+										categoryOptions={EVENT_CATEGORIES}
+										eventTypeOptions={EVENT_TYPES}
+										showCategory={true}
+										showAdvancedFilters={true}
+										enableDateRange={true}
+										enableEventType={true}
+										enableOnlineOnly={true}
+										enableFeaturedOnly={true}
+									/>
 
-										<form onSubmit={handleSearch} className="space-y-4">
-											<div className="flex flex-col md:flex-row gap-4">
-												<div className="flex-grow">
-													<input
-														type="text"
-														placeholder="Search events, tags or cities..."
-														value={searchQuery}
-														onChange={(e) => setSearchQuery(e.target.value)}
-														className="w-full p-3 border ym-border-card rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 ym-bg-card ym-text-card transition-all duration-300"
-													/>
-												</div>
-
-												<button
-													type="submit"
-													className="gradient-bg text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-												>
-													Search
-												</button>
-											</div>
-
-											<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-												<SelectInput
-													id="category-filter"
-													name="category"
-													value={category}
-													onChange={(e) => setCategory(e.target.value as string)}
-													options={categoryOptions}
-													placeholder="All Categories"
-													className="mb-0"
-												/>
-
-												<SelectInput
-													id="state-filter"
-													name="city"
-													value={city}
-													onChange={(e) => setCity(e.target.value as string)}
-													options={stateOptions}
-													placeholder="All States"
-													className="mb-0"
-												/>
-
-												<SelectInput
-													id="tag-filter"
-													name="tag"
-													value={tag}
-													onChange={(e) => setTag(e.target.value as string)}
-													options={tagOptions}
-													placeholder="All Tags"
-													className="mb-0"
-												/>
-											</div>
-
-											<div className="flex justify-end">
-												<button
-													type="button"
-													onClick={handleResetFilters}
-													className="ym-text-yellow-600 hover:ym-text-yellow-700 transition-colors mr-4 font-medium"
-												>
-													Reset Filters
-												</button>
-											</div>
-										</form>
-									</div>
-
-									{/* Events Grid */}
 									<div className="mb-8">
-										<h2 className="text-2xl font-bold ym-text-primary mb-6">Available Events</h2>
+										<h2 className="text-2xl font-bold ym-text-primary mb-6">
+											Your Registered Events
+										</h2>
 
-										{events.length === 0 ? (
+										{filteredRegisteredEvents.length === 0 ? (
 											<div className="ym-bg-card p-8 rounded-xl shadow-lg text-center border ym-border-card">
 												<div className="ym-bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
 													<svg
@@ -429,131 +266,116 @@ const UserDashboard: React.FC = () => {
 															strokeLinecap="round"
 															strokeLinejoin="round"
 															strokeWidth={2}
-															d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+															d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 														/>
 													</svg>
 												</div>
 												<p className="ym-text-secondary text-lg">
-													No events found matching your criteria.
+													{registeredEvents.length === 0
+														? "You haven't registered for any events yet."
+														: 'No events match your search criteria.'}
 												</p>
 												<p className="ym-text-muted text-sm mt-2">
-													Try adjusting your filters or search terms.
+													{registeredEvents.length === 0
+														? 'Explore events and register to start earning XP!'
+														: 'Try adjusting your search or filters.'}
 												</p>
 											</div>
 										) : (
-											<>
-												<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-													{events.map((event) => (
-														<EventCard
-															key={event._id}
-															event={event}
-															onSaveToggle={handleSaveToggle}
-															onManage={handleManage}
-															onEdit={handleEdit}
-															onDelete={handleDelete}
-														/>
-													))}
-												</div>
-
-												{/* Pagination */}
-												{totalPages > 1 && (
-													<div className="flex justify-center mt-8">
-														<nav className="flex items-center bg-white rounded-lg shadow-md border ym-border-card overflow-hidden">
-															<button
-																onClick={() => handlePageChange(currentPage - 1)}
-																disabled={currentPage === 1}
-																className={`px-4 py-2 transition-colors ${
-																	currentPage === 1
-																		? 'ym-text-muted cursor-not-allowed'
-																		: 'ym-text-yellow-600 hover:ym-bg-amber-100'
-																}`}
-															>
-																Previous
-															</button>
-
-															{Array.from({ length: totalPages }, (_, i) => i + 1).map(
-																(page) => (
-																	<button
-																		key={page}
-																		onClick={() => handlePageChange(page)}
-																		className={`px-4 py-2 transition-colors ${
-																			currentPage === page
-																				? 'gradient-bg text-white'
-																				: 'ym-text-yellow-600 hover:ym-bg-amber-100'
-																		}`}
-																	>
-																		{page}
-																	</button>
-																)
-															)}
-
-															<button
-																onClick={() => handlePageChange(currentPage + 1)}
-																disabled={currentPage === totalPages}
-																className={`px-4 py-2 transition-colors ${
-																	currentPage === totalPages
-																		? 'ym-text-muted cursor-not-allowed'
-																		: 'ym-text-yellow-600 hover:ym-bg-amber-100'
-																}`}
-															>
-																Next
-															</button>
-														</nav>
-													</div>
-												)}
-											</>
+											<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+												{filteredRegisteredEvents.map((event) => (
+													<EventCard
+														key={event._id}
+														event={event}
+														onSaveToggle={handleSaveToggle}
+														onManage={handleManage}
+														onEdit={handleEdit}
+														onDelete={handleDelete}
+													/>
+												))}
+											</div>
 										)}
 									</div>
 								</>
 							),
 						},
 						{
-							id: 'recommended',
-							key: 'recommended',
-							label: 'Recommended for You',
+							id: 'saved',
+							key: 'saved',
+							label: 'Saved Events',
 							content: (
-								<div>
-									<h2 className="text-2xl font-bold ym-text-primary mb-6">Recommended Events</h2>
+								<>
+									{/* Search and Filters Section for Saved Events */}
+									<SearchAndFilter
+										data={savedEvents}
+										onFilteredDataChange={handleSavedEventsFilterChange}
+										itemType="events"
+										animationDelay="0.1s"
+										searchPlaceholder="Search saved events by title, location, or tags..."
+										statusOptions={[
+											{ value: '', label: 'All Status' },
+											{ value: 'popular', label: 'Most Popular' },
+											{ value: 'upcoming', label: 'Upcoming' },
+											{ value: 'ongoing', label: 'Ongoing' },
+											{ value: 'completed', label: 'Completed' },
+										]}
+										categoryOptions={EVENT_CATEGORIES}
+										eventTypeOptions={EVENT_TYPES}
+										showCategory={true}
+										showAdvancedFilters={true}
+										enableDateRange={true}
+										enableEventType={true}
+										enableOnlineOnly={true}
+										enableFeaturedOnly={true}
+									/>
 
-									{recommendedEvents.length === 0 ? (
-										<div className="ym-bg-card p-8 rounded-xl shadow-lg text-center border ym-border-card">
-											<div className="ym-bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-												<svg
-													className="w-8 h-8 ym-text-yellow-600"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={2}
-														d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-													/>
-												</svg>
+									<div className="mb-8">
+										<h2 className="text-2xl font-bold ym-text-primary mb-6">Your Saved Events</h2>
+
+										{filteredSavedEvents.length === 0 ? (
+											<div className="ym-bg-card p-8 rounded-xl shadow-lg text-center border ym-border-card">
+												<div className="ym-bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+													<svg
+														className="w-8 h-8 ym-text-yellow-600"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2}
+															d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+														/>
+													</svg>
+												</div>
+												<p className="ym-text-secondary text-lg">
+													{savedEvents.length === 0
+														? "You haven't saved any events yet."
+														: 'No saved events match your search criteria.'}
+												</p>
+												<p className="ym-text-muted text-sm mt-2">
+													{savedEvents.length === 0
+														? "Save events you're interested in to view them later!"
+														: 'Try adjusting your search or filters.'}
+												</p>
 											</div>
-											<p className="ym-text-secondary text-lg">
-												No recommended events available yet.
-											</p>
-											<p className="ym-text-muted text-sm mt-2">
-												Attend more events to get personalized recommendations!
-											</p>
-										</div>
-									) : (
-										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-											{recommendedEvents.map((event) => (
-												<EventCard
-													key={event._id}
-													event={event}
-													onSaveToggle={handleSaveToggle}
-													onManage={handleManage}
-													onEdit={handleEdit}
-													onDelete={handleDelete}
-												/>
-											))}
-										</div>
-									)}
-								</div>
+										) : (
+											<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+												{filteredSavedEvents.map((event) => (
+													<EventCard
+														key={event._id}
+														event={event}
+														onSaveToggle={handleSaveToggle}
+														onManage={handleManage}
+														onEdit={handleEdit}
+														onDelete={handleDelete}
+													/>
+												))}
+											</div>
+										)}
+									</div>
+								</>
 							),
 						},
 					]}

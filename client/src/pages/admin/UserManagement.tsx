@@ -45,11 +45,9 @@ const UserManagement: React.FC = () => {
 
 	// State
 	const [users, setUsers] = useState<UserData[]>([]);
+	const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [roleFilter, setRoleFilter] = useState('all');
-	const [statusFilter, setStatusFilter] = useState('all');
 	const [modal, setModal] = useState<UserModalState>({
 		isOpen: false,
 		type: null,
@@ -93,25 +91,6 @@ const UserManagement: React.FC = () => {
 		noFiltersDescription: 'No users have been registered yet',
 	};
 
-	// Optimized filtering
-	const filteredUsers = useMemo(() => {
-		return users.filter((userData) => {
-			const matchesSearch =
-				!searchTerm ||
-				userData.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				userData.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-			const matchesRole = roleFilter === 'all' || userData.role === roleFilter;
-
-			const matchesStatus =
-				statusFilter === 'all' ||
-				(statusFilter === 'flagged' && userData.isFlagged) ||
-				(statusFilter !== 'flagged' && (userData.status || 'active') === statusFilter);
-
-			return matchesSearch && matchesRole && matchesStatus;
-		});
-	}, [users, searchTerm, roleFilter, statusFilter]);
-
 	// Optimized stats calculation
 	const userStats = useMemo(() => {
 		const total = users.length;
@@ -133,6 +112,11 @@ const UserManagement: React.FC = () => {
 		};
 	}, [users]);
 
+	// Handle filtered data changes from SearchAndFilter component
+	const handleFilteredDataChange = (filtered: any[]) => {
+		setFilteredUsers(filtered as UserData[]);
+	};
+
 	// API functions
 	const fetchUsers = useCallback(async () => {
 		try {
@@ -141,6 +125,7 @@ const UserManagement: React.FC = () => {
 			const { data } = await axios.get('/admin/users');
 			if (data.success) {
 				setUsers(data.users);
+				setFilteredUsers(data.users);
 			}
 		} catch (error) {
 			console.error('Error fetching users:', error);
@@ -396,20 +381,15 @@ const UserManagement: React.FC = () => {
 
 				{/* Search and Filters */}
 				<SearchAndFilter
-					searchTerm={searchTerm}
-					setSearchTerm={setSearchTerm}
-					roleFilter={roleFilter}
-					setRoleFilter={setRoleFilter}
-					statusFilter={statusFilter}
-					setStatusFilter={setStatusFilter}
-					filteredCount={filteredUsers.length}
-					totalCount={users.length}
+					data={users}
+					onFilteredDataChange={handleFilteredDataChange}
 					itemType="users"
 					searchPlaceholder="Search users by name or email..."
 					roleOptions={roleOptions}
 					statusOptions={statusOptions}
 					showRole={true}
 					showCategory={false}
+					showAdvancedFilters={false}
 				/>
 
 				{/* Error Message */}
@@ -424,9 +404,9 @@ const UserManagement: React.FC = () => {
 				<AdminTable
 					loading={loading}
 					filteredItems={filteredUsers}
-					searchTerm={searchTerm}
-					roleFilter={roleFilter}
-					statusFilter={statusFilter}
+					searchTerm=""
+					roleFilter="all"
+					statusFilter="all"
 					columns={columns}
 					emptyStateConfig={emptyStateConfig}
 					renderRow={renderUserRow}

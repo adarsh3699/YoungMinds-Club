@@ -8,6 +8,8 @@ export interface EventCardData {
   description?: string;
   shortDescription?: string;
   date: string;
+  startDate?: string;
+  endDate?: string;
   eventDate?: string;
   poster?: string;
   eventImage?: string;
@@ -23,6 +25,13 @@ export interface EventCardData {
     type?: 'online' | 'offline';
     city?: string;
     venue?: string;
+    state?: string;
+    country?: string;
+    address?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
   };
   venue?: string;
   registrationCount: number;
@@ -30,6 +39,10 @@ export interface EventCardData {
   capacity: number;
   maxAttendees?: number;
   isSaved?: boolean;
+  isOnline?: boolean;
+  isFeatured?: boolean;
+  tags?: string[];
+  animationDelay?: string;
 }
 
 // Countdown type for event card timer

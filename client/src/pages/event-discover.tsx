@@ -5,7 +5,7 @@ import { SearchAndFilter } from '../components/common';
 import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { EventDiscoverData, EventsApiResponse, DateRange, SelectOption } from '@/types';
+import { EventDiscoverData, EventsApiResponse, SelectOption } from '@/types';
 import { EVENT_CATEGORIES as BASE_EVENT_CATEGORIES, EVENT_TYPES } from '../utils/eventConstants';
 
 // Categories with "All Categories" option
@@ -13,10 +13,11 @@ const EVENT_CATEGORIES: SelectOption[] = [{ label: 'All Categories', value: '' }
 
 // Sort options
 const SORT_OPTIONS: SelectOption[] = [
-	{ label: 'Newest', value: 'newest' },
+	{ label: 'All Status', value: 'all' },
 	{ label: 'Most Popular', value: 'popular' },
 	{ label: 'Upcoming', value: 'upcoming' },
-	{ label: 'Outgoing', value: 'outgoing' },
+	{ label: 'Ongoing', value: 'ongoing' },
+	{ label: 'Completed', value: 'completed' },
 ];
 
 const EventsPage: React.FC = () => {
@@ -28,21 +29,6 @@ const EventsPage: React.FC = () => {
 	const [filteredEvents, setFilteredEvents] = useState<EventDiscoverData[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-
-	// State for filters and search
-	const [searchQuery, setSearchQuery] = useState<string>('');
-	const [selectedCategory, setSelectedCategory] = useState<string>('');
-	const [selectedEventType, setSelectedEventType] = useState<string>('');
-	const [selectedLocation, setSelectedLocation] = useState<string>('');
-	const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
-	const [dateRange, setDateRange] = useState<DateRange>({ start: '', end: '' });
-	const [sortBy, setSortBy] = useState<string>('newest');
-
-	// Additional advanced filters
-	const [selectedTags, setSelectedTags] = useState<string>('');
-	const [selectedOrganizer, setSelectedOrganizer] = useState<string>('');
-	const [registrationRange, setRegistrationRange] = useState<{ min: string; max: string }>({ min: '', max: '' });
-	const [priceRange, setPriceRange] = useState<{ min: string; max: string }>({ min: '', max: '' });
 
 	// Fetch events data
 	useEffect(() => {
@@ -73,149 +59,9 @@ const EventsPage: React.FC = () => {
 		fetchEvents();
 	}, []);
 
-	// Apply filters and search
-	useEffect(() => {
-		if (!events.length) {
-			setFilteredEvents([]);
-			return;
-		}
-
-		let result = [...events];
-
-		// Apply search filter
-		if (searchQuery) {
-			const query = searchQuery.toLowerCase();
-			result = result.filter(
-				(event) =>
-					event.title.toLowerCase().includes(query) ||
-					(event.tags && event.tags.some((tag) => tag.toLowerCase().includes(query)))
-			);
-		}
-
-		// Apply category filter
-		if (selectedCategory) {
-			result = result.filter((event) => event.category === selectedCategory);
-		}
-
-		// Apply event type filter
-		if (selectedEventType) {
-			result = result.filter((event) => event.type === selectedEventType);
-		}
-
-		// Apply location filter
-		if (selectedLocation) {
-			const locationQuery = selectedLocation.toLowerCase();
-			result = result.filter((event) => {
-				// Handle online events
-				if (selectedLocation === 'Online' && event.location?.type === 'online') {
-					return true;
-				}
-
-				// For text searches, check if the query matches any location field
-				return (
-					event.location?.city?.toLowerCase().includes(locationQuery) ||
-					event.location?.venue?.toLowerCase().includes(locationQuery)
-				);
-			});
-		}
-
-		// Apply online only filter
-		if (isOnlineOnly) {
-			result = result.filter((event) => event.location?.type === 'online');
-		}
-
-		// Apply date range filter
-		if (dateRange.start) {
-			const startDate = new Date(dateRange.start);
-			result = result.filter((event) => new Date(event.date) >= startDate);
-		}
-		if (dateRange.end) {
-			const endDate = new Date(dateRange.end);
-			result = result.filter((event) => new Date(event.date) <= endDate);
-		}
-
-		// Apply tags filter
-		if (selectedTags) {
-			const tagsQuery = selectedTags.toLowerCase();
-			result = result.filter(
-				(event) => event.tags && event.tags.some((tag) => tag.toLowerCase().includes(tagsQuery))
-			);
-		}
-
-		// Apply organizer filter
-		if (selectedOrganizer) {
-			const organizerQuery = selectedOrganizer.toLowerCase();
-			result = result.filter(
-				(event) => event.organizer?.name && event.organizer.name.toLowerCase().includes(organizerQuery)
-			);
-		}
-
-		// Apply registration range filter
-		if (registrationRange.min) {
-			const minRegistrations = parseInt(registrationRange.min);
-			result = result.filter((event) => (event.registrationCount || 0) >= minRegistrations);
-		}
-		if (registrationRange.max) {
-			const maxRegistrations = parseInt(registrationRange.max);
-			result = result.filter((event) => (event.registrationCount || 0) <= maxRegistrations);
-		}
-
-		// Apply price range filter
-		if (priceRange.min) {
-			const minPrice = parseFloat(priceRange.min);
-			result = result.filter((event) => (event.price || 0) >= minPrice);
-		}
-		if (priceRange.max) {
-			const maxPrice = parseFloat(priceRange.max);
-			result = result.filter((event) => (event.price || 0) <= maxPrice);
-		}
-
-		// Apply sorting
-		switch (sortBy) {
-			case 'newest':
-				result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-				break;
-			case 'popular':
-				result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
-				break;
-			case 'upcoming':
-				result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-				break;
-			case 'outgoing':
-				result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-				break;
-			default:
-				break;
-		}
-
-		setFilteredEvents(result);
-	}, [
-		events,
-		searchQuery,
-		selectedCategory,
-		selectedEventType,
-		selectedLocation,
-		isOnlineOnly,
-		dateRange,
-		sortBy,
-		selectedTags,
-		selectedOrganizer,
-		registrationRange,
-		priceRange,
-	]);
-
-	const resetFilters = (): void => {
-		setSearchQuery('');
-		setSelectedCategory('');
-		setSelectedEventType('');
-		setSelectedLocation('');
-		setIsOnlineOnly(false);
-		setDateRange({ start: '', end: '' });
-		setSortBy('newest');
-		setSelectedTags('');
-		setSelectedOrganizer('');
-		setRegistrationRange({ min: '', max: '' });
-		setPriceRange({ min: '', max: '' });
+	// Handle filtered data changes from SearchAndFilter component
+	const handleFilteredDataChange = (filtered: any[]) => {
+		setFilteredEvents(filtered as EventDiscoverData[]);
 	};
 
 	// Handle saving/unsaving event
@@ -261,63 +107,22 @@ const EventsPage: React.FC = () => {
 
 				{/* Search and Filter Section */}
 				<SearchAndFilter
-					searchTerm={searchQuery}
-					setSearchTerm={setSearchQuery}
-					statusFilter={sortBy}
-					setStatusFilter={setSortBy}
-					statusOptions={SORT_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-					categoryFilter={selectedCategory}
-					setCategoryFilter={setSelectedCategory}
-					categoryOptions={EVENT_CATEGORIES.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-					filteredCount={filteredEvents.length}
-					totalCount={events.length}
+					data={events}
+					onFilteredDataChange={handleFilteredDataChange}
 					itemType="events"
-					searchPlaceholder="Search events by title, or tags..."
+					searchPlaceholder="Search events by title, location, or tags..."
+					animationDelay="0.1s"
 					showCategory={true}
-					advancedFilters={{
-						showAdvancedFilters: true,
-						dateRange: {
-							startDate: dateRange.start,
-							endDate: dateRange.end,
-							setStartDate: (date) => setDateRange((prev) => ({ ...prev, start: date })),
-							setEndDate: (date) => setDateRange((prev) => ({ ...prev, end: date })),
-						},
-						location: {
-							value: selectedLocation,
-							setValue: setSelectedLocation,
-						},
-						eventType: {
-							value: selectedEventType,
-							setValue: setSelectedEventType,
-							options: [{ value: '', label: 'All Types' }, ...EVENT_TYPES].map((opt) => ({
-								value: opt.value.toString(),
-								label: opt.label,
-							})),
-						},
-						organizer: {
-							value: selectedOrganizer,
-							setValue: setSelectedOrganizer,
-						},
-						registrationRange: {
-							min: registrationRange.min,
-							max: registrationRange.max,
-							setMin: (min) => setRegistrationRange((prev) => ({ ...prev, min })),
-							setMax: (max) => setRegistrationRange((prev) => ({ ...prev, max })),
-						},
-						priceRange: {
-							min: priceRange.min,
-							max: priceRange.max,
-							setMin: (min) => setPriceRange((prev) => ({ ...prev, min })),
-							setMax: (max) => setPriceRange((prev) => ({ ...prev, max })),
-						},
-						toggleFilters: {
-							isOnlineOnly: {
-								value: isOnlineOnly,
-								setValue: setIsOnlineOnly,
-							},
-						},
-						onResetAllFilters: resetFilters,
-					}}
+					showAdvancedFilters={true}
+					categoryOptions={EVENT_CATEGORIES}
+					statusOptions={SORT_OPTIONS}
+					eventTypeOptions={[{ label: 'All Types', value: '' }, ...EVENT_TYPES]}
+					enableDateRange={true}
+					enableEventType={true}
+					enableOrganizer={true}
+					enableRegistrationRange={true}
+					enablePriceRange={true}
+					enableOnlineOnly={true}
 				/>
 
 				{/* Events Grid */}
@@ -348,15 +153,6 @@ const EventsPage: React.FC = () => {
 							<p className="mt-1 text-sm ym-text-secondary">
 								Try adjusting your search or filter criteria to find events.
 							</p>
-							<div className="mt-6">
-								<button
-									type="button"
-									className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium ym-text-white gradient-bg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all"
-									onClick={resetFilters}
-								>
-									Reset all filters
-								</button>
-							</div>
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

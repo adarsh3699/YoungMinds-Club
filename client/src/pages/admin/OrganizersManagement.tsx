@@ -28,10 +28,9 @@ type OrganizerModalState = {
 const OrganizersManagement: React.FC = () => {
 	// State
 	const [organizers, setOrganizers] = useState<OrganizerData[]>([]);
+	const [filteredOrganizers, setFilteredOrganizers] = useState<OrganizerData[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [searchTerm, setSearchTerm] = useState('');
-	const [statusFilter, setStatusFilter] = useState('all');
 	const [modal, setModal] = useState<OrganizerModalState>({
 		isOpen: false,
 		type: null,
@@ -67,24 +66,6 @@ const OrganizersManagement: React.FC = () => {
 		description: 'Try adjusting your search or filters',
 		noFiltersDescription: 'No organizers have been registered yet',
 	};
-
-	// Optimized filtering
-	const filteredOrganizers = useMemo(() => {
-		return organizers.filter((organizer) => {
-			const matchesSearch =
-				!searchTerm ||
-				organizer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				organizer.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-			const matchesStatus =
-				statusFilter === 'all' ||
-				(statusFilter === 'active' && (organizer.status === 'active' || !organizer.status)) ||
-				(statusFilter === 'suspended' && organizer.status === 'suspended') ||
-				(statusFilter === 'flagged' && organizer.isFlagged);
-
-			return matchesSearch && matchesStatus;
-		});
-	}, [organizers, searchTerm, statusFilter]);
 
 	// Optimized stats calculation
 	const organizerStats = useMemo(() => {
@@ -152,6 +133,11 @@ const OrganizersManagement: React.FC = () => {
 		},
 	];
 
+	// Handle filtered data changes from SearchAndFilter component
+	const handleFilteredDataChange = (filtered: any[]) => {
+		setFilteredOrganizers(filtered as OrganizerData[]);
+	};
+
 	// API functions
 	const fetchOrganizers = useCallback(async () => {
 		try {
@@ -160,6 +146,7 @@ const OrganizersManagement: React.FC = () => {
 			const { data } = await axios.get('/admin/organizers');
 			if (data.success) {
 				setOrganizers(data.organizers);
+				setFilteredOrganizers(data.organizers);
 			}
 		} catch (error) {
 			console.error('Error fetching organizers:', error);
@@ -401,17 +388,14 @@ const OrganizersManagement: React.FC = () => {
 
 				{/* Search and Filters */}
 				<SearchAndFilter
-					searchTerm={searchTerm}
-					setSearchTerm={setSearchTerm}
-					statusFilter={statusFilter}
-					setStatusFilter={setStatusFilter}
-					filteredCount={filteredOrganizers.length}
-					totalCount={organizers.length}
+					data={organizers}
+					onFilteredDataChange={handleFilteredDataChange}
 					itemType="organizers"
 					searchPlaceholder="Search organizers by name or email..."
 					statusOptions={statusOptions}
 					showRole={false}
 					showCategory={false}
+					showAdvancedFilters={false}
 				/>
 
 				{/* Error Alert */}
@@ -432,9 +416,9 @@ const OrganizersManagement: React.FC = () => {
 				<AdminTable
 					loading={loading}
 					filteredItems={filteredOrganizers}
-					searchTerm={searchTerm}
+					searchTerm=""
 					roleFilter="organizer"
-					statusFilter={statusFilter}
+					statusFilter="all"
 					renderRow={renderOrganizerRow}
 					columns={columns}
 					emptyStateConfig={emptyStateConfig}
@@ -451,6 +435,7 @@ const OrganizersManagement: React.FC = () => {
 					flagReason={modal.flagReason}
 					onFlagReasonChange={(e) => setModal((prev) => ({ ...prev, flagReason: e.target.value }))}
 					onConfirm={handleConfirm}
+					context="user"
 				/>
 			</div>
 		</div>
