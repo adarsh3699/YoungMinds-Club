@@ -229,7 +229,7 @@ const UserDashboard: React.FC = () => {
 										data={registeredEvents}
 										onFilteredDataChange={handleRegisteredEventsFilterChange}
 										itemType="events"
-										animationDelay="0.1s"
+										disableAnimations={true}
 										searchPlaceholder="Search events by title, location, or tags..."
 										statusOptions={[
 											{ value: '', label: 'All Status' },
@@ -310,7 +310,7 @@ const UserDashboard: React.FC = () => {
 										data={savedEvents}
 										onFilteredDataChange={handleSavedEventsFilterChange}
 										itemType="events"
-										animationDelay="0.1s"
+										disableAnimations={true}
 										searchPlaceholder="Search saved events by title, location, or tags..."
 										statusOptions={[
 											{ value: '', label: 'All Status' },

@@ -45,6 +45,7 @@ interface SearchAndFilterConfig {
 	itemType?: string;
 	searchPlaceholder?: string;
 	animationDelay?: string;
+	disableAnimations?: boolean;
 
 	// Filter options
 	categoryOptions?: SelectOption[];
@@ -65,6 +66,7 @@ interface SearchAndFilterConfig {
 	enablePriceRange?: boolean;
 	enableOnlineOnly?: boolean;
 	enableFeaturedOnly?: boolean;
+	enableFreeOnly?: boolean;
 }
 
 /**
@@ -77,6 +79,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 		itemType = 'items',
 		searchPlaceholder = 'Search...',
 		animationDelay = '0.3s',
+		disableAnimations = false,
 		categoryOptions = [{ label: 'All Categories', value: '' }],
 		statusOptions = [{ label: 'All Status', value: '' }],
 		roleOptions = [{ label: 'All Roles', value: '' }],
@@ -91,6 +94,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 		enablePriceRange = false,
 		enableOnlineOnly = false,
 		enableFeaturedOnly = false,
+		enableFreeOnly = false,
 	}) => {
 		// Basic filter states
 		const [searchTerm, setSearchTerm] = useState<string>('');
@@ -110,6 +114,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 		const [maxPrice, setMaxPrice] = useState<string>('');
 		const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
 		const [isFeaturedOnly, setIsFeaturedOnly] = useState<boolean>(false);
+		const [isFreeOnly, setIsFreeOnly] = useState<boolean>(false);
 
 		// Filtering logic
 		const filteredData = useMemo(() => {
@@ -163,6 +168,11 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			// Apply online only filter
 			if (isOnlineOnly) {
 				result = result.filter((item) => item.location?.type === 'online');
+			}
+
+			// Apply free only filter
+			if (isFreeOnly) {
+				result = result.filter((item) => (item.price || 0) === 0);
 			}
 
 			// Apply date range filter
@@ -259,6 +269,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			maxPrice,
 			isOnlineOnly,
 			isFeaturedOnly,
+			isFreeOnly,
 		]);
 
 		// Notify parent of filtered data changes
@@ -282,6 +293,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			setMaxPrice('');
 			setIsOnlineOnly(false);
 			setIsFeaturedOnly(false);
+			setIsFreeOnly(false);
 		};
 
 		// Check if any advanced filters are active
@@ -295,15 +307,22 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			minPrice ||
 			maxPrice ||
 			isOnlineOnly ||
-			isFeaturedOnly;
+			isFeaturedOnly ||
+			isFreeOnly;
 
 		return (
 			<div
-				className="glass-effect rounded-3xl shadow-xl mb-8 animate-fade-in relative z-20 border border-border/20 backdrop-blur-lg"
-				style={{
-					animationDelay,
-					animationFillMode: 'both',
-				}}
+				className={`glass-effect rounded-3xl shadow-xl mb-8 relative z-20 border border-border/20 backdrop-blur-lg ${
+					!disableAnimations ? 'animate-fade-in' : ''
+				}`}
+				style={
+					!disableAnimations
+						? {
+								animationDelay,
+								animationFillMode: 'both',
+						  }
+						: {}
+				}
 			>
 				{/* Basic Filters Section */}
 				<div className="px-8 pt-8 pb-4 rounded-t-xl bg-gradient-to-br from-card/95 via-card/90 to-muted/30">
@@ -423,7 +442,11 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 
 						{/* Advanced Filters Content */}
 						{showAdvancedFiltersPanel && (
-							<div className="px-8 py-6 space-y-6 border-t border-border/20 bg-gradient-to-br from-muted/5 via-transparent to-accent/5 animate-fade-in-up">
+							<div
+								className={`px-8 py-6 space-y-6 border-t border-border/20 bg-gradient-to-br from-muted/5 via-transparent to-accent/5 ${
+									!disableAnimations ? 'animate-fade-in-up' : ''
+								}`}
+							>
 								{/* Date Range */}
 								{enableDateRange && (
 									<div>
@@ -470,7 +493,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 									)}
 
 									{/* Toggle Filters */}
-									{(enableOnlineOnly || enableFeaturedOnly) && (
+									{(enableOnlineOnly || enableFeaturedOnly || enableFreeOnly) && (
 										<div>
 											<label className="block text-s font-semibold text-card-foreground mb-3">
 												Quick Filters
@@ -488,6 +511,13 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 														enabled={isFeaturedOnly}
 														onChange={(event) => setIsFeaturedOnly(event.target.checked)}
 														label="Featured Only"
+													/>
+												)}
+												{enableFreeOnly && (
+													<Switch
+														enabled={isFreeOnly}
+														onChange={(event) => setIsFreeOnly(event.target.checked)}
+														label="Free Only"
 													/>
 												)}
 											</div>

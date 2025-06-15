@@ -123,6 +123,7 @@ const EventsPage: React.FC = () => {
 					enableRegistrationRange={true}
 					enablePriceRange={true}
 					enableOnlineOnly={true}
+					enableFreeOnly={true}
 				/>
 
 				{/* Events Grid */}
