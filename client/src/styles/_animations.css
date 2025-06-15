@@ -27,8 +27,14 @@
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 @keyframes fadeInUpFast {
@@ -77,10 +83,21 @@
 .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
 .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
 .animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
-.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-fade-in-up { 
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+}
 .animate-bounce { animation: bounce 1s infinite; }
 .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 .animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* Smooth animation preparation */
+.animate-on-scroll {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.animate-on-scroll:not(.animate-fade-in-up) {
+  will-change: opacity, transform;
+}
 
 /* FAQ Accordion */
 .faq-accordion-content { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }

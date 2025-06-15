@@ -83,7 +83,7 @@ const EventsPage: React.FC = () => {
 	// Error state
 	if (error) {
 		return (
-			<div className="container mx-auto px-4 py-12">
+			<div className="container mx-auto px-4 py-12 mt-6">
 				<div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
 					<strong className="font-bold">Error! </strong>
 					<span className="block sm:inline">{error}</span>
