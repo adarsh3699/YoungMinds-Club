@@ -6,10 +6,7 @@ import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { EventDiscoverData, EventsApiResponse, SelectOption } from '@/types';
-import { EVENT_CATEGORIES as BASE_EVENT_CATEGORIES, EVENT_TYPES } from '../utils/eventConstants';
-
-// Categories with "All Categories" option
-const EVENT_CATEGORIES: SelectOption[] = [{ label: 'All Categories', value: '' }, ...BASE_EVENT_CATEGORIES];
+import { EVENT_CATEGORIES, EVENT_TYPES } from '../utils/eventConstants';
 
 // Sort options
 const SORT_OPTIONS: SelectOption[] = [
@@ -116,7 +113,7 @@ const EventsPage: React.FC = () => {
 					showAdvancedFilters={true}
 					categoryOptions={EVENT_CATEGORIES}
 					statusOptions={SORT_OPTIONS}
-					eventTypeOptions={[{ label: 'All Types', value: '' }, ...EVENT_TYPES]}
+					eventTypeOptions={EVENT_TYPES}
 					enableDateRange={true}
 					enableEventType={true}
 					enableOrganizer={true}

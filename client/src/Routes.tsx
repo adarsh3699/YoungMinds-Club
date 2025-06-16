@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ErrorProvider } from '@/context/ErrorContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -34,6 +34,31 @@ const AdminAnnouncements = lazy(() => import('@/pages/admin/announcements'));
 const EventDetails = lazy(() => import('@/pages/event-details'));
 const EventsPage = lazy(() => import('@/pages/event-discover'));
 const NotFound = lazy(() => import('@/pages/not-found'));
+
+// ScrollToTop component to handle automatic scroll to top on route change
+const ScrollToTop: React.FC = () => {
+	const { pathname } = useLocation();
+
+	useEffect(() => {
+		// Use setTimeout to ensure the scroll happens after the component renders
+		setTimeout(() => {
+			// Scroll the main window
+			window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+			// Also scroll any potential scroll containers
+			const mainElement = document.querySelector('main');
+			if (mainElement) {
+				mainElement.scrollTop = 0;
+			}
+
+			// Scroll the document element as fallback
+			document.documentElement.scrollTop = 0;
+			document.body.scrollTop = 0;
+		}, 0);
+	}, [pathname]);
+
+	return null;
+};
 
 // Dashboard router component that routes to the appropriate dashboard based on user role
 const DashboardRouter: React.FC = () => {
@@ -69,6 +94,9 @@ const AppRoutes: React.FC = () => {
 		<ErrorProvider>
 			<AuthProvider>
 				<Router>
+					{/* Scroll to top on route change */}
+					<ScrollToTop />
+
 					{/* Global Error Alert */}
 					<GlobalErrorAlert />
 
