@@ -319,16 +319,16 @@ const Navigation: React.FC = () => {
 							</div>
 						) : (
 							<div className="pt-4 pb-3 border-t ym-border-card">
-								<div className="space-y-2 px-4">
+								<div className="space-y-3 px-4">
 									<Link
 										to="/login"
-										className="w-full text-center py-2 px-4 border ym-border-card rounded-md shadow-sm text-sm font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover transition-colors"
+										className="flex items-center justify-center w-full py-3 px-4 border ym-border-card rounded-lg shadow-sm text-base font-medium ym-text-card ym-bg-card hover:ym-bg-card-hover transition-colors"
 									>
 										Login
 									</Link>
 									<Link
 										to="/register"
-										className="w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium ym-text-white gradient-bg hover:shadow-lg transition-all block"
+										className="flex items-center justify-center w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium ym-text-white gradient-bg hover:shadow-lg transition-all"
 									>
 										Sign up
 									</Link>

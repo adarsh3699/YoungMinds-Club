@@ -253,24 +253,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			}
 
 			return result;
-		}, [
-			data,
-			searchTerm,
-			categoryFilter,
-			statusFilter,
-			roleFilter,
-			startDate,
-			endDate,
-			eventType,
-			organizer,
-			minRegistrations,
-			maxRegistrations,
-			minPrice,
-			maxPrice,
-			isOnlineOnly,
-			isFeaturedOnly,
-			isFreeOnly,
-		]);
+		}, [data, searchTerm, categoryFilter, statusFilter, roleFilter, startDate, endDate, eventType, organizer, minRegistrations, maxRegistrations, minPrice, maxPrice, isOnlineOnly, isFreeOnly]);
 
 		// Notify parent of filtered data changes
 		useEffect(() => {
@@ -475,7 +458,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 								)}
 
 								{/* Event Type and Toggle Filters */}
-								<div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+								<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 									{/* Event Type Filter */}
 									{enableEventType && (
 										<div>

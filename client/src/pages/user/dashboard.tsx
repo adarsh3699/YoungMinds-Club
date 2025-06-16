@@ -245,7 +245,7 @@ const UserDashboard: React.FC = () => {
 										enableDateRange={true}
 										enableEventType={true}
 										enableOnlineOnly={true}
-										enableFeaturedOnly={true}
+										enableFreeOnly={true}
 									/>
 
 									<div className="mb-8">
@@ -326,7 +326,7 @@ const UserDashboard: React.FC = () => {
 										enableDateRange={true}
 										enableEventType={true}
 										enableOnlineOnly={true}
-										enableFeaturedOnly={true}
+										enableFreeOnly={true}
 									/>
 
 									<div className="mb-8">

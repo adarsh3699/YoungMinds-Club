@@ -465,6 +465,7 @@ const EventsManagement: React.FC = () => {
 					enablePriceRange={true}
 					enableOnlineOnly={true}
 					enableFeaturedOnly={true}
+					enableFreeOnly={true}
 				/>
 
 				{/* Error Alert */}
