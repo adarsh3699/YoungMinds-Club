@@ -25,14 +25,18 @@ const XPProgressBar: React.FC<XPProgressBarProps> = ({ xp }) => {
 		return currentLevelIndex < levels.length - 1 ? levels[currentLevelIndex + 1] : null;
 	}, [currentLevel, levels]);
 
+	// Calculate the total XP range for the progress bar (up to Veteran level)
+	const maxVisibleXP = useMemo(() => {
+		const veteranLevel = levels.find((level) => level.name === 'Veteran');
+		return veteranLevel ? veteranLevel.min : 300;
+	}, [levels]);
+
 	// Calculate progress percentage
 	const progressPercentage = useMemo((): number => {
-		if (!nextLevel) return 100; // Already at max level
-
-		const totalRange = nextLevel.min - currentLevel.min;
-		const currentProgress = xp - currentLevel.min;
-		return Math.min(Math.floor((currentProgress / totalRange) * 100), 100);
-	}, [xp, currentLevel, nextLevel]);
+		// Calculate progress across the entire visible range (0 to maxVisibleXP)
+		const clampedXP = Math.min(xp, maxVisibleXP);
+		return Math.min(Math.floor((clampedXP / maxVisibleXP) * 100), 100);
+	}, [xp, maxVisibleXP]);
 
 	// XP needed for next level
 	const xpForNextLevel = useMemo((): number => {
@@ -66,7 +70,7 @@ const XPProgressBar: React.FC<XPProgressBarProps> = ({ xp }) => {
 						key={level.name}
 						className="absolute top-0 bottom-0 border-l ym-border-card"
 						style={{
-							left: `${(level.min / levels[levels.length - 1].min) * 100}%`,
+							left: `${(level.min / maxVisibleXP) * 100}%`,
 							opacity: xp >= level.min ? 0.5 : 0.2,
 						}}
 					></div>
@@ -99,4 +103,4 @@ const XPProgressBar: React.FC<XPProgressBarProps> = ({ xp }) => {
 	);
 };
 
-export default XPProgressBar; 
+export default XPProgressBar;
