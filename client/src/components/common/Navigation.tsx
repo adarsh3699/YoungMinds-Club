@@ -45,7 +45,7 @@ const Navigation: React.FC = () => {
 	};
 
 	// Generate user navigation items based on role
-	let userNavigation: NavigationItem[] = [];
+	const userNavigation: NavigationItem[] = [];
 
 	// Add role-specific profile link and items
 	if (isAdmin) {
@@ -64,6 +64,7 @@ const Navigation: React.FC = () => {
 	const publicNavigation: NavigationItem[] = [
 		{ name: 'Home', href: '/' },
 		{ name: 'Events', href: '/events' },
+		{ name: 'Internships', href: '/internships' },
 	];
 
 	// Add Dashboard to navbar for organizers and admins

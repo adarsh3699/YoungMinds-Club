@@ -87,6 +87,7 @@ const EventCard: React.FC<EventCardProps> = ({
 			const date = new Date(dateString);
 			return format(date, 'MMM d, yyyy');
 		} catch (error) {
+			console.error('Error formatting event date:', error);
 			return 'Invalid Date';
 		}
 	};
@@ -96,6 +97,7 @@ const EventCard: React.FC<EventCardProps> = ({
 			const date = new Date(dateString);
 			return format(date, 'h:mm a');
 		} catch (error) {
+			console.error('Error formatting event time:', error);
 			return 'Invalid Time';
 		}
 	};

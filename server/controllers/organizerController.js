@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
+const Internship = require('../models/Internship');
+const InternshipApplication = require('../models/InternshipApplication');
 const { cloudinary } = require('../config/cloudinary');
 
 // Get organizer profile
@@ -172,6 +174,32 @@ exports.getDashboard = async (req, res) => {
         
         const totalRevenue = revenue.length > 0 ? revenue[0].total : 0;
 
+        // Get internship statistics
+        const internshipCount = await Internship.countDocuments({ organizer: req.user._id });
+        
+        // Get total applications across all internships
+        const internships = await Internship.find({ organizer: req.user._id }).select('_id');
+        const internshipIds = internships.map(internship => internship._id);
+        
+        const applicationCount = await InternshipApplication.countDocuments({
+            internship: { $in: internshipIds },
+            status: { $in: ['pending', 'accepted', 'rejected'] }
+        });
+
+        // Count upcoming events and active internships
+        const now = new Date();
+        const upcomingEvents = await Event.countDocuments({
+            organizer: req.user._id,
+            date: { $gte: now },
+            status: 'published'
+        });
+
+        const activeInternships = await Internship.countDocuments({
+            organizer: req.user._id,
+            applicationDeadline: { $gte: now },
+            status: 'published'
+        });
+
         res.status(200).json({
             success: true,
             data: {
@@ -185,7 +213,11 @@ exports.getDashboard = async (req, res) => {
                 stats: {
                     eventCount,
                     attendeeCount,
-                    revenue: totalRevenue
+                    revenue: totalRevenue,
+                    internshipCount,
+                    applicationCount,
+                    upcomingEvents,
+                    activeInternships
                 }
             }
         });
@@ -550,6 +582,374 @@ exports.getFeedbackSummary = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to fetch feedback summary',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// INTERNSHIP MANAGEMENT METHODS
+
+// Get organizer's internships
+exports.getInternships = async (req, res) => {
+    try {
+        const internships = await Internship.find({ organizer: req.user._id })
+            .sort({ createdAt: -1 });
+
+        // Add application count to each internship
+        const internshipsWithCount = await Promise.all(
+            internships.map(async (internship) => {
+                const applicationCount = await InternshipApplication.countDocuments({
+                    internship: internship._id,
+                    status: { $in: ['pending', 'accepted', 'rejected'] }
+                });
+
+                return {
+                    ...internship.toObject(),
+                    applicationCount
+                };
+            })
+        );
+
+        res.status(200).json({
+            success: true,
+            count: internshipsWithCount.length,
+            internships: internshipsWithCount
+        });
+    } catch (error) {
+        console.error('Get organizer internships error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch internships',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Create a new internship
+exports.createInternship = async (req, res) => {
+    try {
+        const {
+            title,
+            companyName,
+            shortDescription,
+            description,
+            type,
+            category,
+            applicationDeadline,
+            startDate,
+            endDate,
+            location,
+            compensation,
+            duration,
+            tags,
+            requirements,
+            responsibilities,
+            isPublished
+        } = req.body;
+
+        // Parse JSON fields
+        let parsedLocation, parsedCompensation, parsedTags, parsedRequirements, parsedResponsibilities;
+        
+        try {
+            parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
+            parsedCompensation = typeof compensation === 'string' ? JSON.parse(compensation) : compensation;
+            parsedTags = typeof tags === 'string' ? JSON.parse(tags) : (tags || []);
+            parsedRequirements = typeof requirements === 'string' ? JSON.parse(requirements) : (requirements || []);
+            parsedResponsibilities = typeof responsibilities === 'string' ? JSON.parse(responsibilities) : (responsibilities || []);
+        } catch (parseError) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid JSON data provided'
+            });
+        }
+
+        const internshipData = {
+            title,
+            companyName,
+            shortDescription,
+            description,
+            type,
+            category,
+            applicationDeadline,
+            startDate: startDate || null,
+            endDate: endDate || null,
+            location: parsedLocation,
+            compensation: parsedCompensation,
+            duration,
+            tags: parsedTags,
+            requirements: parsedRequirements,
+            responsibilities: parsedResponsibilities,
+            organizer: req.user._id,
+            status: isPublished === 'true' ? 'published' : 'draft'
+        };
+
+        // Add poster URL if file was uploaded
+        if (req.file) {
+            internshipData.poster = req.file.path;
+        }
+
+        const internship = new Internship(internshipData);
+        await internship.save();
+
+        res.status(201).json({
+            success: true,
+            message: `Internship ${isPublished === 'true' ? 'published' : 'saved as draft'} successfully`,
+            internship: {
+                ...internship.toObject(),
+                applicationCount: 0
+            }
+        });
+    } catch (error) {
+        console.error('Create internship error:', error);
+        
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: 'Validation failed',
+                errors
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create internship',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get internship details for organizer
+exports.getInternshipDetails = async (req, res) => {
+    try {
+        const internship = await Internship.findOne({
+            _id: req.params.id,
+            organizer: req.user._id
+        });
+
+        if (!internship) {
+            return res.status(404).json({
+                success: false,
+                message: 'Internship not found or you do not have permission'
+            });
+        }
+
+        // Get application count
+        const applicationCount = await InternshipApplication.countDocuments({
+            internship: req.params.id,
+            status: { $in: ['pending', 'accepted', 'rejected'] }
+        });
+
+        res.status(200).json({
+            success: true,
+            internship: {
+                ...internship.toObject(),
+                applicationCount
+            }
+        });
+    } catch (error) {
+        console.error('Get internship details error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch internship details',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Update an internship
+exports.updateInternship = async (req, res) => {
+    try {
+        const internship = await Internship.findOne({
+            _id: req.params.id,
+            organizer: req.user._id
+        });
+
+        if (!internship) {
+            return res.status(404).json({
+                success: false,
+                message: 'Internship not found or you do not have permission'
+            });
+        }
+
+        const {
+            title,
+            companyName,
+            shortDescription,
+            description,
+            type,
+            category,
+            applicationDeadline,
+            startDate,
+            endDate,
+            location,
+            compensation,
+            duration,
+            tags,
+            requirements,
+            responsibilities,
+            isPublished
+        } = req.body;
+
+        // Parse JSON fields
+        let parsedLocation, parsedCompensation, parsedTags, parsedRequirements, parsedResponsibilities;
+        
+        try {
+            parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
+            parsedCompensation = typeof compensation === 'string' ? JSON.parse(compensation) : compensation;
+            parsedTags = typeof tags === 'string' ? JSON.parse(tags) : (tags || []);
+            parsedRequirements = typeof requirements === 'string' ? JSON.parse(requirements) : (requirements || []);
+            parsedResponsibilities = typeof responsibilities === 'string' ? JSON.parse(responsibilities) : (responsibilities || []);
+        } catch (parseError) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid JSON data provided'
+            });
+        }
+
+        const updateData = {
+            title,
+            companyName,
+            shortDescription,
+            description,
+            type,
+            category,
+            applicationDeadline,
+            startDate: startDate || null,
+            endDate: endDate || null,
+            location: parsedLocation,
+            compensation: parsedCompensation,
+            duration,
+            tags: parsedTags,
+            requirements: parsedRequirements,
+            responsibilities: parsedResponsibilities,
+            status: isPublished === 'true' ? 'published' : 'draft'
+        };
+
+        // If there's a new poster file
+        if (req.file) {
+            updateData.poster = req.file.path;
+            
+            // Delete old poster image from Cloudinary if it exists
+            if (internship.poster && internship.poster.includes('cloudinary')) {
+                const publicId = internship.poster.split('/').pop().split('.')[0];
+                await cloudinary.uploader.destroy(publicId);
+            }
+        }
+
+        const updatedInternship = await Internship.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        // Get application count
+        const applicationCount = await InternshipApplication.countDocuments({
+            internship: req.params.id,
+            status: { $in: ['pending', 'accepted', 'rejected'] }
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Internship updated successfully',
+            internship: {
+                ...updatedInternship.toObject(),
+                applicationCount
+            }
+        });
+    } catch (error) {
+        console.error('Update internship error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update internship',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Delete an internship
+exports.deleteInternship = async (req, res) => {
+    try {
+        const internship = await Internship.findOne({
+            _id: req.params.id,
+            organizer: req.user._id
+        });
+
+        if (!internship) {
+            return res.status(404).json({
+                success: false,
+                message: 'Internship not found or you do not have permission'
+            });
+        }
+
+        // Delete internship applications
+        await InternshipApplication.deleteMany({ internship: req.params.id });
+
+        // Delete internship
+        await Internship.findByIdAndDelete(req.params.id);
+
+        // Delete poster image from Cloudinary if it exists
+        if (internship.poster && internship.poster.includes('cloudinary')) {
+            const publicId = internship.poster.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Internship deleted successfully'
+        });
+    } catch (error) {
+        console.error('Delete internship error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete internship',
+            error: process.env.NODE_ENV === 'development' ? error.message : null
+        });
+    }
+};
+
+// Get applicants list for a specific internship
+exports.getInternshipApplicants = async (req, res) => {
+    try {
+        const internship = await Internship.findOne({
+            _id: req.params.id,
+            organizer: req.user._id
+        });
+
+        if (!internship) {
+            return res.status(404).json({
+                success: false,
+                message: 'Internship not found or you do not have permission'
+            });
+        }
+
+        // Get applications with user details
+        const applicants = await InternshipApplication.find({ 
+                internship: req.params.id
+            })
+            .populate('user', 'name email profilePicture')
+            .sort({ applicationDate: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: applicants.length,
+            applicants: applicants.map(app => ({
+                id: app._id,
+                userId: app.user._id,
+                name: app.user.name,
+                email: app.user.email,
+                profilePicture: app.user.profilePicture,
+                applicationDate: app.applicationDate,
+                status: app.status,
+                coverLetter: app.coverLetter,
+                resume: app.resume
+            }))
+        });
+    } catch (error) {
+        console.error('Get internship applicants error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch applicants',
             error: process.env.NODE_ENV === 'development' ? error.message : null
         });
     }

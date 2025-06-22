@@ -74,7 +74,7 @@ const HeroSection: React.FC = () => {
 							Explore Events
 						</Link>
 						<Link
-							to="/events?type=internship"
+							to="/internships"
 							className="inline-flex items-center px-8 py-4 text-lg font-medium ym-btn-secondary hover:ym-bg-card-hover rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
 						>
 							<UsersIcon className="w-5 h-5 mr-2" />

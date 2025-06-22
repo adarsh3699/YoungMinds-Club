@@ -40,6 +40,7 @@
 .bg-destructive-80 { background-color: rgba(239, 68, 68, 0.8); }
 .bg-accent-50 { background-color: rgba(254, 243, 199, 0.5); }
 .bg-info-80 { background-color: rgba(59, 130, 246, 0.8); }
+.bg-info-10 { background-color: rgba(59, 130, 246, 0.1); }
 .bg-black-40 { background-color: rgba(0, 0, 0, 0.4); }
 .bg-indigo-10 { background-color: rgba(99, 102, 241, 0.1); }
 .bg-purple-10 { background-color: rgba(147, 51, 234, 0.1); }

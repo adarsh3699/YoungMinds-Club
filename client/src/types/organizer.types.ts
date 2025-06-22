@@ -1,4 +1,4 @@
-
+import React from 'react';
 import type { FilterOption } from './ui-components.types';
 
 // Organizer Dashboard Types
@@ -7,6 +7,9 @@ export interface OrganizerDashboardData {
   totalRegistrations: number;
   totalRevenue: number;
   upcomingEvents: number;
+  totalInternships?: number;
+  totalInternshipApplications?: number;
+  upcomingInternships?: number;
 }
 
 export interface OrganizerEvent {
@@ -53,10 +56,21 @@ export interface OrganizerFeedbackApiResponse {
 
 // Organizer Dashboard Component Props
 export interface DashboardOverviewProps {
-  onCreateEvent: () => void;
-  dashboardData: OrganizerDashboardData | null;
-  calculatedTotalRegistrations: number;
-  feedbackSummary: OrganizerFeedbackSummary | null;
+  type?: 'events' | 'internships';
+  onCreateAction: any;
+  title?: any;
+  subtitle?: any;
+  buttonText?: any;
+  // Direct data props for events
+  totalEvents?: number;
+  totalRegistrations?: number;
+  upcomingEvents?: number;
+  averageRating?: string | number;
+  // Direct data props for internships
+  totalInternships?: number;
+  totalApplications?: number;
+  activeInternships?: number;
+  avgApplications?: number;
 }
 
 export interface EventRegistrationChartProps {
@@ -228,4 +242,41 @@ export interface OrganizerStatsCardData {
   bgClass: string;
   borderClass: string;
   iconBgClass: string;
+}
+
+export interface OrganizerInternship {
+  _id: string;
+  title: string;
+  companyName: string;
+  applicationDeadline: string;
+  status: 'draft' | 'published' | 'closed';
+  applicationCount: number;
+  poster?: string;
+  description?: string;
+  location: {
+    type: 'remote' | 'onsite' | 'hybrid';
+    city?: string;
+    country?: string;
+  };
+  compensation: {
+    type: 'paid' | 'unpaid' | 'stipend';
+    amount?: number;
+    currency?: string;
+  };
+  duration: string;
+  type: string;
+  category: string;
+}
+
+export interface OrganizerInternshipsApiResponse {
+  success: boolean;
+  internships: OrganizerInternship[];
+}
+
+export interface InternshipsListProps {
+  internships: OrganizerInternship[];
+  internshipFilter: string;
+  setInternshipFilter: (filter: string) => void;
+  filterOptions: FilterOption[];
+  onCreateInternship: () => void;
 } 

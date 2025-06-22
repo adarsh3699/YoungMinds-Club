@@ -64,7 +64,7 @@ const Footer: React.FC = () => {
 							</li>
 							<li>
 								<Link
-									to="/events?type=internship"
+									to="/internships"
 									className="transition-colors hover:text-white font-normal"
 									style={{ color: 'var(--footer-text-muted)' }}
 								>

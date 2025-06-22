@@ -1,6 +1,7 @@
 // Re-export all types from modular files
 export * from './core.types';
 export * from './events.types';
+export * from './internships.types';
 export * from './ui-components.types';
 export * from './user.types';
 export * from './organizer.types';

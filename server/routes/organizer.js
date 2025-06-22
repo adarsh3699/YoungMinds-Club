@@ -27,4 +27,14 @@ router.delete('/events/:id', organizerController.deleteEvent);
 // Attendee management
 router.get('/events/:id/attendees', organizerController.getEventAttendees);
 
+// Internship management routes
+router.get('/internships', organizerController.getInternships);
+router.post('/internships', upload.single('poster'), organizerController.createInternship);
+router.get('/internships/:id', organizerController.getInternshipDetails);
+router.put('/internships/:id', upload.single('poster'), organizerController.updateInternship);
+router.delete('/internships/:id', organizerController.deleteInternship);
+
+// Internship applicant management
+router.get('/internships/:id/applicants', organizerController.getInternshipApplicants);
+
 module.exports = router; 

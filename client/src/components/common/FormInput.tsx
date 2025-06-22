@@ -79,7 +79,7 @@ const FormInput: React.FC<FormInputProps> = ({
 					min={min}
 					max={max}
 					step={step}
-					className={`w-full ${
+					className={`w-full text-sm ${
 						icon ? 'pl-10' : 'pl-4'
 					} pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm border ${
 						error ? 'input-error' : 'input-base'

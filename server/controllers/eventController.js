@@ -54,11 +54,41 @@ exports.getAllEvents = async (req, res) => {
             filter.tags = req.query.tag;
         }
         
-        const events = await Event.find(filter)
-            .sort({ date: 1 }) // Sort by date ascending (upcoming first)
-            .skip(skip)
-            .limit(limit)
-            .populate('organizer', 'name email');
+        // Use aggregation to sort upcoming events first, then ended events
+        const currentDate = new Date();
+        const eventsResult = await Event.aggregate([
+            { $match: filter },
+            {
+                $addFields: {
+                    isUpcoming: { $gte: ['$date', currentDate] }
+                }
+            },
+            {
+                $sort: {
+                    isUpcoming: -1,    // Upcoming events first (true = 1, false = 0, so -1 puts true first)
+                    createdAt: -1      // Then by creation date descending (newest first)
+                }
+            },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'organizer',
+                    foreignField: '_id',
+                    as: 'organizer',
+                    pipeline: [{ $project: { name: 1, email: 1 } }]
+                }
+            },
+            {
+                $addFields: {
+                    organizer: { $arrayElemAt: ['$organizer', 0] }
+                }
+            },
+            { $unset: 'isUpcoming' } // Remove the helper field from final output
+        ]);
+
+        const events = eventsResult;
             
         const total = await Event.countDocuments(filter);
         
@@ -412,7 +442,10 @@ exports.getRecommendedEvents = async (req, res) => {
             isPublished: true,
             isFlagged: false
         })
-        .sort({ date: 1 }) // Upcoming events first
+        .sort({ 
+            date: 1,        // Closest upcoming events first  
+            createdAt: -1   // Then newest first
+        })
         .limit(6)
         .populate('organizer', 'name');
         
@@ -449,7 +482,10 @@ exports.getRecommendedEvents = async (req, res) => {
                 }
                 
                 const similarEvents = await Event.find(filter)
-                    .sort({ date: 1 })
+                    .sort({ 
+                        date: 1,        // Closest upcoming events first
+                        createdAt: -1   // Then newest first
+                    })
                     .limit(6)
                     .populate('organizer', 'name');
                 
