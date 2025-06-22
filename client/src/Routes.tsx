@@ -6,7 +6,7 @@ import { ErrorProvider } from '@/context/ErrorContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import Navigation from '@/components/common/Navigation';
 import Footer from '@/components/common/Footer';
-import { GlobalErrorAlert } from '@/components/common';
+import { GlobalErrorAlert, AuthRouteGuard } from '@/components/common';
 import { GoogleCallback } from '@/components/auth';
 import '@/styles/main.css';
 
@@ -122,8 +122,8 @@ const AppRoutes: React.FC = () => {
 										<Route path="/" element={<HomePage />} />
 										<Route path="/about" element={<AboutPage />} />
 										<Route path="/contact" element={<ContactPage />} />
-										<Route path="/login" element={<LoginPage />} />
-										<Route path="/register" element={<RegisterPage />} />
+										<Route path="/login" element={<AuthRouteGuard><LoginPage /></AuthRouteGuard>} />
+										<Route path="/register" element={<AuthRouteGuard><RegisterPage /></AuthRouteGuard>} />
 										<Route path="/event/:id" element={<EventDetails />} />
 										<Route path="/events" element={<EventsPage />} />
 										<Route path="/internship/:id" element={<InternshipDetails />} />
