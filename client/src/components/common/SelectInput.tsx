@@ -84,7 +84,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 					disabled={disabled}
 					className={`
 						relative w-full px-4 py-3 text-left transition-all duration-150 ease-out
-						rounded-xl backdrop-blur-sm shadow-sm
+						rounded-xl backdrop-blur-sm shadow-sm text-[15px]
 						${disabled ? 'opacity-60 cursor-not-allowed ym-bg-card' : 'cursor-pointer hover:shadow-md active:scale-[0.99]'}
 						${
 							error

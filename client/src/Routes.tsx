@@ -33,6 +33,8 @@ const AdminModeration = lazy(() => import('@/pages/admin/ModerationPage'));
 const AdminAnnouncements = lazy(() => import('@/pages/admin/announcements'));
 const EventDetails = lazy(() => import('@/pages/event-details'));
 const EventsPage = lazy(() => import('@/pages/event-discover'));
+const InternshipDetails = lazy(() => import('@/pages/internship-details'));
+const InternshipsPage = lazy(() => import('@/pages/internship-discover'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
 // ScrollToTop component to handle automatic scroll to top on route change
@@ -124,6 +126,9 @@ const AppRoutes: React.FC = () => {
 										<Route path="/register" element={<RegisterPage />} />
 										<Route path="/event/:id" element={<EventDetails />} />
 										<Route path="/events" element={<EventsPage />} />
+										<Route path="/internship/:id" element={<InternshipDetails />} />
+										<Route path="/internships" element={<InternshipsPage />} />
+										<Route path="/internship-discover" element={<InternshipsPage />} />
 
 										{/* Google OAuth routes */}
 										<Route path="/auth/success" element={<GoogleCallback />} />

@@ -34,6 +34,10 @@ const userActivitySchema = new mongoose.Schema({
             default: Date.now
         }
     }],
+    savedInternships: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Internship'
+    }],
     registeredEvents: [{
         event: {
             type: mongoose.Schema.Types.ObjectId,

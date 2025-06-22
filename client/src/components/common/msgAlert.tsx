@@ -8,7 +8,7 @@ interface MsgAlertProps {
 	duration?: number;
 }
 
-const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, duration = 10000 }) => {
+const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, duration = 1000000 }) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
@@ -87,9 +87,9 @@ const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, d
 	const config = getAlertConfig();
 
 	return (
-		<div className="fixed top-0 left-0 right-0 z-[9999] flex justify-center">
+		<div className="fixed top-0 left-1/2 transform -translate-x-1/2 z-[9999]">
 			<div
-				className={`mt-4 mx-4 max-w-md w-full ${config.bgColor} border ${config.borderColor} ${config.textColor} px-6 py-4 rounded-xl shadow-xl backdrop-blur-sm transform transition-all duration-300 ease-out ${
+				className={`mt-4 ${config.bgColor} border ${config.borderColor} ${config.textColor} px-6 py-4 rounded-xl shadow-xl backdrop-blur-sm transform transition-all duration-300 ease-out ${
 					isAnimating ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-full opacity-0 scale-95'
 				}`}
 			>

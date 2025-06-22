@@ -6,6 +6,7 @@ const Announcement = require('../models/Announcement');
 const { cloudinary } = require('../config/cloudinary');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
+const { filterEventUpdateFields } = require('../utils/eventHelpers');
 
 // Get admin dashboard stats
 exports.getDashboardStats = async (req, res) => {
@@ -381,7 +382,37 @@ exports.deleteUser = async (req, res) => {
 // Get all events with organizer info
 exports.getAllEvents = async (req, res) => {
     try {
-        const events = await Event.find().populate('organizer', 'name email');
+        // Use aggregation to sort upcoming events first, then ended events
+        const currentDate = new Date();
+        const events = await Event.aggregate([
+            { $match: {} },
+            {
+                $addFields: {
+                    isUpcoming: { $gte: ['$date', currentDate] }
+                }
+            },
+            {
+                $sort: {
+                    isUpcoming: -1,    // Upcoming events first
+                    createdAt: -1      // Then by creation date descending (newest first)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'organizer',
+                    foreignField: '_id',
+                    as: 'organizer',
+                    pipeline: [{ $project: { name: 1, email: 1 } }]
+                }
+            },
+            {
+                $addFields: {
+                    organizer: { $arrayElemAt: ['$organizer', 0] }
+                }
+            },
+            { $unset: 'isUpcoming' } // Remove the helper field from final output
+        ]);
 
         res.status(200).json({
             success: true,
@@ -511,8 +542,8 @@ exports.updateEvent = async (req, res) => {
             });
         }
 
-        // Update event data
-        const updateData = { ...req.body };
+        // Filter event update data (admin role)
+        const updateData = filterEventUpdateFields(req.body, 'admin');
         
         // If there's a new poster file
         if (req.file) {
@@ -646,7 +677,9 @@ exports.getAnalytics = async (req, res) => {
 exports.getFlaggedItems = async (req, res) => {
     try {
         const flaggedUsers = await User.find({ isFlagged: true }).select('-password');
-        const flaggedEvents = await Event.find({ isFlagged: true }).populate('organizer', 'name email');
+        const flaggedEvents = await Event.find({ isFlagged: true })
+            .sort({ createdAt: -1 })
+            .populate('organizer', 'name email');
 
         res.status(200).json({
             success: true,
@@ -829,6 +862,7 @@ exports.getFlaggedContent = async (req, res) => {
         // Get flagged events
         const flaggedEvents = await Event.find({ isFlagged: true })
             .select('title shortDescription poster organizer flagReason flaggedAt')
+            .sort({ createdAt: -1 })
             .populate('organizer', 'name email')
             .limit(limit);
             

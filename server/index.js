@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/admin');
 const organizerRoutes = require('./routes/organizer');
 const userRoutes = require('./routes/user');
 const eventRoutes = require('./routes/event');
+const internshipRoutes = require('./routes/internship');
 
 // Create Express app
 const app = express();
@@ -41,6 +42,7 @@ app.use('/admin', adminRoutes);
 app.use('/organizer', organizerRoutes);
 app.use('/user', userRoutes);
 app.use('/events', eventRoutes);
+app.use('/internships', internshipRoutes);
 
 // Additional public routes
 app.get('/leaderboard', require('./controllers/userActivityController').getLeaderboard);

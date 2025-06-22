@@ -1,61 +1,145 @@
-import { PlusIcon, CalendarIcon, UsersIcon, StarIcon } from '@heroicons/react/24/outline';
+import {
+	PlusIcon,
+	CalendarDaysIcon,
+	UsersIcon,
+	StarIcon,
+	BriefcaseIcon,
+	DocumentTextIcon,
+	ClockIcon,
+	ChartBarIcon,
+	ArrowTrendingUpIcon,
+} from '@heroicons/react/24/outline';
 
-const DashboardOverview = ({ onCreateEvent, dashboardData, calculatedTotalRegistrations, feedbackSummary }) => {
-	const statsData = [
-		{
-			title: 'Total Events',
-			value: dashboardData?.stats?.eventCount || 0,
-			icon: CalendarIcon,
-			bgColor: 'ym-bg-amber-100',
-			iconColor: 'ym-text-yellow-600',
-			valueColor: 'ym-text-yellow-600',
-			delay: '0s',
+const DashboardOverview = ({
+	type = 'events', // 'events' or 'internships'
+	onCreateAction,
+	title,
+	subtitle,
+	buttonText,
+	// Direct data props for events
+	totalEvents = 0,
+	totalRegistrations = 0,
+	upcomingEvents = 0,
+	averageRating = 'N/A',
+	// Direct data props for internships
+	totalInternships = 0,
+	totalApplications = 0,
+	activeInternships = 0,
+	avgApplications = 0,
+}) => {
+	// Default titles and subtitles
+	const defaultTitles = {
+		events: {
+			title: 'Events Management',
+			subtitle: 'Create and manage your events, track registrations',
+			buttonText: 'Create New Event',
 		},
-		{
-			title: 'Total Registrations',
-			value: dashboardData?.stats?.attendeeCount || calculatedTotalRegistrations || 0,
-			icon: UsersIcon,
-			bgColor: 'ym-bg-success bg-opacity-10',
-			iconColor: 'text-white',
-			valueColor: 'ym-text-success',
-			delay: '0.1s',
+		internships: {
+			title: 'Internships Management',
+			subtitle: 'Create and manage your internships, track applications',
+			buttonText: 'Create New Internship',
 		},
-		{
-			title: 'Total Feedback',
-			value: feedbackSummary?.overallStats?.totalFeedback || 0,
-			icon: StarIcon,
-			bgColor: 'ym-bg-amber-100',
-			iconColor: 'ym-text-yellow-600',
-			valueColor: 'ym-text-yellow-600',
-			delay: '0.2s',
-		},
-		{
-			title: 'Average Rating',
-			value: feedbackSummary?.overallStats?.averageRating
-				? `${feedbackSummary.overallStats.averageRating.toFixed(1)}/5`
-				: 'N/A',
-			icon: StarIcon,
-			bgColor: 'ym-bg-orange-400',
-			iconColor: 'text-white',
-			valueColor: 'ym-text-yellow-600',
-			delay: '0.3s',
-		},
-	];
+	};
+
+	const currentConfig = defaultTitles[type] || defaultTitles.events;
+	const displayTitle = title || currentConfig.title;
+	const displaySubtitle = subtitle || currentConfig.subtitle;
+	const displayButtonText = buttonText || currentConfig.buttonText;
+
+	// Generate stats based on type
+	const statsData =
+		type === 'events'
+			? [
+					{
+						title: 'Total Events',
+						value: totalEvents,
+						icon: CalendarDaysIcon,
+						bgColor: 'bg-warning-10',
+						iconColor: 'text-warning',
+						valueColor: 'text-warning',
+						delay: '0s',
+					},
+					{
+						title: 'Total Registration',
+						value: totalRegistrations,
+						icon: UsersIcon,
+						bgColor: 'bg-success-10',
+						iconColor: 'text-success',
+						valueColor: 'text-success',
+						delay: '0.1s',
+					},
+					{
+						title: 'Upcoming Events',
+						value: upcomingEvents,
+						icon: ArrowTrendingUpIcon,
+						bgColor: 'bg-info-10',
+						iconColor: 'text-info',
+						valueColor: 'text-info',
+						delay: '0.2s',
+					},
+					{
+						title: 'Avg Rating',
+						value: averageRating,
+						icon: StarIcon,
+						bgColor: 'bg-warning-10',
+						iconColor: 'text-warning',
+						valueColor: 'text-warning',
+						delay: '0.3s',
+					},
+			  ]
+			: [
+					{
+						title: 'Total Internships',
+						value: totalInternships,
+						icon: BriefcaseIcon,
+						bgColor: 'bg-purple-10',
+						iconColor: 'text-purple',
+						valueColor: 'text-purple',
+						delay: '0s',
+					},
+					{
+						title: 'Total Applications',
+						value: totalApplications,
+						icon: DocumentTextIcon,
+						bgColor: 'bg-success-10',
+						iconColor: 'text-success',
+						valueColor: 'text-success',
+						delay: '0.1s',
+					},
+					{
+						title: 'Active Internships',
+						value: activeInternships,
+						icon: ClockIcon,
+						bgColor: 'bg-info-10',
+						iconColor: 'text-info',
+						valueColor: 'text-info',
+						delay: '0.2s',
+					},
+					{
+						title: 'Avg Applications',
+						value: avgApplications,
+						icon: ChartBarIcon,
+						bgColor: 'bg-gradient-brand-tertiary-light',
+						iconColor: 'text-brand-tertiary',
+						valueColor: 'text-brand-tertiary',
+						delay: '0.3s',
+					},
+			  ];
 
 	return (
-		<div className="mb-8">
+		<div className="space-y-8">
 			{/* Header Section */}
-			<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 animate-fade-in">
+			<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
 				<div>
-					<h1 className="text-3xl font-bold ym-text-primary mb-2">Organizer Dashboard</h1>
-					<p className="ym-text-secondary">Manage your events and engage with attendees</p>
+					<h2 className="text-2xl font-bold ym-text-primary mb-2">{displayTitle}</h2>
+					<p className="ym-text-secondary">{displaySubtitle}</p>
 				</div>
 				<button
-					onClick={onCreateEvent}
+					onClick={onCreateAction}
 					className="mt-4 md:mt-0 inline-flex items-center px-6 py-3 gradient-bg text-white font-medium rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg"
 				>
 					<PlusIcon className="h-5 w-5 mr-2" />
-					Create New Event
+					{displayButtonText}
 				</button>
 			</div>
 

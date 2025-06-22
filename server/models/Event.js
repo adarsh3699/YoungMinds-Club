@@ -25,7 +25,7 @@ const eventSchema = new mongoose.Schema({
     type: {
         type: String,
         required: [true, 'Event type is required'],
-        enum: ['Conference', 'Workshop', 'Meetup', 'Hackathon', 'MUN', 'Concert', 'Other']
+        enum: ['Competition', 'Concert', 'Conference', 'Exhibition', 'Hackathon', 'Meetup', 'MUN', 'Networking', 'Other', 'Seminar', 'Training', 'Webinar', 'Workshop']
     },
     tags: [{
         type: String,
@@ -34,7 +34,7 @@ const eventSchema = new mongoose.Schema({
     category: {
         type: String,
         required: [true, 'Event category is required'],
-        enum: ['Technology', 'Business', 'Education', 'Arts', 'Science', 'Music', 'Sports', 'Other']
+        enum: ['Arts', 'Business', 'Career', 'Design', 'Education', 'Entrepreneurship', 'Environment', 'Finance', 'Health', 'Marketing', 'Music', 'Other', 'Science', 'Social', 'Sports', 'Technology']
     },
     date: {
         type: Date,
@@ -108,9 +108,7 @@ const eventSchema = new mongoose.Schema({
             default: 0
         },
         registrationsDaily: [{
-            date: {
-                type: Date
-            },
+            date: Date,
             count: {
                 type: Number,
                 default: 0
