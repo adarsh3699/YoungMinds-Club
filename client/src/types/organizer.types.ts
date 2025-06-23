@@ -176,7 +176,7 @@ export interface OrganizerProfileData {
   organizationName?: string;
   bio?: string;
   email: string;
-  profilePicture?: string;
+  organizerBrandLogo?: string;
   socialLinks?: SocialLinks;
   rating?: number;
   totalEvents?: number;
@@ -200,7 +200,7 @@ export interface OrganizerProfileApiResponse {
 
 export interface OrganizerProfilePictureResponse {
   success: boolean;
-  profilePicture: string;
+  organizerBrandLogo: string;
 }
 
 // Organizers Management Types (for admin use)

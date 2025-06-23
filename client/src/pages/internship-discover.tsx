@@ -29,13 +29,13 @@ const InternshipDiscoverPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	// Transform internship data to be compatible with SearchAndFilter
-	const transformInternshipForFilter = React.useCallback((internship: InternshipDiscoverData): any => {
+	const transformInternshipForFilter = React.useCallback((internship: InternshipDiscoverData) => {
 		return {
 			...internship,
 			date: internship.startDate, // Map startDate to date for filtering
 			location: {
 				...internship.location,
-				type: internship.location?.type === 'remote' ? 'online' : 'offline', // Transform for compatibility
+				type: (internship.location?.type === 'remote' ? 'online' : 'offline') as 'online' | 'offline', // Transform for compatibility
 			},
 			organizer: internship.company ? { name: internship.company.name } : undefined, // Map company to organizer
 			registrationCount: internship.applicationCount, // Map applicationCount to registrationCount
@@ -73,7 +73,7 @@ const InternshipDiscoverPage: React.FC = () => {
 	}, []);
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = React.useCallback((filtered: any[]) => {
+	const handleFilteredDataChange = React.useCallback((filtered: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 		setFilteredInternships(filtered as InternshipDiscoverData[]);
 	}, []);
 

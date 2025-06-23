@@ -4,12 +4,12 @@ This is the backend server for the YoungMinds Club platform, built with Node.js,
 
 ## Features
 
-- RESTful API architecture
-- JWT authentication with Google OAuth support
-- Role-based access control (RBAC)
-- MongoDB database with Mongoose ODM
-- Secure password handling with bcrypt
-- Image upload with Cloudinary
+-   RESTful API architecture
+-   JWT authentication with Google OAuth support
+-   Role-based access control (RBAC)
+-   MongoDB database with Mongoose ODM
+-   Secure password handling with bcrypt
+-   Image upload with Cloudinary
 
 ## Project Structure
 
@@ -31,9 +31,9 @@ server/
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm or yarn
-- MongoDB (local or Atlas)
+-   Node.js (v14 or higher)
+-   npm or yarn
+-   MongoDB (local or Atlas)
 
 ### Installation
 
@@ -76,37 +76,37 @@ npm run dev
 
 ### Authentication
 
-- `POST /auth/signup` - Register a new user
-- `POST /auth/login` - Login a user
-- `GET /auth/logout` - Logout a user
-- `GET /auth/me` - Get current user data
-- `GET /auth/google` - Google OAuth login
-- `GET /auth/google/callback` - Google OAuth callback
+-   `POST /auth/signup` - Register a new user
+-   `POST /auth/login` - Login a user
+-   `GET /auth/logout` - Logout a user
+-   `GET /auth/me` - Get current user data
+-   `GET /auth/google` - Google OAuth login
+-   `GET /auth/google/callback` - Google OAuth callback
 
 ### Users
 
-- `GET /users/profile` - Get user profile
-- `PUT /users/profile` - Update user profile
-- `POST /users/profile/picture` - Upload profile picture
+-   `GET /users/profile` - Get user profile
+-   `PUT /users/profile` - Update user profile
+-   `POST /users/profile/picture` - Upload profile picture
 
 ### Events
 
-- `GET /events` - Get all events
-- `GET pi/events/:id` - Get event by ID
-- `POST /events` - Create event (organizer only)
-- `PUT /events/:id` - Update event (organizer only)
-- `DELETE /events/:id` - Delete event (organizer only)
+-   `GET /events` - Get all events
+-   `GET pi/events/:id` - Get event by ID
+-   `POST /events` - Create event (organizer only)
+-   `PUT /events/:id` - Update event (organizer only)
+-   `DELETE /events/:id` - Delete event (organizer only)
 
 ### Admin
 
-- `GET /admin/users` - Get all users
-- `PUT /admin/users/:id/role` - Update user role
-- `DELETE /admin/users/:id` - Delete user
-- `GET /admin/events` - Get all events with admin data
-- `PUT /admin/events/:id` - Update event status
+-   `GET /admin/users` - Get all users
+-   `PUT /admin/users/:id/role` - Update user role
+-   `DELETE /admin/users/:id` - Delete user
+-   `GET /admin/events` - Get all events with admin data
+-   `PUT /admin/events/:id` - Update event status
 
 ## Available Scripts
 
-- `npm run start` - Start the server
-- `npm run dev` - Start the server with nodemon
-- `npm run test` - Run tests 
+-   `npm run start` - Start the server
+-   `npm run dev` - Start the server with nodemon
+-   `npm run test` - Run tests

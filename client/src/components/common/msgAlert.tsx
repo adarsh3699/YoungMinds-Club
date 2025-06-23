@@ -8,7 +8,7 @@ interface MsgAlertProps {
 	duration?: number;
 }
 
-const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, duration = 1000000 }) => {
+const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, duration = 10000 }) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
@@ -120,6 +120,15 @@ const MsgAlert: React.FC<MsgAlertProps> = ({ message, type = 'error', onClose, d
 			</div>
 		</div>
 	);
+};
+
+// Simple utility to get error message from server response
+export const getErrorMessage = (error: unknown): string => {
+	if (error && typeof error === 'object' && 'response' in error) {
+		const e = error as { response?: { data?: { message?: string } } };
+		return e.response?.data?.message || 'Something went wrong. Please try again.';
+	}
+	return 'Something went wrong. Please try again.';
 };
 
 export default MsgAlert; 

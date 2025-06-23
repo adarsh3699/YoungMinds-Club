@@ -62,25 +62,25 @@ export const getInternshipCompensationOptions = () => INTERNSHIP_COMPENSATION;
 
 // Helper functions to get labels by value
 export const getInternshipTypeLabel = (value) => {
-	const internshipType = INTERNSHIP_TYPES.find(type => type.value === value);
+	const internshipType = INTERNSHIP_TYPES.find((type) => type.value === value);
 	return internshipType ? internshipType.label : value;
 };
 
 export const getInternshipCategoryLabel = (value) => {
-	const category = INTERNSHIP_CATEGORIES.find(cat => cat.value === value);
+	const category = INTERNSHIP_CATEGORIES.find((cat) => cat.value === value);
 	return category ? category.label : value;
 };
 
 export const getInternshipDurationLabel = (value) => {
-	const duration = INTERNSHIP_DURATION.find(dur => dur.value === value);
+	const duration = INTERNSHIP_DURATION.find((dur) => dur.value === value);
 	return duration ? duration.label : value;
 };
 
 export const getInternshipCompensationLabel = (value) => {
-	const compensation = INTERNSHIP_COMPENSATION.find(comp => comp.value === value);
+	const compensation = INTERNSHIP_COMPENSATION.find((comp) => comp.value === value);
 	return compensation ? compensation.label : value;
 };
 
 // Aliases for backward compatibility
 export const COMPENSATION_TYPES = INTERNSHIP_COMPENSATION;
-export const INTERNSHIP_DURATIONS = INTERNSHIP_DURATION; 
+export const INTERNSHIP_DURATIONS = INTERNSHIP_DURATION;

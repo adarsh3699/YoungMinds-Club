@@ -87,6 +87,9 @@ const userSchema = new mongoose.Schema(
 		profilePicture: {
 			type: String,
 		},
+		organizerBrandLogo: {
+			type: String,
+		},
 		createdAt: {
 			type: Date,
 			default: Date.now,

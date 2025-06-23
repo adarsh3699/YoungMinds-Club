@@ -158,13 +158,39 @@ const InternshipDetails: React.FC = () => {
 	// Format compensation display
 	const formatCompensation = (): string => {
 		if (!internship) return '';
+		
+		if (!internship.compensation) {
+			return 'Not specified';
+		}
+		
+		// Handle new compensation object structure
+		if (typeof internship.compensation === 'object') {
+			const { type, amount, currency } = internship.compensation;
+			
+			if (type === 'Unpaid') {
+				return 'Unpaid';
+			}
+			if (type === 'Certificate') {
+				return 'Certificate Only';
+			}
+			if (type === 'Experience') {
+				return 'Experience Letter';
+			}
+			if ((type === 'Paid' || type === 'Stipend') && amount) {
+				const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
+				return `${currencySymbol}${amount}/month`;
+			}
+			return type;
+		}
+		
+		// Handle legacy string format for backward compatibility
 		if (internship.compensation === 'Unpaid') {
 			return 'Unpaid';
 		}
 		if (internship.compensation === 'Paid' && internship.stipend) {
 			return `₹${internship.stipend}/month`;
 		}
-		return internship.compensation || 'Not specified';
+		return String(internship.compensation);
 	};
 
 	// Show loading state

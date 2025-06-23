@@ -34,6 +34,7 @@ const CreateInternshipModal = ({
 		type: '',
 		category: '',
 		duration: '',
+		capacity: 1,
 		compensation: {
 			type: '',
 			amount: 0,
@@ -60,6 +61,7 @@ const CreateInternshipModal = ({
 		type: internshipToEdit?.type || '',
 		category: internshipToEdit?.category || '',
 		duration: internshipToEdit?.duration || '',
+		capacity: internshipToEdit?.capacity || 1,
 		compensation: internshipToEdit?.compensation || {
 			type: '',
 			amount: 0,
@@ -115,6 +117,7 @@ const CreateInternshipModal = ({
 			type: internshipToEdit.type || '',
 			category: internshipToEdit.category || '',
 			duration: internshipToEdit.duration || '',
+			capacity: internshipToEdit.capacity || 1,
 			compensation: internshipToEdit.compensation || {
 				type: '',
 				amount: 0,
@@ -332,13 +335,23 @@ const CreateInternshipModal = ({
 			type: 'Internship type is required',
 			category: 'Category is required',
 			duration: 'Duration is required',
+			capacity: 'Number of positions is required',
+			'compensation.type': 'Compensation type is required',
 			applicationDeadline: 'Application deadline is required',
 			startDate: 'Start date is required',
 		};
 
 		// Check all required fields at once
 		Object.entries(requiredFields).forEach(([field, message]) => {
-			if (!formData[field]) newErrors[field] = message;
+			if (field.includes('.')) {
+				// Handle nested fields like 'compensation.type'
+				const [parent, child] = field.split('.');
+				if (!formData[parent] || !formData[parent][child]) {
+					newErrors[field] = message;
+				}
+			} else {
+				if (!formData[field]) newErrors[field] = message;
+			}
 		});
 
 		// Special validation for compensation amount (0 is allowed for unpaid)
@@ -353,6 +366,18 @@ const CreateInternshipModal = ({
 				} else if (numericAmount < 0) {
 					newErrors['compensation.amount'] = 'Compensation amount cannot be negative';
 				}
+			}
+		}
+
+		// Special validation for capacity
+		if (formData.capacity) {
+			const capacityNumber = Number(formData.capacity);
+			if (isNaN(capacityNumber)) {
+				newErrors.capacity = 'Number of positions must be a valid number';
+			} else if (capacityNumber < 1) {
+				newErrors.capacity = 'Number of positions must be at least 1';
+			} else if (!Number.isInteger(capacityNumber)) {
+				newErrors.capacity = 'Number of positions must be a whole number';
 			}
 		}
 
@@ -424,14 +449,14 @@ const CreateInternshipModal = ({
 				if (key === 'location' && value && typeof value === 'object') {
 					// Handle location object specially
 					Object.entries(value).forEach(([locKey, locValue]) => {
-						if (locValue !== null && locValue !== undefined && locValue !== '') {
+						if (locValue !== null && locValue !== undefined) {
 							internshipFormData.append(`location.${locKey}`, locValue);
 						}
 					});
 				} else if (key === 'compensation' && value && typeof value === 'object') {
 					// Handle compensation object specially
 					Object.entries(value).forEach(([compKey, compValue]) => {
-						if (compValue !== null && compValue !== undefined && compValue !== '') {
+						if (compValue !== null && compValue !== undefined) {
 							internshipFormData.append(`compensation.${compKey}`, compValue);
 						}
 					});
@@ -441,12 +466,9 @@ const CreateInternshipModal = ({
 						internshipFormData.append(`${key}[]`, item);
 					});
 				} else {
-					// Handle primitive values - only append if value is not null/undefined/empty string
-					// But allow 0 and false as valid values
-					if (value !== null && value !== undefined && value !== '') {
-						internshipFormData.append(key, value);
-					} else if (value === 0 || value === false) {
-						// Explicitly allow 0 and false as valid values
+					// Handle primitive values - only append if value is not null/undefined
+					// Allow empty strings, 0 and false as valid values
+					if (value !== null && value !== undefined) {
 						internshipFormData.append(key, value);
 					}
 				}
@@ -890,7 +912,7 @@ const CreateInternshipModal = ({
 									Schedule
 								</h3>
 
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+								<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
 									<DateTimePicker
 										id="applicationDeadline"
 										label="Application Deadline"
@@ -939,6 +961,20 @@ const CreateInternshipModal = ({
 											error={errors.duration}
 										/>
 									</div>
+
+									<FormInput
+										id="capacity"
+										label="Number of Positions"
+										name="capacity"
+										type="number"
+										min="1"
+										value={formData.capacity}
+										onChange={handleChange}
+										placeholder="e.g., 5"
+										error={errors.capacity}
+										required
+										icon={<UsersIcon className="h-5 w-5" />}
+									/>
 								</div>
 							</div>
 						</div>

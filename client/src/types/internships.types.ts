@@ -14,7 +14,11 @@ export interface InternshipCardData {
   companyLogo?: string;
   type: string;
   category?: string;
-  compensation?: string;
+  compensation?: {
+    type: string;
+    amount: number;
+    currency: string;
+  };
   stipend?: number;
   company?: {
     name?: string;
@@ -100,7 +104,11 @@ export interface InternshipDetailsData {
   location: InternshipLocation;
   category: string;
   type: string;
-  compensation: string;
+  compensation: {
+    type: string;
+    amount: number;
+    currency: string;
+  };
   stipend?: number;
   duration: string;
   logo: string;
