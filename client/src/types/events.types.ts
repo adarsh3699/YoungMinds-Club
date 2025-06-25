@@ -43,6 +43,7 @@ export interface EventCardData {
   isFeatured?: boolean;
   tags?: string[];
   animationDelay?: string;
+  [key: string]: unknown; // Allow additional properties for SearchAndFilter compatibility
 }
 
 // Countdown type for event card timer
@@ -145,7 +146,7 @@ export interface UserEventsResponse {
 }
 
 // Event Details Component Props
-export interface EventDetailsProps {}
+export type EventDetailsProps = Record<string, never>;
 
 // Event Discovery Page Types
 export interface EventDiscoverFilters {
@@ -169,7 +170,7 @@ export interface EventsApiResponse {
 }
 
 // Event Discovery Component Props
-export interface EventDiscoverProps {}
+export type EventDiscoverProps = Record<string, never>;
 
 // Event Card Component with Discover-specific properties
 export interface EventDiscoverData extends EventCardData {

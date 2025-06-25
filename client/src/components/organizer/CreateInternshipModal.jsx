@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import axios from "axios";
 import {
 	XMarkIcon,
 	BriefcaseIcon,
@@ -13,11 +13,17 @@ import {
 	ClockIcon,
 	AcademicCapIcon,
 	BuildingOfficeIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
-import './CreateEventModal.css';
-import { FormInput, TextareaField, SelectInput, DateTimePicker, Tooltip, MsgAlert } from '../common';
-import { INTERNSHIP_TYPES, INTERNSHIP_CATEGORIES, INTERNSHIP_COMPENSATION } from '../../utils/internshipConstants';
+import "./CreateEventModal.css";
+import { FormInput, TextareaField, SelectInput, SearchableSelect, DateTimePicker, Tooltip, MsgAlert } from "../common";
+import {
+	INTERNSHIP_TYPES,
+	INTERNSHIP_CATEGORIES,
+	INTERNSHIP_COMPENSATION,
+	INTERNSHIP_DURATION,
+	INTERNSHIP_CITIES,
+} from "../../utils/internshipConstants";
 
 const CreateInternshipModal = ({
 	onClose,
@@ -27,26 +33,26 @@ const CreateInternshipModal = ({
 	apiEndpoint = null,
 }) => {
 	const initialFormData = {
-		title: '',
-		companyName: '',
-		shortDescription: '',
-		description: '',
-		type: '',
-		category: '',
-		duration: '',
+		title: "",
+		companyName: "",
+		shortDescription: "",
+		description: "",
+		type: "",
+		category: "",
+		duration: "",
 		capacity: 1,
 		compensation: {
-			type: '',
+			type: "",
 			amount: 0,
-			currency: 'USD',
+			currency: "INR",
 		},
-		applicationDeadline: '',
-		startDate: '',
+		applicationDeadline: "",
+		startDate: "",
 		location: {
-			type: 'remote',
-			city: '',
-			country: '',
-			address: '',
+			type: "remote",
+			city: "",
+			country: "India",
+			address: "",
 		},
 		requirements: [],
 		responsibilities: [],
@@ -58,22 +64,22 @@ const CreateInternshipModal = ({
 	const [formData, setFormData] = useState({
 		...initialFormData,
 		...internshipToEdit,
-		type: internshipToEdit?.type || '',
-		category: internshipToEdit?.category || '',
-		duration: internshipToEdit?.duration || '',
+		type: internshipToEdit?.type || "",
+		category: internshipToEdit?.category || "",
+		duration: internshipToEdit?.duration || "",
 		capacity: internshipToEdit?.capacity || 1,
 		compensation: internshipToEdit?.compensation || {
-			type: '',
+			type: "",
 			amount: 0,
-			currency: 'USD',
+			currency: "INR",
 		},
-		applicationDeadline: internshipToEdit?.applicationDeadline || '',
-		startDate: internshipToEdit?.startDate || '',
+		applicationDeadline: internshipToEdit?.applicationDeadline || "",
+		startDate: internshipToEdit?.startDate || "",
 		location: internshipToEdit?.location || {
-			type: 'remote',
-			city: '',
-			country: '',
-			address: '',
+			type: "remote",
+			city: "",
+			country: "India",
+			address: "",
 		},
 		requirements: internshipToEdit?.requirements || [],
 		responsibilities: internshipToEdit?.responsibilities || [],
@@ -82,30 +88,131 @@ const CreateInternshipModal = ({
 		isPublished: internshipToEdit?.isPublished || false,
 	});
 
-	const [skillInput, setSkillInput] = useState('');
-	const [requirementInput, setRequirementInput] = useState('');
-	const [responsibilityInput, setResponsibilityInput] = useState('');
-	const [benefitInput, setBenefitInput] = useState('');
+	const [skillInput, setSkillInput] = useState("");
+	const [requirementInput, setRequirementInput] = useState("");
+	const [responsibilityInput, setResponsibilityInput] = useState("");
+	const [benefitInput, setBenefitInput] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [submitType, setSubmitType] = useState(null);
 	const [alertMessage, setAlertMessage] = useState(null);
-	const [alertType, setAlertType] = useState('error');
+	const [alertType, setAlertType] = useState("error");
+
+	// State for API filter data
+	const [filterData, setFilterData] = useState({
+		categoryArray: [],
+		cityArray: [],
+		loading: true,
+		error: null,
+	});
 
 	// Transform options for select components
 	const internshipTypeOptions = INTERNSHIP_TYPES.slice(1); // Remove 'All Types' option
-	const categoryOptions = INTERNSHIP_CATEGORIES.slice(1); // Remove 'All Categories' option
-	const durationOptions = [
-		{ value: '1 Month', label: '1 Month' },
-		{ value: '2 Months', label: '2 Months' },
-		{ value: '3 Months', label: '3 Months' },
-		{ value: '4 Months', label: '4 Months' },
-		{ value: '5 Months', label: '5 Months' },
-		{ value: '6 Months', label: '6 Months' },
-		{ value: '6+ Months', label: '6+ Months' },
-		{ value: 'Other', label: 'Other' },
-	];
+	const categoryOptions = filterData.categoryArray.map((category) => ({
+		value: category.name,
+		label: category.label,
+	})); // Transform API data for SearchableSelect
+	const cityOptions = filterData.cityArray.map((city) => ({ value: city, label: city })); // Transform for SearchableSelect
+	const durationOptions = INTERNSHIP_DURATION.slice(1); // Remove 'All Durations' option
 	const compensationOptions = INTERNSHIP_COMPENSATION.slice(1); // Remove 'All Compensation' option
+
+	// Fetch filter data from API
+	useEffect(() => {
+		const fetchFilterData = async () => {
+			try {
+				setFilterData((prev) => ({ ...prev, loading: true, error: null }));
+
+				// Cache configuration
+				const CACHE_KEY = "internship_filter_data";
+				const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+				// Check for cached data
+				const getCachedData = () => {
+					try {
+						const cached = localStorage.getItem(CACHE_KEY);
+						if (cached) {
+							const { data, timestamp } = JSON.parse(cached);
+							const now = Date.now();
+
+							// Check if cache is still valid (within 1 hour)
+							if (now - timestamp < CACHE_DURATION) {
+								console.log("Using cached filter data");
+								return data;
+							} else {
+								console.log("Cache expired, removing...");
+								localStorage.removeItem(CACHE_KEY);
+							}
+						}
+					} catch (error) {
+						console.error("Error reading cache:", error);
+						localStorage.removeItem(CACHE_KEY);
+					}
+					return null;
+				};
+
+				// Set cached data to localStorage
+				const setCachedData = (data) => {
+					try {
+						const cacheObject = {
+							data,
+							timestamp: Date.now(),
+						};
+						localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObject));
+						console.log("Filter data cached successfully");
+					} catch (error) {
+						console.error("Error caching data:", error);
+					}
+				};
+
+				// Try to get cached data first
+				const cachedData = getCachedData();
+
+				if (cachedData) {
+					// Use cached data
+					setFilterData({
+						categoryArray: cachedData.categoryArray,
+						cityArray: cachedData.cityArray,
+						loading: false,
+						error: null,
+					});
+				} else {
+					// Fetch fresh data from API
+					console.log("Fetching fresh filter data from API...");
+					const response = await axios.get("/filters/internships_cat_loc");
+
+					if (response.data.success) {
+						const apiData = {
+							categoryArray: response.data.data.categoryArray,
+							cityArray: response.data.data.cityArray,
+						};
+
+						// Cache the fresh data
+						setCachedData(apiData);
+
+						// Update state with fresh data
+						setFilterData({
+							...apiData,
+							loading: false,
+							error: null,
+						});
+					} else {
+						throw new Error("Failed to fetch filter data");
+					}
+				}
+			} catch (error) {
+				console.error("Error fetching filter data:", error);
+				// Fallback to existing constants if API fails
+				setFilterData({
+					categoryArray: INTERNSHIP_CATEGORIES.slice(1), // Remove 'All Categories' option
+					cityArray: INTERNSHIP_CITIES,
+					loading: false,
+					error: "Failed to load categories and cities. Using default options.",
+				});
+			}
+		};
+
+		fetchFilterData();
+	}, []);
 
 	// If editing, populate form with internship data
 	useEffect(() => {
@@ -114,22 +221,22 @@ const CreateInternshipModal = ({
 		// Format date fields correctly for the datetime-local input
 		const formattedInternship = {
 			...formData,
-			type: internshipToEdit.type || '',
-			category: internshipToEdit.category || '',
-			duration: internshipToEdit.duration || '',
+			type: internshipToEdit.type || "",
+			category: internshipToEdit.category || "",
+			duration: internshipToEdit.duration || "",
 			capacity: internshipToEdit.capacity || 1,
 			compensation: internshipToEdit.compensation || {
-				type: '',
+				type: "",
 				amount: 0,
-				currency: 'USD',
+				currency: "INR",
 			},
 			applicationDeadline: formatDateForInput(internshipToEdit.applicationDeadline),
 			startDate: formatDateForInput(internshipToEdit.startDate),
 			location: internshipToEdit.location || {
-				type: 'remote',
-				city: '',
-				country: '',
-				address: '',
+				type: "remote",
+				city: "",
+				country: "India",
+				address: "",
 			},
 			requirements: internshipToEdit.requirements || [],
 			responsibilities: internshipToEdit.responsibilities || [],
@@ -144,7 +251,7 @@ const CreateInternshipModal = ({
 	// Format date for datetime-local input
 	const formatDateForInput = (dateString) => {
 		const date = new Date(dateString);
-		if (isNaN(date.getTime())) return '';
+		if (isNaN(date.getTime())) return "";
 
 		return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 	};
@@ -154,8 +261,8 @@ const CreateInternshipModal = ({
 		let newFormData = { ...formData };
 
 		// Handle nested location object
-		if (name.startsWith('location.')) {
-			const locationField = name.split('.')[1];
+		if (name.startsWith("location.")) {
+			const locationField = name.split(".")[1];
 			newFormData = {
 				...formData,
 				location: {
@@ -165,13 +272,13 @@ const CreateInternshipModal = ({
 			};
 		}
 		// Handle nested compensation object
-		else if (name.startsWith('compensation.')) {
-			const compensationField = name.split('.')[1];
+		else if (name.startsWith("compensation.")) {
+			const compensationField = name.split(".")[1];
 			newFormData = {
 				...formData,
 				compensation: {
 					...formData.compensation,
-					[compensationField]: compensationField === 'amount' ? Number(value) : value,
+					[compensationField]: compensationField === "amount" ? Number(value) : value,
 				},
 			};
 		} else {
@@ -182,13 +289,13 @@ const CreateInternshipModal = ({
 		}
 
 		// Clear dependent fields and errors when application deadline changes
-		if (name === 'applicationDeadline') {
+		if (name === "applicationDeadline") {
 			const deadlineDate = new Date(value);
 			const now = new Date();
 
 			// Clear start date if it's now before the new deadline
 			if (newFormData.startDate && new Date(newFormData.startDate) <= deadlineDate) {
-				newFormData.startDate = '';
+				newFormData.startDate = "";
 			}
 
 			// Clear related errors
@@ -203,11 +310,11 @@ const CreateInternshipModal = ({
 		}
 
 		// Clear compensation amount error when amount is changed and valid
-		if (name === 'compensation.amount' && value !== '') {
+		if (name === "compensation.amount" && value !== "") {
 			const numericAmount = Number(value);
 			if (!isNaN(numericAmount) && numericAmount >= 0) {
 				const newErrors = { ...errors };
-				delete newErrors['compensation.amount'];
+				delete newErrors["compensation.amount"];
 				setErrors(newErrors);
 			}
 		}
@@ -231,7 +338,7 @@ const CreateInternshipModal = ({
 	};
 
 	const handleSkillInputKeyDown = (e) => {
-		if (e.key === 'Enter' && skillInput.trim() !== '') {
+		if (e.key === "Enter" && skillInput.trim() !== "") {
 			e.preventDefault();
 			if (!formData.skills.includes(skillInput.trim())) {
 				setFormData({
@@ -239,7 +346,7 @@ const CreateInternshipModal = ({
 					skills: [...formData.skills, skillInput.trim()],
 				});
 			}
-			setSkillInput('');
+			setSkillInput("");
 		}
 	};
 
@@ -255,7 +362,7 @@ const CreateInternshipModal = ({
 	};
 
 	const handleRequirementInputKeyDown = (e) => {
-		if (e.key === 'Enter' && requirementInput.trim() !== '') {
+		if (e.key === "Enter" && requirementInput.trim() !== "") {
 			e.preventDefault();
 			if (!formData.requirements.includes(requirementInput.trim())) {
 				setFormData({
@@ -263,7 +370,7 @@ const CreateInternshipModal = ({
 					requirements: [...formData.requirements, requirementInput.trim()],
 				});
 			}
-			setRequirementInput('');
+			setRequirementInput("");
 		}
 	};
 
@@ -279,7 +386,7 @@ const CreateInternshipModal = ({
 	};
 
 	const handleResponsibilityInputKeyDown = (e) => {
-		if (e.key === 'Enter' && responsibilityInput.trim() !== '') {
+		if (e.key === "Enter" && responsibilityInput.trim() !== "") {
 			e.preventDefault();
 			if (!formData.responsibilities.includes(responsibilityInput.trim())) {
 				setFormData({
@@ -287,7 +394,7 @@ const CreateInternshipModal = ({
 					responsibilities: [...formData.responsibilities, responsibilityInput.trim()],
 				});
 			}
-			setResponsibilityInput('');
+			setResponsibilityInput("");
 		}
 	};
 
@@ -303,7 +410,7 @@ const CreateInternshipModal = ({
 	};
 
 	const handleBenefitInputKeyDown = (e) => {
-		if (e.key === 'Enter' && benefitInput.trim() !== '') {
+		if (e.key === "Enter" && benefitInput.trim() !== "") {
 			e.preventDefault();
 			if (!formData.benefits.includes(benefitInput.trim())) {
 				setFormData({
@@ -311,7 +418,7 @@ const CreateInternshipModal = ({
 					benefits: [...formData.benefits, benefitInput.trim()],
 				});
 			}
-			setBenefitInput('');
+			setBenefitInput("");
 		}
 	};
 
@@ -328,24 +435,24 @@ const CreateInternshipModal = ({
 
 		// Required field validation
 		const requiredFields = {
-			title: 'Internship title is required',
-			companyName: 'Company name is required',
-			shortDescription: 'Short description is required',
-			description: 'Description is required',
-			type: 'Internship type is required',
-			category: 'Category is required',
-			duration: 'Duration is required',
-			capacity: 'Number of positions is required',
-			'compensation.type': 'Compensation type is required',
-			applicationDeadline: 'Application deadline is required',
-			startDate: 'Start date is required',
+			title: "Internship title is required",
+			companyName: "Company name is required",
+			shortDescription: "Short description is required",
+			description: "Description is required",
+			type: "Internship type is required",
+			category: "Category is required",
+			duration: "Duration is required",
+			capacity: "Number of positions is required",
+			"compensation.type": "Compensation type is required",
+			applicationDeadline: "Application deadline is required",
+			startDate: "Start date is required",
 		};
 
 		// Check all required fields at once
 		Object.entries(requiredFields).forEach(([field, message]) => {
-			if (field.includes('.')) {
+			if (field.includes(".")) {
 				// Handle nested fields like 'compensation.type'
-				const [parent, child] = field.split('.');
+				const [parent, child] = field.split(".");
 				if (!formData[parent] || !formData[parent][child]) {
 					newErrors[field] = message;
 				}
@@ -355,16 +462,16 @@ const CreateInternshipModal = ({
 		});
 
 		// Special validation for compensation amount (0 is allowed for unpaid)
-		if (formData.compensation.type === 'Paid' || formData.compensation.type === 'Stipend') {
+		if (formData.compensation.type === "Paid") {
 			const compensationAmount = formData.compensation.amount;
-			if (compensationAmount === null || compensationAmount === undefined || compensationAmount === '') {
-				newErrors['compensation.amount'] = 'Compensation amount is required';
+			if (compensationAmount === null || compensationAmount === undefined || compensationAmount === "") {
+				newErrors["compensation.amount"] = "Compensation amount is required";
 			} else {
 				const numericAmount = Number(compensationAmount);
 				if (isNaN(numericAmount)) {
-					newErrors['compensation.amount'] = 'Compensation amount must be a valid number';
+					newErrors["compensation.amount"] = "Compensation amount must be a valid number";
 				} else if (numericAmount < 0) {
-					newErrors['compensation.amount'] = 'Compensation amount cannot be negative';
+					newErrors["compensation.amount"] = "Compensation amount cannot be negative";
 				}
 			}
 		}
@@ -373,11 +480,11 @@ const CreateInternshipModal = ({
 		if (formData.capacity) {
 			const capacityNumber = Number(formData.capacity);
 			if (isNaN(capacityNumber)) {
-				newErrors.capacity = 'Number of positions must be a valid number';
+				newErrors.capacity = "Number of positions must be a valid number";
 			} else if (capacityNumber < 1) {
-				newErrors.capacity = 'Number of positions must be at least 1';
+				newErrors.capacity = "Number of positions must be at least 1";
 			} else if (!Number.isInteger(capacityNumber)) {
-				newErrors.capacity = 'Number of positions must be a whole number';
+				newErrors.capacity = "Number of positions must be a whole number";
 			}
 		}
 
@@ -387,28 +494,28 @@ const CreateInternshipModal = ({
 
 			// 1. Application Deadline must be greater than or equal to current date and time
 			if (deadlineDate <= now) {
-				newErrors.applicationDeadline = 'Application deadline must be in the future';
+				newErrors.applicationDeadline = "Application deadline must be in the future";
 			}
 
 			// 2. Start Date must be greater than Application Deadline
 			if (formData.startDate) {
 				const startDate = new Date(formData.startDate);
 				if (startDate <= deadlineDate) {
-					newErrors.startDate = 'Start date must be after the application deadline';
+					newErrors.startDate = "Start date must be after the application deadline";
 				}
 			}
 		}
 
 		// Location validation based on type
-		if (formData.location.type === 'on-site' || formData.location.type === 'hybrid') {
+		if (formData.location.type === "on-site" || formData.location.type === "hybrid") {
 			const requiredLocationFields = {
-				'location.city': 'City is required',
-				'location.country': 'Country is required',
-				'location.address': 'Address is required',
+				"location.city": "City is required",
+				"location.country": "Country is required",
+				"location.address": "Address is required",
 			};
 
 			Object.entries(requiredLocationFields).forEach(([field, message]) => {
-				const [parent, child] = field.split('.');
+				const [parent, child] = field.split(".");
 				if (!formData[parent][child]) newErrors[field] = message;
 			});
 		}
@@ -423,17 +530,17 @@ const CreateInternshipModal = ({
 			const errorCount = Object.keys(errors).length;
 			const errorMessage =
 				errorCount === 1
-					? 'Please fix the highlighted field to continue.'
+					? "Please fix the highlighted field to continue."
 					: `Please fix the ${errorCount} highlighted fields to continue.`;
 
 			// Show alert message when validation fails
 			setAlertMessage(errorMessage);
-			setAlertType('error');
+			setAlertType("error");
 			return;
 		}
 
 		setLoading(true);
-		setSubmitType(publishStatus ? 'publish' : 'draft');
+		setSubmitType(publishStatus ? "publish" : "draft");
 
 		try {
 			const internshipFormData = new FormData();
@@ -446,14 +553,14 @@ const CreateInternshipModal = ({
 
 			// Handle form data properly for multipart submission
 			Object.entries(dataToSubmit).forEach(([key, value]) => {
-				if (key === 'location' && value && typeof value === 'object') {
+				if (key === "location" && value && typeof value === "object") {
 					// Handle location object specially
 					Object.entries(value).forEach(([locKey, locValue]) => {
 						if (locValue !== null && locValue !== undefined) {
 							internshipFormData.append(`location.${locKey}`, locValue);
 						}
 					});
-				} else if (key === 'compensation' && value && typeof value === 'object') {
+				} else if (key === "compensation" && value && typeof value === "object") {
 					// Handle compensation object specially
 					Object.entries(value).forEach(([compKey, compValue]) => {
 						if (compValue !== null && compValue !== undefined) {
@@ -477,26 +584,26 @@ const CreateInternshipModal = ({
 			// Send request - use custom apiEndpoint if provided, otherwise use default organizer endpoint
 			const url =
 				apiEndpoint ||
-				(isEditing ? `/organizer/internships/${internshipToEdit._id}` : '/organizer/internships');
+				(isEditing ? `/organizer/internships/${internshipToEdit._id}` : "/organizer/internships");
 
-			const method = isEditing ? 'put' : 'post';
+			const method = isEditing ? "put" : "post";
 
 			const response = await axios[method](url, internshipFormData, {
-				headers: { 'Content-Type': 'multipart/form-data' },
+				headers: { "Content-Type": "multipart/form-data" },
 			});
 
 			if (response.status === 200 || response.status === 201) {
 				// Success response
 				const successMessage = isEditing
 					? publishStatus
-						? 'Internship updated and published successfully!'
-						: 'Internship updated successfully!'
+						? "Internship updated and published successfully!"
+						: "Internship updated successfully!"
 					: publishStatus
-					? 'Internship created and published successfully!'
-					: 'Internship saved as draft successfully!';
+					? "Internship created and published successfully!"
+					: "Internship saved as draft successfully!";
 
 				setAlertMessage(successMessage);
-				setAlertType('success');
+				setAlertType("success");
 
 				// Wait a moment to show success message before closing
 				setTimeout(() => {
@@ -507,10 +614,10 @@ const CreateInternshipModal = ({
 				}, 1500);
 			}
 		} catch (error) {
-			console.error('Error submitting internship:', error);
+			console.error("Error submitting internship:", error);
 
 			// Handle different types of errors
-			let errorMessage = 'An unexpected error occurred. Please try again.';
+			let errorMessage = "An unexpected error occurred. Please try again.";
 
 			if (error.response) {
 				// Server responded with error status
@@ -518,24 +625,24 @@ const CreateInternshipModal = ({
 
 				if (status === 400) {
 					// Bad request - likely validation errors
-					errorMessage = data.message || 'Please check your input and try again.';
+					errorMessage = data.message || "Please check your input and try again.";
 				} else if (status === 401) {
 					// Unauthorized
-					errorMessage = 'You are not authorized to perform this action.';
+					errorMessage = "You are not authorized to perform this action.";
 				} else if (status === 413) {
 					// Payload too large
-					errorMessage = 'The poster image is too large. Please use an image smaller than 5MB.';
+					errorMessage = "The poster image is too large. Please use an image smaller than 5MB.";
 				} else if (status === 500) {
 					// Internal server error
-					errorMessage = 'Server error. Please try again later.';
+					errorMessage = "Server error. Please try again later.";
 				}
 			} else if (error.request) {
 				// Network error
-				errorMessage = 'Network error. Please check your connection and try again.';
+				errorMessage = "Network error. Please check your connection and try again.";
 			}
 
 			setAlertMessage(errorMessage);
-			setAlertType('error');
+			setAlertType("error");
 		} finally {
 			setLoading(false);
 			setSubmitType(null);
@@ -549,6 +656,13 @@ const CreateInternshipModal = ({
 				{alertMessage && (
 					<div className="">
 						<MsgAlert type={alertType} message={alertMessage} />
+					</div>
+				)}
+
+				{/* Filter Data Error Alert */}
+				{filterData.error && (
+					<div className="">
+						<MsgAlert type="warning" message={filterData.error} />
 					</div>
 				)}
 
@@ -577,10 +691,10 @@ const CreateInternshipModal = ({
 						</div>
 						<div className="min-w-0 flex-1">
 							<h2 className="text-lg sm:text-2xl font-bold ym-text-white truncate">
-								{isEditing ? 'Edit Internship' : 'Create New Internship'}
+								{isEditing ? "Edit Internship" : "Create New Internship"}
 							</h2>
 							<p className="ym-text-white-80 text-xs sm:text-sm font-medium hidden xs:block">
-								{isEditing ? 'Update your internship details' : 'Post your internship opportunity'}
+								{isEditing ? "Update your internship details" : "Post your internship opportunity"}
 							</p>
 						</div>
 					</div>
@@ -592,8 +706,8 @@ const CreateInternshipModal = ({
 								<span
 									className={`inline-flex items-center px-2 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg border-2 transform transition-all duration-200 hover:scale-105 ${
 										internshipToEdit.isPublished
-											? 'bg-green-600 text-white border-green-400 shadow-green-500/30'
-											: 'bg-orange-600 text-white border-orange-400 shadow-orange-500/30'
+											? "bg-green-600 text-white border-green-400 shadow-green-500/30"
+											: "bg-orange-600 text-white border-orange-400 shadow-orange-500/30"
 									}`}
 								>
 									{internshipToEdit.isPublished ? (
@@ -627,7 +741,7 @@ const CreateInternshipModal = ({
 					<form
 						onSubmit={(e) => e.preventDefault()}
 						className="p-4 sm:p-8"
-						style={{ backgroundColor: 'var(--background)' }}
+						style={{ backgroundColor: "var(--background)" }}
 					>
 						{/* Main Grid Layout */}
 						<div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 mb-4 sm:mb-8">
@@ -692,8 +806,7 @@ const CreateInternshipModal = ({
 										/>
 
 										{/* Compensation Amount - Show only for paid internships */}
-										{(formData.compensation.type === 'Paid' ||
-											formData.compensation.type === 'Stipend') && (
+										{formData.compensation.type === "Paid" && (
 											<div className="grid grid-cols-2 gap-4">
 												<FormInput
 													id="compensation.amount"
@@ -703,7 +816,7 @@ const CreateInternshipModal = ({
 													value={formData.compensation.amount}
 													onChange={handleChange}
 													placeholder="e.g., 5000"
-													error={errors['compensation.amount']}
+													error={errors["compensation.amount"]}
 													required
 													icon={<CurrencyDollarIcon className="h-5 w-5" />}
 												/>
@@ -718,10 +831,10 @@ const CreateInternshipModal = ({
 														value={formData.compensation.currency}
 														onChange={handleChange}
 														options={[
-															{ value: 'INR', label: 'INR' },
-															{ value: 'USD', label: 'USD' },
-															{ value: 'EUR', label: 'EUR' },
-															{ value: 'GBP', label: 'GBP' },
+															{ value: "INR", label: "INR" },
+															{ value: "USD", label: "USD" },
+															{ value: "EUR", label: "EUR" },
+															{ value: "GBP", label: "GBP" },
 														]}
 													/>
 												</div>
@@ -770,25 +883,26 @@ const CreateInternshipModal = ({
 													value={formData.compensation.type}
 													onChange={handleChange}
 													options={compensationOptions}
-													error={errors['compensation.type']}
+													error={errors["compensation.type"]}
 												/>
 											</div>
 										</div>
 
-										<div>
-											<label className="block text-sm font-semibold ym-text-primary mb-2">
-												Category
-												<span className="ym-text-yellow-600 ml-1">*</span>
-											</label>
-											<SelectInput
-												id="category"
-												name="category"
-												value={formData.category}
-												onChange={handleChange}
-												options={categoryOptions}
-												error={errors.category}
-											/>
-										</div>
+										<SearchableSelect
+											id="category"
+											name="category"
+											value={formData.category}
+											onChange={handleChange}
+											options={categoryOptions}
+											label="Category"
+											placeholder={
+												filterData.loading ? "Loading categories..." : "Select a category"
+											}
+											searchPlaceholder="Search categories..."
+											error={errors.category}
+											required
+											disabled={filterData.loading}
+										/>
 									</div>
 								</div>
 
@@ -810,12 +924,12 @@ const CreateInternshipModal = ({
 														type="radio"
 														name="locationType"
 														value="remote"
-														checked={formData.location.type === 'remote'}
+														checked={formData.location.type === "remote"}
 														onChange={handleLocationTypeChange}
 														className="h-4 w-4 focus:ring-2 focus:ring-offset-0"
 														style={{
-															color: 'var(--ring)',
-															'--tw-ring-color': 'var(--ring)',
+															color: "var(--ring)",
+															"--tw-ring-color": "var(--ring)",
 														}}
 													/>
 													<span className="ml-2 sm:ml-3 text-sm sm:text-base font-semibold ym-text-primary">
@@ -827,12 +941,12 @@ const CreateInternshipModal = ({
 														type="radio"
 														name="locationType"
 														value="on-site"
-														checked={formData.location.type === 'on-site'}
+														checked={formData.location.type === "on-site"}
 														onChange={handleLocationTypeChange}
 														className="h-4 w-4 focus:ring-2 focus:ring-offset-0"
 														style={{
-															color: 'var(--ring)',
-															'--tw-ring-color': 'var(--ring)',
+															color: "var(--ring)",
+															"--tw-ring-color": "var(--ring)",
 														}}
 													/>
 													<span className="ml-2 sm:ml-3 text-sm sm:text-base font-semibold ym-text-primary">
@@ -844,12 +958,12 @@ const CreateInternshipModal = ({
 														type="radio"
 														name="locationType"
 														value="hybrid"
-														checked={formData.location.type === 'hybrid'}
+														checked={formData.location.type === "hybrid"}
 														onChange={handleLocationTypeChange}
 														className="h-4 w-4 focus:ring-2 focus:ring-offset-0"
 														style={{
-															color: 'var(--ring)',
-															'--tw-ring-color': 'var(--ring)',
+															color: "var(--ring)",
+															"--tw-ring-color": "var(--ring)",
 														}}
 													/>
 													<span className="ml-2 sm:ml-3 text-sm sm:text-base font-semibold ym-text-primary">
@@ -859,19 +973,23 @@ const CreateInternshipModal = ({
 											</div>
 										</div>
 
-										{(formData.location.type === 'on-site' ||
-											formData.location.type === 'hybrid') && (
+										{(formData.location.type === "on-site" ||
+											formData.location.type === "hybrid") && (
 											<div className="space-y-4">
-												<FormInput
+												<SearchableSelect
 													id="location.city"
-													label="City"
 													name="location.city"
 													value={formData.location.city}
 													onChange={handleChange}
-													placeholder="e.g., Mumbai, Delhi, Bangalore"
-													error={errors['location.city']}
+													options={cityOptions}
+													label="City"
+													placeholder={
+														filterData.loading ? "Loading cities..." : "Select a city"
+													}
+													searchPlaceholder="Search cities..."
+													error={errors["location.city"]}
 													required
-													icon={<MapPinIcon className="h-5 w-5" />}
+													disabled={filterData.loading}
 												/>
 
 												<FormInput
@@ -881,7 +999,7 @@ const CreateInternshipModal = ({
 													value={formData.location.country}
 													onChange={handleChange}
 													placeholder="e.g., India, USA, UK"
-													error={errors['location.country']}
+													error={errors["location.country"]}
 													required
 												/>
 
@@ -892,7 +1010,7 @@ const CreateInternshipModal = ({
 													value={formData.location.address}
 													onChange={handleChange}
 													placeholder="Full address with landmarks"
-													error={errors['location.address']}
+													error={errors["location.address"]}
 													required
 												/>
 											</div>
@@ -941,8 +1059,8 @@ const CreateInternshipModal = ({
 										} // Must be after application deadline
 										placeholder={
 											formData.applicationDeadline
-												? 'Must be after application deadline'
-												: 'Select start date'
+												? "Must be after application deadline"
+												: "Select start date"
 										}
 										showTimeSelect={false}
 									/>
@@ -1207,7 +1325,7 @@ const CreateInternshipModal = ({
 									onClick={onClose}
 									disabled={loading}
 									className={`w-full sm:w-auto px-4 sm:px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400/30 focus:ring-offset-2 shadow-sm ${
-										loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+										loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
 									}`}
 								>
 									Cancel
@@ -1220,11 +1338,11 @@ const CreateInternshipModal = ({
 									disabled={loading}
 									className={`w-full sm:w-auto px-4 sm:px-6 py-3 bg-secondary border-2 border-secondary text-secondary-foreground rounded-xl font-semibold transition-all duration-200 hover:bg-muted hover:ym-border-card focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:ring-offset-2 shadow-sm ${
 										loading
-											? 'opacity-70 cursor-not-allowed'
-											: 'hover:shadow-md hover:scale-[1.02] cursor-pointer'
+											? "opacity-70 cursor-not-allowed"
+											: "hover:shadow-md hover:scale-[1.02] cursor-pointer"
 									}`}
 								>
-									{loading && submitType === 'draft' ? (
+									{loading && submitType === "draft" ? (
 										<span className="flex items-center justify-center">
 											<svg
 												className="animate-spin -ml-1 mr-3 h-5 w-5"
@@ -1263,11 +1381,11 @@ const CreateInternshipModal = ({
 									disabled={loading}
 									className={`w-full sm:w-auto px-6 sm:px-8 py-3 gradient-bg text-white rounded-xl font-semibold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:ring-offset-2 ${
 										loading
-											? 'opacity-70 cursor-not-allowed transform-none'
-											: 'hover:shadow-xl hover:scale-105 cursor-pointer'
+											? "opacity-70 cursor-not-allowed transform-none"
+											: "hover:shadow-xl hover:scale-105 cursor-pointer"
 									}`}
 								>
-									{loading && submitType === 'publish' ? (
+									{loading && submitType === "publish" ? (
 										<span className="flex items-center justify-center">
 											<svg
 												className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -1289,13 +1407,13 @@ const CreateInternshipModal = ({
 													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 												></path>
 											</svg>
-											{isEditing ? 'Publishing...' : 'Publishing...'}
+											{isEditing ? "Publishing..." : "Publishing..."}
 										</span>
 									) : (
 										<span className="flex items-center justify-center">
 											<BriefcaseIcon className="w-5 h-5 mr-2" />
 											<span className="hidden xs:inline">
-												{isEditing ? 'Publish Internship' : 'Publish Internship'}
+												{isEditing ? "Publish Internship" : "Publish Internship"}
 											</span>
 											Publish Internship
 										</span>

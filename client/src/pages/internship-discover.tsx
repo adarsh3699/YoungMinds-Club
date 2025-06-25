@@ -1,22 +1,12 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import axios, { AxiosResponse } from "axios";
 import InternshipCard from "../components/common/InternshipCard";
-import { SearchAndFilter } from "../components/common";
+import { SearchAndFilter_Internship } from "../components/common";
 import EventCardSkeleton from "../components/organizer/EventCardSkeleton";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { InternshipDiscoverData, InternshipsApiResponse, SelectOption } from "@/types";
-import { INTERNSHIP_CATEGORIES, INTERNSHIP_TYPES } from "../utils/internshipConstants";
-
-// Sort options for internships
-const SORT_OPTIONS: SelectOption[] = [
-	{ label: "All Status", value: "all" },
-	{ label: "Most Popular", value: "popular" },
-	{ label: "Recently Posted", value: "recent" },
-	{ label: "Deadline Soon", value: "deadline" },
-	{ label: "High Stipend", value: "stipend" },
-	{ label: "Remote Only", value: "remote" },
-];
+import { InternshipDiscoverData, InternshipsApiResponse } from "@/types";
+import { INTERNSHIP_CATEGORIES, INTERNSHIP_TYPES, INTERNSHIP_COMPENSATION } from "../utils/internshipConstants";
 
 const InternshipDiscoverPage: React.FC = () => {
 	const { isAuthenticated } = useAuth();
@@ -27,18 +17,6 @@ const InternshipDiscoverPage: React.FC = () => {
 	const [filteredInternships, setFilteredInternships] = useState<InternshipDiscoverData[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-
-	// Transform internship data to be compatible with SearchAndFilter
-	const transformInternshipForFilter = React.useCallback((internship: InternshipDiscoverData) => {
-		return {
-			...internship,
-			date: internship.startDate, // Map startDate to date for filtering
-			location: internship.location,
-			organizer: internship.company ? { name: internship.company.name } : undefined, // Map company to organizer
-			registrationCount: internship.applicationCount, // Map applicationCount to registrationCount
-			price: internship.stipend || 0, // Map stipend to price for filtering
-		};
-	}, []);
 
 	// Fetch internships data
 	useEffect(() => {
@@ -70,15 +48,9 @@ const InternshipDiscoverPage: React.FC = () => {
 	}, []);
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = React.useCallback((filtered: any[]) => {
-		// eslint-disable-line @typescript-eslint/no-explicit-any
+	const handleFilteredDataChange = React.useCallback((filtered: unknown[]) => {
 		setFilteredInternships(filtered as InternshipDiscoverData[]);
 	}, []);
-
-	// Memoize the transformed data to prevent infinite re-renders
-	const transformedInternships = useMemo(() => {
-		return internships.map(transformInternshipForFilter);
-	}, [internships, transformInternshipForFilter]);
 
 	// Handle saving/unsaving internship
 	const handleSaveToggle = React.useCallback(
@@ -125,24 +97,15 @@ const InternshipDiscoverPage: React.FC = () => {
 				</div>
 
 				{/* Search and Filter Section */}
-				<SearchAndFilter
-					data={transformedInternships}
+				<SearchAndFilter_Internship
+					data={internships}
 					onFilteredDataChange={handleFilteredDataChange}
 					itemType="internships"
-					searchPlaceholder="Search internships by title, company, location, or skills..."
+					searchPlaceholder="Search internships by title, skills, category, or location..."
 					animationDelay="0.1s"
-					showCategory={true}
-					showAdvancedFilters={true}
 					categoryOptions={INTERNSHIP_CATEGORIES}
-					statusOptions={SORT_OPTIONS}
-					eventTypeOptions={INTERNSHIP_TYPES}
-					enableDateRange={true}
-					enableEventType={true}
-					enableOrganizer={true}
-					enableRegistrationRange={false}
-					enablePriceRange={true}
-					enableOnlineOnly={true}
-					enableFreeOnly={false}
+					internshipTypeOptions={INTERNSHIP_TYPES}
+					compensationOptions={INTERNSHIP_COMPENSATION}
 				/>
 
 				{/* Internships Grid */}

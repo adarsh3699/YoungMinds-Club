@@ -6,7 +6,6 @@ export { default as ErrorAlert } from './msgAlert';
 export { default as MsgAlert, getErrorMessage } from './msgAlert';
 export { default as GlobalErrorAlert } from './GlobalErrorAlert';
 export { default as FormInput } from './FormInput';
-export { default as Logo } from './Logo';
 export { default as Tooltip } from './Tooltip';
 export { default as Modal } from './Modal';
 export { default as TextareaField } from './TextareaField';
@@ -16,6 +15,7 @@ export { default as Accordion } from './Accordion';
 export { default as EventCard } from './EventCard';
 export { default as InternshipCard } from './InternshipCard';
 export { default as SearchAndFilter } from './SearchAndFilter';
+export { default as SearchAndFilter_Internship } from './SearchAndFilter_Internship';
 
 // Layout Components
 export { default as Footer } from './Footer';
@@ -23,6 +23,7 @@ export { default as Navigation } from './Navigation';
 
 // Form Components
 export { default as SelectInput } from './SelectInput';
+export { default as SearchableSelect } from './SearchableSelect';
 export { default as DateTimePicker } from './DateTimePicker';
 
 // Loading Components

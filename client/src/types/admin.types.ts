@@ -427,6 +427,7 @@ export interface AdminEventData {
   flagReason?: string | null;
   createdAt: string;
   updatedAt: string;
+  [key: string]: unknown; // Allow additional properties for SearchAndFilter compatibility
 }
 
 export interface EventDeleteModalState {

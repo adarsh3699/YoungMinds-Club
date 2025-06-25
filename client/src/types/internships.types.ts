@@ -15,7 +15,7 @@ export interface InternshipCardData {
   type: string;
   category?: string;
   compensation?: {
-    type: string;
+    type: 'Paid' | 'Unpaid';
     amount: number;
     currency: string;
   };
@@ -105,7 +105,7 @@ export interface InternshipDetailsData {
   category: string;
   type: string;
   compensation: {
-    type: string;
+    type: 'Paid' | 'Unpaid';
     amount: number;
     currency: string;
   };
@@ -133,7 +133,7 @@ export interface InternshipApplicationResponse {
   success: boolean;
   message: string;
   xp?: number;
-  application?: any;
+  application?: unknown;
 }
 
 export interface InternshipSaveResponse {
@@ -149,7 +149,9 @@ export interface UserInternshipsResponse {
 }
 
 // Internship Details Component Props
-export interface InternshipDetailsProps {}
+export interface InternshipDetailsProps {
+  // This interface can be empty for now
+}
 
 // Internship Discovery Page Types
 export interface InternshipDiscoverFilters {
@@ -175,8 +177,10 @@ export interface InternshipsApiResponse {
   message?: string;
 }
 
-// Internship Discovery Component Props
-export interface InternshipDiscoverProps {}
+// Internship Discovery Component Props  
+export interface InternshipDiscoverProps {
+  // This interface can be empty for now
+}
 
 // Internship Card Component with Discover-specific properties
 export interface InternshipDiscoverData extends InternshipCardData {

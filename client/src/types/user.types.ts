@@ -134,7 +134,7 @@ export type BadgeType = 'Newbie' | 'Regular' | 'Champ' | 'Veteran' | 'Master';
 export type AnnouncementType = 'info' | 'warning' | 'success' | 'error';
 
 // User Dashboard Component Props
-export interface UserDashboardProps {}
+export type UserDashboardProps = object;
 
 // Event Handler Types for UserDashboard
 export interface UserDashboardHandlers {
@@ -191,6 +191,7 @@ export interface UserData {
   flagReason?: string | null;
   createdAt: string;
   updatedAt: string;
+  [key: string]: unknown; // Allow additional properties for SearchAndFilter compatibility
 }
 
 export interface UserModalState {

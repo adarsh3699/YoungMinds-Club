@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import axios, { AxiosResponse } from 'axios';
-import { formatDate } from '../utils/formatDate';
-import { Tabs, MsgAlert } from '../components/common';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios, { AxiosResponse } from "axios";
+import { formatDate } from "../utils/formatDate";
+import { Tabs, MsgAlert } from "../components/common";
 import {
 	InternshipDetailsData,
 	InternshipApplicationResponse,
 	InternshipSaveResponse,
 	UserInternshipsResponse,
-} from '@/types';
+} from "@/types";
 
 const InternshipDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -24,18 +24,18 @@ const InternshipDetails: React.FC = () => {
 	const [isApplied, setIsApplied] = useState<boolean>(false);
 	const [applicationError, setApplicationError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
-	const [activeTab, setActiveTab] = useState<string>('details');
+	const [activeTab, setActiveTab] = useState<string>("details");
 
 	// Check for application success from URL query
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
-		if (queryParams.get('applied') === 'true') {
+		if (queryParams.get("applied") === "true") {
 			setSuccessMessage(
-				'You have successfully applied for this internship. You earned 15 XP for applying. Keep it up!'
+				"You have successfully applied for this internship. You earned 15 XP for applying. Keep it up!"
 			);
 			// Clear the URL parameter without refreshing the page
 			const newUrl = window.location.pathname;
-			window.history.replaceState({}, '', newUrl);
+			window.history.replaceState({}, "", newUrl);
 		}
 	}, [location.search]);
 
@@ -54,7 +54,7 @@ const InternshipDetails: React.FC = () => {
 				if (isAuthenticated) {
 					try {
 						const userInternshipsResponse: AxiosResponse<UserInternshipsResponse> = await axios.get(
-							'/user/internships'
+							"/user/internships"
 						);
 
 						// Check if internship is saved
@@ -70,14 +70,14 @@ const InternshipDetails: React.FC = () => {
 						setIsApplied(internshipIsApplied || false);
 					} catch (userDataError) {
 						// Silently handle the case where user internships endpoint doesn't exist
-						console.log('User internships data not available \n', userDataError);
+						console.log("User internships data not available \n", userDataError);
 						setIsSaved(false);
 						setIsApplied(false);
 					}
 				}
 			} catch (error) {
-				console.error('Error fetching internship details:', error);
-				setError('Failed to load internship details. Please try again.');
+				console.error("Error fetching internship details:", error);
+				setError("Failed to load internship details. Please try again.");
 			} finally {
 				setLoading(false);
 			}
@@ -89,7 +89,7 @@ const InternshipDetails: React.FC = () => {
 	// Handle saving/unsaving internship
 	const handleSaveInternship = async () => {
 		if (!isAuthenticated) {
-			navigate('/login', { state: { from: `/internship/${id}` } });
+			navigate("/login", { state: { from: `/internship/${id}` } });
 			return;
 		}
 
@@ -99,15 +99,15 @@ const InternshipDetails: React.FC = () => {
 			const response: AxiosResponse<InternshipSaveResponse> = await axios.post(`/internships/${id}/save`);
 			setIsSaved(response.data.isSaved);
 		} catch (error) {
-			console.error('Error saving internship:', error);
-			setError('Failed to save internship. Please try again.');
+			console.error("Error saving internship:", error);
+			setError("Failed to save internship. Please try again.");
 		}
 	};
 
 	// Handle application
 	const handleApply = async () => {
 		if (!isAuthenticated) {
-			navigate('/login', { state: { from: `/internship/${id}` } });
+			navigate("/login", { state: { from: `/internship/${id}` } });
 			return;
 		}
 
@@ -120,19 +120,20 @@ const InternshipDetails: React.FC = () => {
 			setIsApplied(true);
 			setSuccessMessage(
 				`Application successful! You have successfully applied for this internship.${
-					response.data.xp ? ` You earned ${response.data.xp} XP for applying. Keep it up!` : ''
+					response.data.xp ? ` You earned ${response.data.xp} XP for applying. Keep it up!` : ""
 				}`
 			);
 			setApplicationError(null);
-		} catch (error: any) {
-			console.error('Error applying for internship:', error);
-			setApplicationError(error.response?.data?.message || 'Failed to apply. Please try again.');
+		} catch (error: unknown) {
+			console.error("Error applying for internship:", error);
+			const axiosError = error as { response?: { data?: { message?: string } } };
+			setApplicationError(axiosError.response?.data?.message || "Failed to apply. Please try again.");
 		}
 	};
 
 	// Generate WhatsApp share link
 	const generateWhatsAppLink = (): string => {
-		if (!internship) return '#';
+		if (!internship) return "#";
 
 		const startDate = formatDate(internship.startDate);
 		const shareText = `Check out this internship: "${internship.title}" at ${internship.company.name}. Starts ${startDate}. Apply here: ${window.location.href}`;
@@ -157,37 +158,31 @@ const InternshipDetails: React.FC = () => {
 
 	// Format compensation display
 	const formatCompensation = (): string => {
-		if (!internship) return '';
-		
+		if (!internship) return "";
+
 		if (!internship.compensation) {
-			return 'Not specified';
+			return "Not specified";
 		}
-		
+
 		// Handle new compensation object structure
-		if (typeof internship.compensation === 'object') {
+		if (typeof internship.compensation === "object") {
 			const { type, amount, currency } = internship.compensation;
-			
-			if (type === 'Unpaid') {
-				return 'Unpaid';
+
+			if (type === "Unpaid") {
+				return "Unpaid";
 			}
-			if (type === 'Certificate') {
-				return 'Certificate Only';
-			}
-			if (type === 'Experience') {
-				return 'Experience Letter';
-			}
-			if ((type === 'Paid' || type === 'Stipend') && amount) {
-				const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
+			if (type === "Paid" && amount) {
+				const currencySymbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : currency;
 				return `${currencySymbol}${amount}/month`;
 			}
 			return type;
 		}
-		
+
 		// Handle legacy string format for backward compatibility
-		if (internship.compensation === 'Unpaid') {
-			return 'Unpaid';
+		if (internship.compensation === "Unpaid") {
+			return "Unpaid";
 		}
-		if (internship.compensation === 'Paid' && internship.stipend) {
+		if (internship.compensation === "Paid" && internship.stipend) {
 			return `₹${internship.stipend}/month`;
 		}
 		return String(internship.compensation);
@@ -200,7 +195,7 @@ const InternshipDetails: React.FC = () => {
 				<div className="flex flex-col items-center justify-center h-64">
 					<div
 						className="w-12 h-12 border-t-4 border-solid rounded-full animate-spin mb-4"
-						style={{ borderTopColor: 'var(--ring)' }}
+						style={{ borderTopColor: "var(--ring)" }}
 					></div>
 					<h2 className="text-xl font-semibold ym-text-secondary">Loading internship details...</h2>
 				</div>
@@ -214,9 +209,9 @@ const InternshipDetails: React.FC = () => {
 			<div className="container mx-auto px-4 py-12 mt-6">
 				<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative">
 					<strong className="font-bold">Error!</strong>
-					<span className="block sm:inline"> {error || 'Internship not found'}</span>
+					<span className="block sm:inline"> {error || "Internship not found"}</span>
 					<button
-						onClick={() => navigate('/internship-discover')}
+						onClick={() => navigate("/internship-discover")}
 						className="mt-4 ml-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
 					>
 						Back to Internships
@@ -273,7 +268,7 @@ const InternshipDetails: React.FC = () => {
 					<div className="md:w-1/2 lg:w-2/5">
 						<div className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
 							<img
-								src={internship.logo || 'https://via.placeholder.com/400x300?text=Company+Logo'}
+								src={internship.logo || "https://via.placeholder.com/400x300?text=Company+Logo"}
 								alt={internship.company.name}
 								className="w-full h-auto object-cover"
 							/>
@@ -330,8 +325,8 @@ const InternshipDetails: React.FC = () => {
 								onClick={handleSaveInternship}
 								className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
 									isSaved
-										? 'ym-bg-amber-100 ym-text-yellow-700'
-										: 'ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card'
+										? "ym-bg-amber-100 ym-text-yellow-700"
+										: "ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card"
 								}`}
 							>
 								{isSaved ? (
@@ -399,11 +394,11 @@ const InternshipDetails: React.FC = () => {
 									{internship.type}
 								</span>
 								<span className="ym-bg-blue-100 ym-text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded">
-									{internship.location.type === 'remote'
-										? 'Remote'
-										: internship.location.type === 'hybrid'
-										? 'Hybrid'
-										: 'On-site'}
+									{internship.location.type === "remote"
+										? "Remote"
+										: internship.location.type === "hybrid"
+										? "Hybrid"
+										: "On-site"}
 								</span>
 								{internship.tags &&
 									internship.tags.map((tag, index) => (
@@ -446,8 +441,8 @@ const InternshipDetails: React.FC = () => {
 								onClick={handleSaveInternship}
 								className={`flex items-center py-2 px-6 rounded-lg font-medium transition-all duration-300 ${
 									isSaved
-										? 'ym-bg-amber-100 ym-text-yellow-700'
-										: 'ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card'
+										? "ym-bg-amber-100 ym-text-yellow-700"
+										: "ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card"
 								}`}
 							>
 								{isSaved ? (
@@ -494,8 +489,8 @@ const InternshipDetails: React.FC = () => {
 							<div className="ym-bg-card border ym-border-card rounded-lg p-4">
 								<h3 className="font-semibold ym-text-primary mb-2">📍 Location</h3>
 								<p className="ym-text-secondary text-sm">
-									{internship.location.type === 'remote'
-										? 'Remote'
+									{internship.location.type === "remote"
+										? "Remote"
 										: `${internship.location.city}, ${internship.location.state}`}
 								</p>
 							</div>
@@ -510,10 +505,10 @@ const InternshipDetails: React.FC = () => {
 								<p
 									className={`text-sm font-medium ${
 										isDeadlinePast()
-											? 'text-red-600'
+											? "text-red-600"
 											: getDaysRemaining() <= 7
-											? 'text-orange-600'
-											: 'ym-text-secondary'
+											? "text-orange-600"
+											: "ym-text-secondary"
 									}`}
 								>
 									{formatDate(internship.applicationDeadline)}
@@ -542,8 +537,8 @@ const InternshipDetails: React.FC = () => {
 							onTabChange={setActiveTab}
 							tabs={[
 								{
-									id: 'details',
-									label: 'Details',
+									id: "details",
+									label: "Details",
 									content: (
 										<div className="space-y-6">
 											{/* Description */}
@@ -638,8 +633,8 @@ const InternshipDetails: React.FC = () => {
 									),
 								},
 								{
-									id: 'company',
-									label: 'Company',
+									id: "company",
+									label: "Company",
 									content: (
 										<div className="space-y-6">
 											<div>
@@ -648,7 +643,7 @@ const InternshipDetails: React.FC = () => {
 												</h3>
 												<div className="ym-text-secondary">
 													{internship.company.description ||
-														'Company information not available.'}
+														"Company information not available."}
 												</div>
 											</div>
 
@@ -669,8 +664,8 @@ const InternshipDetails: React.FC = () => {
 									),
 								},
 								{
-									id: 'share',
-									label: 'Share',
+									id: "share",
+									label: "Share",
 									content: (
 										<div className="space-y-4">
 											<h3 className="text-lg font-semibold ym-text-primary mb-4">
@@ -696,7 +691,7 @@ const InternshipDetails: React.FC = () => {
 												<button
 													onClick={() => {
 														navigator.clipboard.writeText(window.location.href);
-														setSuccessMessage('Link copied to clipboard!');
+														setSuccessMessage("Link copied to clipboard!");
 													}}
 													className="flex items-center justify-center ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card py-3 px-4 rounded-lg transition-colors"
 												>
@@ -729,4 +724,3 @@ const InternshipDetails: React.FC = () => {
 };
 
 export default InternshipDetails;
- 

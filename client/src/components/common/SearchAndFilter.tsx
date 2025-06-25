@@ -32,7 +32,7 @@ interface DataItem {
 		venue?: string;
 		type?: "online" | "offline";
 	};
-	[key: string]: any; // Allow additional properties
+	[key: string]: unknown; // Allow additional properties
 }
 
 // Configuration interface for the component
@@ -130,19 +130,19 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 					const titleMatch = (item.title || item.name || "").toLowerCase().includes(query);
 
 					// Search in email (for organizers)
-					const emailMatch = item.email && item.email.toLowerCase().includes(query);
+					const emailMatch = typeof item.email === "string" && item.email.toLowerCase().includes(query);
 
 					// Search in organization name (for organizers)
 					const organizationMatch =
-						item.organizationName && item.organizationName.toLowerCase().includes(query);
+						typeof item.organizationName === "string" &&
+						item.organizationName.toLowerCase().includes(query);
 
 					// Search in location fields (for events)
 					const locationMatch =
 						item.location &&
 						((item.location.city && item.location.city.toLowerCase().includes(query)) ||
 							(item.location.venue && item.location.venue.toLowerCase().includes(query)) ||
-							(item.location.type === "online" && "online".includes(query)) ||
-							(item.location.type === "remote" && "remote".includes(query)));
+							(item.location.type === "online" && "online".includes(query)));
 
 					// Search in tags (for events)
 					const tagsMatch = item.tags && item.tags.some((tag) => tag.toLowerCase().includes(query));

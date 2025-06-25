@@ -216,6 +216,7 @@ export interface OrganizerData {
   eventCount?: number;
   createdAt: string;
   updatedAt: string;
+  [key: string]: unknown; // Allow additional properties for SearchAndFilter compatibility
 }
 
 export interface OrganizerModalState {
@@ -259,7 +260,7 @@ export interface OrganizerInternship {
     country?: string;
   };
   compensation: {
-    type: 'paid' | 'unpaid' | 'stipend';
+    type: 'Paid' | 'Unpaid';
     amount?: number;
     currency?: string;
   };

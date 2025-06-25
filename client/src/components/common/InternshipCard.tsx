@@ -103,13 +103,7 @@ const InternshipCard = ({ internship, isRecruiter = false, onManage, onEdit, onS
 			if (type === "Unpaid") {
 				return "Unpaid";
 			}
-			if (type === "Certificate") {
-				return "Certificate Only";
-			}
-			if (type === "Experience") {
-				return "Experience Letter";
-			}
-			if ((type === "Paid" || type === "Stipend") && amount) {
+			if (type === "Paid" && amount) {
 				const currencySymbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : currency;
 				return `${currencySymbol} ${amount.toLocaleString()}`;
 			}
