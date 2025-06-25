@@ -1,13 +1,13 @@
-import React, { memo, useState, useEffect, useMemo } from 'react';
+import React, { memo, useState, useEffect, useMemo } from "react";
 import {
 	MagnifyingGlassIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
 	AdjustmentsHorizontalIcon,
 	UserGroupIcon,
-} from '@heroicons/react/24/outline';
-import { FormInput, SelectInput, Switch, DateTimePicker } from '.';
-import { SelectOption } from '@/types';
+} from "@heroicons/react/24/outline";
+import { FormInput, SelectInput, Switch, DateTimePicker } from ".";
+import { SelectOption } from "@/types";
 
 // Generic data item interface
 interface DataItem {
@@ -30,7 +30,7 @@ interface DataItem {
 	location?: {
 		city?: string;
 		venue?: string;
-		type?: 'online' | 'offline';
+		type?: "online" | "offline";
 	};
 	[key: string]: any; // Allow additional properties
 }
@@ -76,14 +76,14 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 	({
 		data,
 		onFilteredDataChange,
-		itemType = 'items',
-		searchPlaceholder = 'Search...',
-		animationDelay = '0.3s',
+		itemType = "items",
+		searchPlaceholder = "Search...",
+		animationDelay = "0.3s",
 		disableAnimations = false,
-		categoryOptions = [{ label: 'All Categories', value: '' }],
-		statusOptions = [{ label: 'All Status', value: '' }],
-		roleOptions = [{ label: 'All Roles', value: '' }],
-		eventTypeOptions = [{ label: 'All Types', value: '' }],
+		categoryOptions = [{ label: "All Categories", value: "" }],
+		statusOptions = [{ label: "All Status", value: "" }],
+		roleOptions = [{ label: "All Roles", value: "" }],
+		eventTypeOptions = [{ label: "All Types", value: "" }],
 		showCategory = false,
 		showRole = false,
 		showAdvancedFilters = false,
@@ -97,21 +97,21 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 		enableFreeOnly = false,
 	}) => {
 		// Basic filter states
-		const [searchTerm, setSearchTerm] = useState<string>('');
-		const [categoryFilter, setCategoryFilter] = useState<string>('');
-		const [statusFilter, setStatusFilter] = useState<string>('');
-		const [roleFilter, setRoleFilter] = useState<string>('');
+		const [searchTerm, setSearchTerm] = useState<string>("");
+		const [categoryFilter, setCategoryFilter] = useState<string>("");
+		const [statusFilter, setStatusFilter] = useState<string>("");
+		const [roleFilter, setRoleFilter] = useState<string>("");
 
 		// Advanced filter states
 		const [showAdvancedFiltersPanel, setShowAdvancedFiltersPanel] = useState(false);
-		const [startDate, setStartDate] = useState<string>('');
-		const [endDate, setEndDate] = useState<string>('');
-		const [eventType, setEventType] = useState<string>('');
-		const [organizer, setOrganizer] = useState<string>('');
-		const [minRegistrations, setMinRegistrations] = useState<string>('');
-		const [maxRegistrations, setMaxRegistrations] = useState<string>('');
-		const [minPrice, setMinPrice] = useState<string>('');
-		const [maxPrice, setMaxPrice] = useState<string>('');
+		const [startDate, setStartDate] = useState<string>("");
+		const [endDate, setEndDate] = useState<string>("");
+		const [eventType, setEventType] = useState<string>("");
+		const [organizer, setOrganizer] = useState<string>("");
+		const [minRegistrations, setMinRegistrations] = useState<string>("");
+		const [maxRegistrations, setMaxRegistrations] = useState<string>("");
+		const [minPrice, setMinPrice] = useState<string>("");
+		const [maxPrice, setMaxPrice] = useState<string>("");
 		const [isOnlineOnly, setIsOnlineOnly] = useState<boolean>(false);
 		const [isFeaturedOnly, setIsFeaturedOnly] = useState<boolean>(false);
 		const [isFreeOnly, setIsFreeOnly] = useState<boolean>(false);
@@ -127,7 +127,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 				const query = searchTerm.toLowerCase().trim();
 				result = result.filter((item) => {
 					// Search in title/name
-					const titleMatch = (item.title || item.name || '').toLowerCase().includes(query);
+					const titleMatch = (item.title || item.name || "").toLowerCase().includes(query);
 
 					// Search in email (for organizers)
 					const emailMatch = item.email && item.email.toLowerCase().includes(query);
@@ -141,7 +141,8 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 						item.location &&
 						((item.location.city && item.location.city.toLowerCase().includes(query)) ||
 							(item.location.venue && item.location.venue.toLowerCase().includes(query)) ||
-							(item.location.type === 'online' && 'online'.includes(query)));
+							(item.location.type === "online" && "online".includes(query)) ||
+							(item.location.type === "remote" && "remote".includes(query)));
 
 					// Search in tags (for events)
 					const tagsMatch = item.tags && item.tags.some((tag) => tag.toLowerCase().includes(query));
@@ -151,23 +152,23 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			}
 
 			// Apply category filter
-			if (categoryFilter && categoryFilter !== '') {
+			if (categoryFilter && categoryFilter !== "") {
 				result = result.filter((item) => item.category === categoryFilter);
 			}
 
 			// Apply role filter
-			if (roleFilter && roleFilter !== '' && roleFilter !== 'all') {
+			if (roleFilter && roleFilter !== "" && roleFilter !== "all") {
 				result = result.filter((item) => item.role === roleFilter);
 			}
 
 			// Apply event type filter
-			if (eventType && eventType !== '') {
+			if (eventType && eventType !== "") {
 				result = result.filter((item) => item.type === eventType);
 			}
 
 			// Apply online only filter
 			if (isOnlineOnly) {
-				result = result.filter((item) => item.location?.type === 'online');
+				result = result.filter((item) => item.location?.type === "online");
 			}
 
 			// Apply free only filter
@@ -214,17 +215,17 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 			}
 
 			// Apply status-based sorting/filtering
-			if (statusFilter && statusFilter !== '' && statusFilter !== 'all') {
+			if (statusFilter && statusFilter !== "" && statusFilter !== "all") {
 				const now = new Date();
 				switch (statusFilter) {
 					// Event-specific statuses
-					case 'popular':
+					case "popular":
 						result.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
 						break;
-					case 'upcoming':
+					case "upcoming":
 						result.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
 						break;
-					case 'ongoing':
+					case "ongoing":
 						result = result.filter((item) => {
 							if (!item.date) return false;
 							const eventDate = new Date(item.date);
@@ -232,7 +233,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 							return eventDate <= now && now <= endDate;
 						});
 						break;
-					case 'completed':
+					case "completed":
 						result = result.filter((item) => {
 							if (!item.date) return false;
 							const endDate = new Date(item.endDate || item.date);
@@ -240,20 +241,36 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 						});
 						break;
 					// Organizer-specific statuses
-					case 'active':
-						result = result.filter((item) => item.status === 'active' || !item.status);
+					case "active":
+						result = result.filter((item) => item.status === "active" || !item.status);
 						break;
-					case 'suspended':
-						result = result.filter((item) => item.status === 'suspended');
+					case "suspended":
+						result = result.filter((item) => item.status === "suspended");
 						break;
-					case 'flagged':
+					case "flagged":
 						result = result.filter((item) => item.isFlagged);
 						break;
 				}
 			}
 
 			return result;
-		}, [data, searchTerm, categoryFilter, statusFilter, roleFilter, startDate, endDate, eventType, organizer, minRegistrations, maxRegistrations, minPrice, maxPrice, isOnlineOnly, isFreeOnly]);
+		}, [
+			data,
+			searchTerm,
+			categoryFilter,
+			statusFilter,
+			roleFilter,
+			startDate,
+			endDate,
+			eventType,
+			organizer,
+			minRegistrations,
+			maxRegistrations,
+			minPrice,
+			maxPrice,
+			isOnlineOnly,
+			isFreeOnly,
+		]);
 
 		// Notify parent of filtered data changes
 		useEffect(() => {
@@ -262,18 +279,18 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 
 		// Reset all filters
 		const resetAllFilters = () => {
-			setSearchTerm('');
-			setCategoryFilter('');
-			setStatusFilter('');
-			setRoleFilter('');
-			setStartDate('');
-			setEndDate('');
-			setEventType('');
-			setOrganizer('');
-			setMinRegistrations('');
-			setMaxRegistrations('');
-			setMinPrice('');
-			setMaxPrice('');
+			setSearchTerm("");
+			setCategoryFilter("");
+			setStatusFilter("");
+			setRoleFilter("");
+			setStartDate("");
+			setEndDate("");
+			setEventType("");
+			setOrganizer("");
+			setMinRegistrations("");
+			setMaxRegistrations("");
+			setMinPrice("");
+			setMaxPrice("");
 			setIsOnlineOnly(false);
 			setIsFeaturedOnly(false);
 			setIsFreeOnly(false);
@@ -296,13 +313,13 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 		return (
 			<div
 				className={`glass-effect rounded-3xl shadow-xl mb-8 relative z-20 border border-border/20 backdrop-blur-lg ${
-					!disableAnimations ? 'animate-fade-in' : ''
+					!disableAnimations ? "animate-fade-in" : ""
 				}`}
 				style={
 					!disableAnimations
 						? {
 								animationDelay,
-								animationFillMode: 'both',
+								animationFillMode: "both",
 						  }
 						: {}
 				}
@@ -366,7 +383,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 						<div className="flex items-center gap-3">
 							<div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
 							<span className="text-sm font-medium text-muted-foreground">
-								Showing <span className="text-primary font-semibold">{filteredData.length}</span> of{' '}
+								Showing <span className="text-primary font-semibold">{filteredData.length}</span> of{" "}
 								<span className="text-card-foreground font-semibold">{data.length}</span> {itemType}
 							</span>
 						</div>
@@ -427,7 +444,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 						{showAdvancedFiltersPanel && (
 							<div
 								className={`px-8 py-6 space-y-6 border-t border-border/20 bg-gradient-to-br from-muted/5 via-transparent to-accent/5 ${
-									!disableAnimations ? 'animate-fade-in-up' : ''
+									!disableAnimations ? "animate-fade-in-up" : ""
 								}`}
 							>
 								{/* Date Range */}
@@ -592,7 +609,7 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 												<span className="text-sm font-medium text-card-foreground">
 													<span className="text-primary font-semibold">
 														{filteredData.length}
-													</span>{' '}
+													</span>{" "}
 													of {data.length} {itemType} shown
 												</span>
 											</div>
@@ -624,6 +641,6 @@ const SearchAndFilter: React.FC<SearchAndFilterConfig> = memo(
 	}
 );
 
-SearchAndFilter.displayName = 'SearchAndFilter';
+SearchAndFilter.displayName = "SearchAndFilter";
 
 export default SearchAndFilter;

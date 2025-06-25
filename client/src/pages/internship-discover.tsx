@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import InternshipCard from '../components/common/InternshipCard';
-import { SearchAndFilter } from '../components/common';
-import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { InternshipDiscoverData, InternshipsApiResponse, SelectOption } from '@/types';
-import { INTERNSHIP_CATEGORIES, INTERNSHIP_TYPES } from '../utils/internshipConstants';
+import React, { useState, useEffect, useMemo } from "react";
+import axios, { AxiosResponse } from "axios";
+import InternshipCard from "../components/common/InternshipCard";
+import { SearchAndFilter } from "../components/common";
+import EventCardSkeleton from "../components/organizer/EventCardSkeleton";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { InternshipDiscoverData, InternshipsApiResponse, SelectOption } from "@/types";
+import { INTERNSHIP_CATEGORIES, INTERNSHIP_TYPES } from "../utils/internshipConstants";
 
 // Sort options for internships
 const SORT_OPTIONS: SelectOption[] = [
-	{ label: 'All Status', value: 'all' },
-	{ label: 'Most Popular', value: 'popular' },
-	{ label: 'Recently Posted', value: 'recent' },
-	{ label: 'Deadline Soon', value: 'deadline' },
-	{ label: 'High Stipend', value: 'stipend' },
-	{ label: 'Remote Only', value: 'remote' },
+	{ label: "All Status", value: "all" },
+	{ label: "Most Popular", value: "popular" },
+	{ label: "Recently Posted", value: "recent" },
+	{ label: "Deadline Soon", value: "deadline" },
+	{ label: "High Stipend", value: "stipend" },
+	{ label: "Remote Only", value: "remote" },
 ];
 
 const InternshipDiscoverPage: React.FC = () => {
@@ -33,10 +33,7 @@ const InternshipDiscoverPage: React.FC = () => {
 		return {
 			...internship,
 			date: internship.startDate, // Map startDate to date for filtering
-			location: {
-				...internship.location,
-				type: (internship.location?.type === 'remote' ? 'online' : 'offline') as 'online' | 'offline', // Transform for compatibility
-			},
+			location: internship.location,
 			organizer: internship.company ? { name: internship.company.name } : undefined, // Map company to organizer
 			registrationCount: internship.applicationCount, // Map applicationCount to registrationCount
 			price: internship.stipend || 0, // Map stipend to price for filtering
@@ -48,20 +45,20 @@ const InternshipDiscoverPage: React.FC = () => {
 		const fetchInternships = async () => {
 			setLoading(true);
 			try {
-				const response: AxiosResponse<InternshipsApiResponse> = await axios.get('/internships');
+				const response: AxiosResponse<InternshipsApiResponse> = await axios.get("/internships");
 				if (response.data.success) {
 					const internshipsData = response.data.internships as InternshipDiscoverData[];
 					setInternships(internshipsData);
 					setFilteredInternships(internshipsData);
 				} else {
-					console.error('Error fetching internships:', response.data.message);
-					setError('Failed to load internships. Please try again later.');
+					console.error("Error fetching internships:", response.data.message);
+					setError("Failed to load internships. Please try again later.");
 					setInternships([]);
 					setFilteredInternships([]);
 				}
 			} catch (err) {
-				console.error('Error fetching internships:', err);
-				setError('Failed to load internships. Please try again later.');
+				console.error("Error fetching internships:", err);
+				setError("Failed to load internships. Please try again later.");
 				setInternships([]);
 				setFilteredInternships([]);
 			} finally {
@@ -73,7 +70,8 @@ const InternshipDiscoverPage: React.FC = () => {
 	}, []);
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = React.useCallback((filtered: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+	const handleFilteredDataChange = React.useCallback((filtered: any[]) => {
+		// eslint-disable-line @typescript-eslint/no-explicit-any
 		setFilteredInternships(filtered as InternshipDiscoverData[]);
 	}, []);
 
@@ -87,7 +85,7 @@ const InternshipDiscoverPage: React.FC = () => {
 		async (internshipId: string): Promise<void> => {
 			if (!isAuthenticated) {
 				// Redirect to login if not authenticated
-				navigate('/login');
+				navigate("/login");
 				return;
 			}
 
@@ -95,7 +93,7 @@ const InternshipDiscoverPage: React.FC = () => {
 				// Always use POST method, as the server endpoint handles both save and unsave
 				await axios.post(`/internships/${internshipId}/save`);
 			} catch (error) {
-				console.error('Error toggling saved internship:', error);
+				console.error("Error toggling saved internship:", error);
 			}
 		},
 		[isAuthenticated, navigate]
@@ -177,7 +175,7 @@ const InternshipDiscoverPage: React.FC = () => {
 							</p>
 						</div>
 					) : (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 							{filteredInternships.map((internship) => (
 								<InternshipCard
 									key={internship._id}

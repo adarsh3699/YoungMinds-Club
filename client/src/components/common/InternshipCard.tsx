@@ -1,34 +1,14 @@
-import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { useState, useEffect, useMemo } from "react";
 import {
-	CalendarIcon,
-	MapPinIcon,
-	UserGroupIcon,
 	ClockIcon,
 	BookmarkIcon,
 	BuildingOfficeIcon,
 	BanknotesIcon,
 	ComputerDesktopIcon,
-	ArrowRightIcon,
-} from '@heroicons/react/24/outline';
-import { BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
-import { Link } from 'react-router-dom';
-import { InternshipCardData } from '@/types';
-
-// Vibrant colors for different internship categories
-const getCategoryColor = (category: string) => {
-	const colors = {
-		Technology: 'from-violet-500 to-indigo-600',
-		Business: 'from-sky-500 to-blue-600',
-		Marketing: 'from-orange-500 to-red-600',
-		Design: 'from-emerald-500 to-teal-600',
-		Finance: 'from-pink-500 to-rose-600',
-		Engineering: 'from-amber-500 to-yellow-600',
-		default: 'from-blue-500 to-indigo-600',
-	};
-
-	return colors[category as keyof typeof colors] || colors.default;
-};
+} from "@heroicons/react/24/outline";
+import { BookmarkIcon as BookmarkSolidIcon } from "@heroicons/react/24/solid";
+import { Link } from "react-router-dom";
+import { InternshipCardData } from "@/types";
 
 // Function to calculate countdown for application deadline
 const useCountdown = (targetDate: string) => {
@@ -92,28 +72,11 @@ interface InternshipCardProps {
 	onSaveToggle?: (internshipId: string) => void;
 }
 
-const InternshipCard = ({
-	internship,
-	isFeatured = false,
-	isRecruiter = false,
-	onManage,
-	onEdit,
-	onSaveToggle,
-}: InternshipCardProps) => {
+const InternshipCard = ({ internship, isRecruiter = false, onManage, onEdit, onSaveToggle }: InternshipCardProps) => {
 	const [isSaved, setIsSaved] = useState(internship.isSaved || false);
 
 	// Get countdown for application deadline
 	const countdown = useCountdown(internship.applicationDeadline);
-
-	// Format date
-	const formatDate = (dateString: string) => {
-		try {
-			const date = new Date(dateString);
-			return format(date, 'MMM d, yyyy');
-		} catch {
-			return 'Invalid Date';
-		}
-	};
 
 	// Handle bookmark toggle
 	const handleSaveToggle = (e: React.MouseEvent) => {
@@ -123,264 +86,327 @@ const InternshipCard = ({
 		setIsSaved(!isSaved);
 
 		if (onSaveToggle) {
-			onSaveToggle(internship.id || internship._id || '');
+			onSaveToggle(internship.id || internship._id || "");
 		}
 	};
 
-	// Compensation formatting
-	const formatCompensation = () => {
+	// Memoized compensation formatting
+	const formatCompensation = useMemo(() => {
 		if (!internship.compensation) {
-			return 'Not specified';
+			return "Unpaid";
 		}
-		
+
 		// Handle new compensation object structure
-		if (typeof internship.compensation === 'object') {
+		if (typeof internship.compensation === "object") {
 			const { type, amount, currency } = internship.compensation;
-			
-			if (type === 'Unpaid') {
-				return 'Unpaid';
+
+			if (type === "Unpaid") {
+				return "Unpaid";
 			}
-			if (type === 'Certificate') {
-				return 'Certificate Only';
+			if (type === "Certificate") {
+				return "Certificate Only";
 			}
-			if (type === 'Experience') {
-				return 'Experience Letter';
+			if (type === "Experience") {
+				return "Experience Letter";
 			}
-			if ((type === 'Paid' || type === 'Stipend') && amount) {
-				const currencySymbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency;
-				return `${currencySymbol}${amount}/month`;
+			if ((type === "Paid" || type === "Stipend") && amount) {
+				const currencySymbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : currency;
+				return `${currencySymbol} ${amount.toLocaleString()}`;
 			}
 			return type;
 		}
-		
+
 		// Handle legacy string format for backward compatibility
-		if (internship.compensation === 'Unpaid') {
-			return 'Unpaid';
+		if (internship.compensation === "Unpaid") {
+			return "Unpaid";
 		}
-		if (internship.compensation === 'Paid' && internship.stipend) {
-			return `₹${internship.stipend}/month`;
+		if (internship.compensation === "Paid" && internship.stipend) {
+			return `₹ ${internship.stipend.toLocaleString()}`;
 		}
 		return String(internship.compensation);
-	};
+	}, [internship.compensation, internship.stipend]);
 
-	// Check if application deadline is past
-	const isDeadlinePast = () => {
+	// Memoized deadline check
+	const isDeadlinePast = useMemo(() => {
 		return new Date(internship.applicationDeadline) < new Date();
-	};
+	}, [internship.applicationDeadline]);
 
-	// Get category color gradient
-	const categoryColorGradient = getCategoryColor(internship.category || '');
-
-	// Get location display
-	const getLocationDisplay = () => {
-		if (internship.location?.type === 'remote') {
-			return 'Remote';
+	// Memoized location display
+	const getLocationDisplay = useMemo(() => {
+		console.log(internship);
+		switch (internship.location?.type) {
+			case "remote":
+				return "Work from home";
+			case "on-site":
+				return internship.location?.city || "Location not specified";
+			case "hybrid":
+				return `Hybrid${internship.location?.city ? ` • ${internship.location.city}` : ""}`;
+			default:
+				return internship.location?.city || "Location not specified";
 		}
-		return internship.location?.city || 'Location not specified';
-	};
+	}, [internship.location?.type, internship.location?.city]);
 
-	// Get location icon
-	const getLocationIcon = () => {
-		if (internship.location?.type === 'remote') {
-			return <ComputerDesktopIcon className="h-4 w-4" />;
+	// Memoized posting time calculation
+	const postingTimeInfo = useMemo(() => {
+		const extendedInternship = internship as InternshipCardData & { createdAt?: string; postedAt?: string };
+		const postedDate =
+			extendedInternship.createdAt || extendedInternship.postedAt || internship.applicationDeadline;
+
+		if (!postedDate) return { display: null, isToday: false, isRecent: false };
+
+		const posted = new Date(postedDate);
+		const now = new Date();
+		const diffMs = now.getTime() - posted.getTime();
+		const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+		// Check if posted today
+		const isToday = posted.toDateString() === now.toDateString();
+
+		let display = null;
+		let isRecent = false;
+
+		if (diffHours < 1) {
+			display = "Just now";
+			isRecent = true;
+		} else if (diffHours < 24 && isToday) {
+			if (diffHours < 6) {
+				display = "Few hours ago";
+			} else {
+				display = "Today";
+			}
+			isRecent = true;
+		} else if (diffDays === 1) {
+			display = "1 day ago";
+		} else if (diffDays < 7) {
+			display = `${diffDays} days ago`;
 		}
-		return <MapPinIcon className="h-4 w-4" />;
-	};
+
+		return { display, isToday, isRecent };
+	}, [internship.applicationDeadline]);
+
+	// Memoize the actively hiring status to prevent unnecessary recalculations
+	const isActivelyHiring = useMemo(() => {
+		// Don't show if deadline is very close (less than 7 days) - indicates urgency/desperation
+		if ((countdown.days < 7 && countdown.days > 0) || countdown.days === 0) {
+			return false;
+		}
+
+		// Don't show if deadline has passed
+		if (isDeadlinePast) {
+			return false;
+		}
+
+		// Check multiple factors for high activity and trust
+		const factors = {
+			// Recently posted (within last 3 days)
+			recentlyPosted: postingTimeInfo.isRecent,
+
+			// Good application timeline (deadline more than 7 days away)
+			goodTimeline: countdown.days >= 7,
+
+			// Not too many applications yet (suggests they're being selective)
+			selectiveHiring: internship.applicationCount < 50,
+
+			// Has complete company profile (name and logo)
+			hasCompleteProfile: !!(
+				internship.company?.name &&
+				internship.company.name !== "Company Name" &&
+				(internship.logo || internship.companyLogo)
+			),
+
+			// Has proper compensation structure
+			hasCompensation: !!(internship.compensation && formatCompensation !== "Unpaid"),
+
+			// Reasonable duration (not too short or too long)
+			reasonableDuration: internship.duration && !internship.duration.toLowerCase().includes("week"),
+		};
+
+		// Count positive factors
+		const positiveFactors = Object.values(factors).filter(Boolean).length;
+
+		// Show "Actively hiring" if at least 3 out of 6 factors are positive
+		return positiveFactors >= 3;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		countdown.days,
+		internship.applicationCount,
+		internship.company?.name,
+		internship.logo,
+		internship.companyLogo,
+		internship.compensation,
+		internship.duration,
+		internship.applicationDeadline,
+	]);
+
+	// Memoized format duration for display
+	const formatDuration = useMemo(() => {
+		if (!internship.duration) return "";
+
+		// Convert duration to a more readable format
+		const duration = internship.duration.toLowerCase();
+		if (duration.includes("month")) {
+			const months = parseInt(duration);
+			return months === 1 ? "1 Month" : `${months} Months`;
+		}
+		return internship.duration;
+	}, [internship.duration]);
 
 	return (
-		<div className="relative rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 group">
-			{/* Card Container */}
-			<div className="ym-bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border ym-border-card">
-				{/* Image Section with Overlay */}
-				<Link
-					to={`/internship/${internship.id || internship._id}`}
-					className="block relative h-52 overflow-hidden"
-				>
-					<img
-						src={
-							internship.logo ||
-							internship.companyLogo ||
-							'https://via.placeholder.com/400x200?text=Company+Logo'
-						}
-						alt={internship.title}
-						className="w-full h-full object-cover"
-					/>
-
-					{/* Gradient Overlay */}
-					<div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-70"></div>
-
-					{/* Featured Badge */}
-					{isFeatured && (
-						<div className="absolute top-3 left-3 z-5">
-							<span className="gradient-bg ym-text-white text-xs font-bold px-3 py-1 rounded-full flex items-center">
-								<span className="mr-1">⭐</span> FEATURED
-							</span>
-						</div>
-					)}
-
-					{/* Company Badge */}
-					<div className="absolute top-3 left-3 z-5">
-						<div className="flex items-center ym-bg-white-90 ym-text-primary text-xs px-2 py-1 rounded-full">
-							<BuildingOfficeIcon className="h-3 w-3 mr-1" />
-							<span>{internship.company?.name || 'Company'}</span>
-						</div>
-					</div>
-
-					{/* Category Badge */}
-					<div className="absolute top-3 right-3 z-5">
-						<span
-							className={`bg-gradient-to-r ${categoryColorGradient} ym-text-white text-xs font-semibold px-3 py-1.5 rounded-full`}
-						>
-							{internship.category}
-						</span>
-					</div>
-
-					{/* Compensation Tag */}
-					<div className="absolute bottom-3 right-3 z-5">
-						<span className="ym-bg-white-90 ym-text-primary text-sm font-bold px-3 py-1 rounded-lg flex items-center">
-							<BanknotesIcon className="h-4 w-4 mr-1" />
-							{formatCompensation()}
-						</span>
-					</div>
-
-					{/* Deadline Warning */}
-					{countdown.days <= 3 && countdown.days > 0 && (
-						<div className="absolute bottom-3 left-3 z-5">
-							<span className="bg-red-500 ym-text-white text-xs font-bold px-2 py-1 rounded-full">
-								{countdown.days}d left
-							</span>
-						</div>
-					)}
-				</Link>
-
-				{/* Content Section */}
-				<div className="p-4 flex-grow flex flex-col">
-					{/* Internship Title with Bookmark */}
-					<div className="flex justify-between items-start mb-2">
-						<Link to={`/internship/${internship.id || internship._id}`} className="flex-grow">
-							<h3 className="font-bold text-lg ym-text-primary line-clamp-2 hover:ym-text-yellow-700 transition-colors">
-								{internship.title}
-							</h3>
-						</Link>
-
-						{/* Save/Bookmark Button - Only show if onSaveToggle is provided */}
-						{onSaveToggle && (
-							<button
-								onClick={handleSaveToggle}
-								className="ml-2 p-1 flex-shrink-0 transition-all duration-300"
-							>
-								{isSaved ? (
-									<BookmarkSolidIcon className="h-5 w-5 ym-text-yellow-600" />
-								) : (
-									<BookmarkIcon className="h-5 w-5 ym-text-muted hover:ym-text-yellow-600" />
-								)}
-							</button>
-						)}
-					</div>
-
-					{/* Short Description */}
-					{internship.shortDescription && (
-						<p className="ym-text-secondary text-sm mb-3 line-clamp-2">{internship.shortDescription}</p>
-					)}
-
-					{/* Internship Details */}
-					<div className="space-y-2 mb-4">
-						{/* Duration */}
-						{internship.duration && (
-							<div className="flex items-center ym-text-muted text-sm">
-								<ClockIcon className="h-4 w-4 mr-2" />
-								<span>{internship.duration}</span>
+		<div className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow duration-200 overflow-hidden w-full">
+			<Link to={`/internship/${internship.id || internship._id}`} className="block">
+				<div className="p-6">
+					{/* Header Section - Horizontal Layout */}
+					<div className="flex items-start justify-between mb-4">
+						<div className="flex-1 min-w-0">
+							{/* Title */}
+							<div className="flex items-center gap-3 mb-2">
+								<h3 className="text-xl font-semibold text-gray-900 truncate">{internship.title}</h3>
 							</div>
-						)}
 
-						{/* Location */}
-						<div className="flex items-center ym-text-muted text-sm">
-							{getLocationIcon()}
-							<span className="ml-2">{getLocationDisplay()}</span>
+							{/* Company Name with Actively Hiring Badge */}
+							<div className="flex items-center gap-3 mb-4">
+								<p className="text-gray-600 font-medium text-lg">
+									{internship.company?.name || "Company Name"}
+								</p>
+								{isActivelyHiring && (
+									<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
+										Actively hiring
+									</span>
+								)}
+							</div>
+
+							{/* Details Section - Horizontal Layout */}
+							<div className="flex items-center flex-wrap gap-6 text-sm text-gray-600 mb-4">
+								{/* Location */}
+								<div className="flex items-center gap-2">
+									<ComputerDesktopIcon className="h-4 w-4 flex-shrink-0" />
+									<span>{getLocationDisplay}</span>
+								</div>
+
+								{/* Compensation */}
+								{formatCompensation !== "Unpaid" && (
+									<div className="flex items-center gap-2">
+										<BanknotesIcon className="h-4 w-4 flex-shrink-0" />
+										<span className="font-medium">{formatCompensation}/month</span>
+									</div>
+								)}
+
+								{/* Duration */}
+								{formatDuration && (
+									<div className="flex items-center gap-2">
+										<ClockIcon className="h-4 w-4 flex-shrink-0" />
+										<span>{formatDuration}</span>
+									</div>
+								)}
+							</div>
+
+							{/* Status and Badges Section */}
+							<div className="flex items-center flex-wrap gap-4">
+								{/* Posted Time */}
+								{postingTimeInfo.display && (
+									<div className="flex items-center gap-2 text-green-600 text-sm">
+										<div className="w-2 h-2 bg-green-500 rounded-full"></div>
+										<span className="font-medium">{postingTimeInfo.display}</span>
+									</div>
+								)}
+
+								{/* Early Applicant Badge - Only for today posted internships */}
+								{postingTimeInfo.isToday && internship.applicationCount < 10 && (
+									<div className="flex items-center gap-2 text-orange-600 text-sm">
+										<div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+										<span className="font-medium">Be an early applicant</span>
+									</div>
+								)}
+
+								{/* Part Time Badge */}
+								{internship.tags && internship.tags.includes("part-time") && (
+									<span className="text-gray-500 text-sm">• Part time</span>
+								)}
+
+								{/* Special Offers */}
+								{internship.tags &&
+									internship.tags.some((tag) => tag.toLowerCase().includes("job offer")) && (
+										<div className="flex items-center gap-2 text-orange-600 text-sm">
+											<BuildingOfficeIcon className="h-4 w-4 flex-shrink-0" />
+											<span className="font-medium">Job offer upto ₹ 6LPA post internship</span>
+										</div>
+									)}
+							</div>
 						</div>
 
-						{/* Start Date */}
-						<div className="flex items-center ym-text-muted text-sm">
-							<CalendarIcon className="h-4 w-4 mr-2" />
-							<span>Starts {formatDate(internship.startDate)}</span>
-						</div>
+						{/* Right Side - Logo and Actions */}
+						<div className="flex items-start gap-3 ml-6 flex-shrink-0">
+							{/* Save Button */}
+							{onSaveToggle && (
+								<button
+									onClick={handleSaveToggle}
+									className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+								>
+									{isSaved ? (
+										<BookmarkSolidIcon className="h-5 w-5 text-blue-600" />
+									) : (
+										<BookmarkIcon className="h-5 w-5 text-gray-400 hover:text-blue-600" />
+									)}
+								</button>
+							)}
 
-						{/* Application Count */}
-						<div className="flex items-center ym-text-muted text-sm">
-							<UserGroupIcon className="h-4 w-4 mr-2" />
-							<span>{internship.applicationCount} applications</span>
+							{/* Company Logo */}
+							<div className="w-16 h-16 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+								<img
+									src={
+										internship.logo ||
+										internship.companyLogo ||
+										"https://via.placeholder.com/64x64?text=Logo"
+									}
+									alt={internship.company?.name || "Company"}
+									className="w-full h-full object-cover"
+								/>
+							</div>
 						</div>
 					</div>
 
-					{/* Tags */}
-					{internship.tags && internship.tags.length > 0 && (
-						<div className="flex flex-wrap gap-1 mb-4">
-							{internship.tags.slice(0, 3).map((tag, index) => (
-								<span key={index} className="ym-bg-muted ym-text-muted text-xs px-2 py-1 rounded-full">
-									{tag}
-								</span>
-							))}
-							{internship.tags.length > 3 && (
-								<span className="ym-text-muted text-xs px-2 py-1">
-									+{internship.tags.length - 3} more
-								</span>
+					{/* Quick Actions for Recruiters */}
+					{isRecruiter && (
+						<div className="flex gap-3 pt-4 border-t border-gray-100">
+							{onEdit && (
+								<button
+									onClick={(e) => {
+										e.preventDefault();
+										onEdit();
+									}}
+									className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+								>
+									Edit
+								</button>
+							)}
+							{onManage && (
+								<button
+									onClick={(e) => {
+										e.preventDefault();
+										onManage();
+									}}
+									className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+								>
+									Manage
+								</button>
 							)}
 						</div>
 					)}
 
-					{/* Action Buttons */}
-					<div className="mt-auto">
-						{/* Deadline Info */}
-						<div className="mb-3 text-sm">
-							{isDeadlinePast() ? (
-								<span className="ym-text-red-600 font-medium">Applications Closed</span>
-							) : countdown.days <= 7 ? (
-								<span className="ym-text-orange-600 font-medium">
-									Deadline: {countdown.days}d {countdown.hours}h left
+					{/* Deadline Warning for Urgent Applications */}
+					{!isRecruiter && countdown.days <= 3 && countdown.days > 0 && (
+						<div className="mt-4 pt-4 border-t border-gray-100">
+							<div className="flex items-center gap-2 text-red-600 text-sm">
+								<ClockIcon className="h-4 w-4" />
+								<span className="font-medium">
+									Application deadline in {countdown.days} day{countdown.days !== 1 ? "s" : ""}
 								</span>
-							) : (
-								<span className="ym-text-muted">
-									Deadline: {formatDate(internship.applicationDeadline)}
-								</span>
-							)}
-						</div>
-
-						{/* Primary Action Button */}
-						{isRecruiter ? (
-							<div className="flex gap-2">
-								{onEdit && (
-									<button
-										onClick={() => onEdit()}
-										className="flex-1 bg-blue-600 hover:bg-blue-700 ym-text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
-									>
-										Edit
-									</button>
-								)}
-								{onManage && (
-									<button
-										onClick={() => onManage()}
-										className="flex-1 ym-bg-muted hover:ym-bg-muted-hover ym-text-primary px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-									>
-										Manage
-									</button>
-								)}
 							</div>
-						) : (
-							<Link
-								to={`/internship/${internship.id || internship._id}`}
-								className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-center ${
-									isDeadlinePast()
-										? 'ym-bg-muted ym-text-muted cursor-not-allowed'
-										: 'gradient-bg ym-text-white hover:shadow-lg hover:scale-105'
-								}`}
-							>
-								{isDeadlinePast() ? 'Applications Closed' : 'View Details'}
-								{!isDeadlinePast() && <ArrowRightIcon className="ml-2 h-4 w-4" />}
-							</Link>
-						)}
-					</div>
+						</div>
+					)}
 				</div>
-			</div>
+			</Link>
 		</div>
 	);
 };
