@@ -177,7 +177,7 @@ export interface InternshipsApiResponse {
   message?: string;
 }
 
-// Internship Discovery Component Props  
+// Internship Discovery Component Props
 export interface InternshipDiscoverProps {
   // This interface can be empty for now
 }

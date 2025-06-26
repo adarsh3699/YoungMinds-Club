@@ -164,4 +164,19 @@
 .footer-text { color: var(--footer-text); }
 .footer-text-muted { color: var(--footer-text-muted); }
 .footer-text-muted:hover { color: var(--footer-text); }
-.footer-border { border-color: var(--footer-border); } 
+.footer-border { border-color: var(--footer-border); }
+
+/* ==============================================
+   INPUT FIELD UTILITIES
+   ============================================== */
+/* Remove arrows/spinners from number inputs globally */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+} 

@@ -6,7 +6,7 @@ import EventCardSkeleton from "../components/organizer/EventCardSkeleton";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { InternshipDiscoverData, InternshipsApiResponse } from "@/types";
-import { INTERNSHIP_CATEGORIES, INTERNSHIP_TYPES, INTERNSHIP_COMPENSATION } from "../utils/internshipConstants";
+import { INTERNSHIP_TYPES } from "../utils/internshipConstants";
 
 const InternshipDiscoverPage: React.FC = () => {
 	const { isAuthenticated } = useAuth();
@@ -103,9 +103,7 @@ const InternshipDiscoverPage: React.FC = () => {
 					itemType="internships"
 					searchPlaceholder="Search internships by title, skills, category, or location..."
 					animationDelay="0.1s"
-					categoryOptions={INTERNSHIP_CATEGORIES}
 					internshipTypeOptions={INTERNSHIP_TYPES}
-					compensationOptions={INTERNSHIP_COMPENSATION}
 				/>
 
 				{/* Internships Grid */}

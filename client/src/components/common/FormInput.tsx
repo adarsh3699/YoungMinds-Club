@@ -1,9 +1,9 @@
-import React from 'react';
-import Tooltip from './Tooltip';
-import { FormInputProps } from '@/types';
+import React from "react";
+import Tooltip from "./Tooltip";
+import { FormInputProps } from "@/types";
 
 const FormInput: React.FC<FormInputProps> = ({
-	type = 'text',
+	type = "text",
 	id,
 	name,
 	value,
@@ -11,22 +11,22 @@ const FormInput: React.FC<FormInputProps> = ({
 	onKeyDown,
 	label,
 	error,
-	placeholder = '',
+	placeholder = "",
 	required = false,
 	icon = null,
 	min,
 	max,
-	className = '',
+	className = "",
 	step,
 	tooltip = null,
 	allowNegative = true,
 }) => {
 	// Handle input change with negative value prevention for number inputs
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (type === 'number' && !allowNegative) {
+		if (type === "number" && !allowNegative) {
 			const value = e.target.value;
 			// Allow empty string, and only positive numbers (including decimals)
-			if (value === '' || (Number(value) >= 0 && !isNaN(Number(value)))) {
+			if (value === "" || (Number(value) >= 0 && !isNaN(Number(value)))) {
 				onChange(e);
 			}
 			// If negative or invalid, don't call onChange (blocks the input)
@@ -40,16 +40,10 @@ const FormInput: React.FC<FormInputProps> = ({
 		<div className={className}>
 			{label && (
 				<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
-					<span className="flex items-center">
+					<span className="flex items-center gap-2">
 						{label}
-						{required && <span className="text-brand ml-1">*</span>}
-						{tooltip && (
-							<span className="ml-2">
-								<Tooltip content={tooltip} position="top">
-									<div />
-								</Tooltip>
-							</span>
-						)}
+						{required && <span className="text-brand">*</span>}
+						{tooltip && <Tooltip content={tooltip} position="top" />}
 					</span>
 				</label>
 			)}
@@ -57,7 +51,7 @@ const FormInput: React.FC<FormInputProps> = ({
 				{icon && (
 					<div
 						className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10"
-						style={{ color: '#f59e0b', fontSize: '20px' }}
+						style={{ color: "#f59e0b", fontSize: "20px" }}
 					>
 						{icon}
 					</div>
@@ -71,7 +65,7 @@ const FormInput: React.FC<FormInputProps> = ({
 					onKeyDown={onKeyDown}
 					onWheel={(e) => {
 						// Prevent number input from changing on scroll
-						if (type === 'number') {
+						if (type === "number") {
 							e.currentTarget.blur();
 						}
 					}}
@@ -80,9 +74,9 @@ const FormInput: React.FC<FormInputProps> = ({
 					max={max}
 					step={step}
 					className={`w-full text-sm ${
-						icon ? 'pl-10' : 'pl-4'
+						icon ? "pl-10" : "pl-4"
 					} pr-4 py-3 rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm border ${
-						error ? 'input-error' : 'input-base'
+						error ? "input-error" : "input-base"
 					} ym-text-card placeholder-gray-400 font-medium`}
 				/>
 			</div>

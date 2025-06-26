@@ -41,7 +41,7 @@ export const INTERNSHIP_DURATION = [
 	{ value: "4 Months", label: "4 Months" },
 	{ value: "5 Months", label: "5 Months" },
 	{ value: "6 Months", label: "6 Months" },
-	{ value: "6+ Months", label: "6+ Months" },
+	{ value: "12 Months", label: "12 Months" },
 	{ value: "Other", label: "Other" },
 ];
 
