@@ -372,7 +372,7 @@ const InternshipDetails: React.FC = () => {
 									<h1 className="text-2xl md:text-3xl font-bold ym-text-primary mb-2">
 										{internship.title}
 									</h1>
-									<p className="ym-text-secondary mb-3">{internship.shortDescription}</p>
+									<p className="ym-text-secondary mb-3">{internship.companyDescription}</p>
 									<p className="text-lg font-semibold ym-text-primary mb-3">
 										{internship.company.name}
 									</p>
@@ -547,7 +547,9 @@ const InternshipDetails: React.FC = () => {
 													About this Internship
 												</h3>
 												<div className="ym-text-secondary prose prose-sm max-w-none">
-													<p>{internship.description}</p>
+													<p>
+														{internship.internshipDescription || "No description available"}
+													</p>
 												</div>
 											</div>
 

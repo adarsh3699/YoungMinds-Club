@@ -5,8 +5,8 @@ export interface InternshipCardData {
   id?: string;
   _id?: string;
   title: string;
-  description?: string;
-  shortDescription?: string;
+  internshipDescription?: string;
+  companyDescription?: string;
   startDate: string;
   endDate?: string;
   applicationDeadline: string;
@@ -96,8 +96,8 @@ export interface InternshipCompany {
 export interface InternshipDetailsData {
   _id: string;
   title: string;
-  description: string;
-  shortDescription?: string;
+  internshipDescription?: string;
+  companyDescription?: string;
   startDate: string;
   endDate?: string;
   applicationDeadline: string;
@@ -150,7 +150,8 @@ export interface UserInternshipsResponse {
 
 // Internship Details Component Props
 export interface InternshipDetailsProps {
-  // This interface can be empty for now
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 // Internship Discovery Page Types
@@ -179,7 +180,8 @@ export interface InternshipsApiResponse {
 
 // Internship Discovery Component Props
 export interface InternshipDiscoverProps {
-  // This interface can be empty for now
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
 // Internship Card Component with Discover-specific properties

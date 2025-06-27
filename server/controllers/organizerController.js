@@ -636,8 +636,8 @@ exports.createInternship = async (req, res) => {
 		let {
 			title,
 			companyName,
-			shortDescription,
-			description,
+			companyDescription,
+			internshipDescription,
 			type,
 			category,
 			applicationDeadline,
@@ -697,8 +697,8 @@ exports.createInternship = async (req, res) => {
 		const internshipData = {
 			title,
 			companyName,
-			shortDescription,
-			description,
+			companyDescription,
+			internshipDescription,
 			type,
 			category,
 			applicationDeadline,
@@ -808,8 +808,8 @@ exports.updateInternship = async (req, res) => {
 		const {
 			title,
 			companyName,
-			shortDescription,
-			description,
+			companyDescription,
+			internshipDescription,
 			type,
 			category,
 			applicationDeadline,
@@ -850,8 +850,8 @@ exports.updateInternship = async (req, res) => {
 		const updateData = {
 			title,
 			companyName,
-			shortDescription,
-			description,
+			companyDescription,
+			internshipDescription,
 			type,
 			category,
 			applicationDeadline,

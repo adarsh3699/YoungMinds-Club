@@ -69,8 +69,8 @@ const CreateInternshipModal = ({
 	const initialFormData = {
 		title: "",
 		companyName: "",
-		shortDescription: "",
-		description: "",
+		companyDescription: "",
+		internshipDescription: "",
 		type: "",
 		category: "",
 		duration: "",
@@ -306,8 +306,8 @@ const CreateInternshipModal = ({
 			case 1: // Basic Information
 				if (!formData.title) newErrors.title = "Internship title is required";
 				if (!formData.companyName) newErrors.companyName = "Company name is required";
-				if (!formData.shortDescription) newErrors.shortDescription = "Short description is required";
-				// Description is now optional
+				if (!formData.companyDescription) newErrors.companyDescription = "Company description is required";
+				// Internship description is optional
 				break;
 
 			case 2: // Type & Category
@@ -514,27 +514,28 @@ const CreateInternshipModal = ({
 							icon={<BuildingOfficeIcon className="h-5 w-5" />}
 						/>
 
-						<FormInput
-							id="shortDescription"
-							label="Short Description"
-							name="shortDescription"
-							value={formData.shortDescription}
+						<TextareaField
+							id="companyDescription"
+							label="Company Description"
+							name="companyDescription"
+							value={formData.companyDescription}
 							onChange={handleChange}
-							placeholder="Brief summary of the internship (max 200 characters)"
-							error={errors.shortDescription}
+							placeholder="Brief description of your company and what it does (max 250 characters)"
+							rows={4}
+							error={errors.companyDescription}
 							required
-							maxLength={200}
+							maxLength={250}
 						/>
 
 						<TextareaField
-							id="description"
-							label="Detailed Description"
-							name="description"
-							value={formData.description}
+							id="internshipDescription"
+							label="Internship Description"
+							name="internshipDescription"
+							value={formData.internshipDescription}
 							onChange={handleChange}
 							placeholder="Provide a comprehensive description of the internship opportunity..."
 							rows={6}
-							error={errors.description}
+							error={errors.internshipDescription}
 						/>
 					</div>
 				);
@@ -957,7 +958,7 @@ const CreateInternshipModal = ({
 									<p className="text-sm ym-text-muted">
 										{formData.title} at {formData.companyName}
 									</p>
-									<p className="text-sm ym-text-muted">{formData.shortDescription}</p>
+									<p className="text-sm ym-text-muted">{formData.companyDescription}</p>
 								</div>
 
 								<div>

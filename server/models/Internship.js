@@ -14,16 +14,16 @@ const internshipSchema = new mongoose.Schema(
 			trim: true,
 			maxlength: [100, "Company name cannot be more than 100 characters"],
 		},
-		description: {
+		internshipDescription: {
 			type: String,
 			required: false,
 			trim: true,
 		},
-		shortDescription: {
+		companyDescription: {
 			type: String,
-			required: [true, "Short description is required"],
+			required: [true, "Company description is required"],
 			trim: true,
-			maxlength: [200, "Short description cannot be more than 200 characters"],
+			maxlength: [250, "Company description cannot be more than 250 characters"],
 		},
 		// Logo will be populated dynamically via virtual field from organizer's brand logo
 		type: {
