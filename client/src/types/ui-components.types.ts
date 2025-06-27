@@ -79,6 +79,7 @@ export interface SelectInputProps {
   className?: string;
   placeholder?: string;
   disabled?: boolean;
+  required?: boolean;
 }
 
 // TextareaField Props
@@ -87,7 +88,7 @@ export interface TextareaFieldProps {
   name: string;
   value: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  label: string;
+  label?: string;
   error?: string;
   placeholder?: string;
   required?: boolean;
@@ -97,6 +98,8 @@ export interface TextareaFieldProps {
   expandable?: boolean;
   minRows?: number;
   maxRows?: number;
+  hideLabel?: boolean;
+  hideCharCountInLabel?: boolean;
 }
 
 // Switch Props
@@ -133,6 +136,7 @@ export interface AccordionProps {
 }
 
 // EventCardSkeleton Props (simple component, no props needed)
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface EventCardSkeletonProps {}
 
 // DateTimePicker Props

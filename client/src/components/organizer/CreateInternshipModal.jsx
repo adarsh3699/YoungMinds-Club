@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import {
 	XMarkIcon,
 	BriefcaseIcon,
@@ -15,6 +16,7 @@ import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
 	CheckIcon,
+	DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 
 import "./CreateEventModal.css";
@@ -28,6 +30,7 @@ const CreateInternshipModal = ({
 	isEditing = false,
 	apiEndpoint = null,
 }) => {
+	const { user } = useAuth();
 	// Step configuration
 	const STEPS = [
 		{
@@ -105,6 +108,7 @@ const CreateInternshipModal = ({
 	const [submitType, setSubmitType] = useState(null);
 	const [alertMessage, setAlertMessage] = useState(null);
 	const [alertType, setAlertType] = useState("error");
+	const [userBio, setUserBio] = useState("");
 
 	// State for API filter data
 	const [filterData, setFilterData] = useState({
@@ -211,6 +215,25 @@ const CreateInternshipModal = ({
 		fetchFilterData();
 	}, []);
 
+	// Fetch user's profile bio
+	useEffect(() => {
+		const fetchUserProfile = async () => {
+			try {
+				const response = await axios.get("/organizer/profile");
+				if (response.data.success && response.data.profile.bio) {
+					setUserBio(response.data.profile.bio);
+				}
+			} catch (error) {
+				console.error("Error fetching user profile:", error);
+				// Silently fail - bio copy feature will just not be available
+			}
+		};
+
+		if (user && user.role === "organizer") {
+			fetchUserProfile();
+		}
+	}, [user]);
+
 	// Initialize form data for editing
 	useEffect(() => {
 		if (isEditing && internshipToEdit) {
@@ -278,6 +301,21 @@ const CreateInternshipModal = ({
 			...formData,
 			location: { ...formData.location, type: e.target.value },
 		});
+	};
+
+	const copyBioToCompanyDescription = () => {
+		if (userBio) {
+			// Truncate bio to 250 characters if it's longer
+			const truncatedBio = userBio.length > 250 ? userBio.substring(0, 250) : userBio;
+			setFormData({
+				...formData,
+				companyDescription: truncatedBio,
+			});
+			// Clear any existing error for company description
+			if (errors.companyDescription) {
+				setErrors((prev) => ({ ...prev, companyDescription: undefined }));
+			}
+		}
 	};
 
 	// Array input handlers
@@ -514,18 +552,40 @@ const CreateInternshipModal = ({
 							icon={<BuildingOfficeIcon className="h-5 w-5" />}
 						/>
 
-						<TextareaField
-							id="companyDescription"
-							label="Company Description"
-							name="companyDescription"
-							value={formData.companyDescription}
-							onChange={handleChange}
-							placeholder="Brief description of your company and what it does (max 250 characters)"
-							rows={4}
-							error={errors.companyDescription}
-							required
-							maxLength={250}
-						/>
+						<div className="space-y-2">
+							<div className="flex items-center justify-between">
+								<label
+									htmlFor="companyDescription"
+									className="block text-sm font-semibold ym-text-primary"
+								>
+									Company Description
+									<span className="text-brand ml-1">*</span>
+								</label>
+								{userBio && (
+									<button
+										type="button"
+										onClick={copyBioToCompanyDescription}
+										className="flex items-center px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors duration-200"
+									>
+										<DocumentDuplicateIcon className="w-3 h-3 mr-1" />
+										Copy from profile bio
+									</button>
+								)}
+							</div>
+							<TextareaField
+								id="companyDescription"
+								name="companyDescription"
+								value={formData.companyDescription}
+								onChange={handleChange}
+								placeholder="Brief description of your company and what it does (max 250 characters)"
+								rows={4}
+								error={errors.companyDescription}
+								required
+								maxLength={250}
+								hideLabel={true}
+								hideCharCountInLabel={true}
+							/>
+						</div>
 
 						<TextareaField
 							id="internshipDescription"
@@ -545,32 +605,28 @@ const CreateInternshipModal = ({
 					<div className="space-y-6">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div>
-								<label className="block text-sm font-semibold ym-text-primary mb-2">
-									Internship Type
-									<span className="ym-text-yellow-600 ml-1">*</span>
-								</label>
 								<SelectInput
 									id="type"
 									name="type"
 									value={formData.type}
 									onChange={handleChange}
 									options={internshipTypeOptions}
+									label="Internship Type"
 									error={errors.type}
+									required
 								/>
 							</div>
 
 							<div>
-								<label className="block text-sm font-semibold ym-text-primary mb-2">
-									Compensation Type
-									<span className="ym-text-yellow-600 ml-1">*</span>
-								</label>
 								<SelectInput
 									id="compensation.type"
 									name="compensation.type"
 									value={formData.compensation.type}
 									onChange={handleChange}
 									options={compensationOptions}
+									label="Compensation Type"
 									error={errors["compensation.type"]}
+									required
 								/>
 							</div>
 						</div>
@@ -694,17 +750,15 @@ const CreateInternshipModal = ({
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div>
-								<label className="block text-sm font-semibold ym-text-primary mb-2">
-									Duration
-									<span className="ym-text-yellow-600 ml-1">*</span>
-								</label>
 								<SelectInput
 									id="duration"
 									name="duration"
 									value={formData.duration}
 									onChange={handleChange}
 									options={durationOptions}
+									label="Duration"
 									error={errors.duration}
+									required
 								/>
 							</div>
 

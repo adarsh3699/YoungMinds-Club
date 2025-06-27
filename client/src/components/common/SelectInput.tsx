@@ -13,6 +13,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 	className = "",
 	placeholder = "Select an option",
 	disabled = false,
+	required = false,
 }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -73,6 +74,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 			{label && (
 				<label htmlFor={id} className="block font-semibold ym-text-primary mb-2">
 					{label}
+					{required && <span className="text-brand ml-1">*</span>}
 				</label>
 			)}
 

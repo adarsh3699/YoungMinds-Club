@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { TextareaFieldProps } from '@/types';
+import React, { useRef, useEffect, useCallback } from "react";
+import { TextareaFieldProps } from "@/types";
 
 const TextareaField: React.FC<TextareaFieldProps> = ({
 	id,
@@ -8,14 +8,16 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 	onChange,
 	label,
 	error,
-	placeholder = '',
+	placeholder = "",
 	required = false,
 	rows = 3,
 	maxLength,
-	className = '',
+	className = "",
 	expandable = true,
 	minRows = 3,
 	maxRows = 10,
+	hideLabel = false,
+	hideCharCountInLabel = false,
 }) => {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -27,8 +29,8 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 		const scrollTop = textarea.scrollTop;
 
 		// Reset and measure
-		textarea.style.height = 'auto';
-		textarea.style.overflowY = 'hidden';
+		textarea.style.height = "auto";
+		textarea.style.overflowY = "hidden";
 
 		const { scrollHeight, style } = textarea;
 		const computedStyle = window.getComputedStyle(textarea);
@@ -46,7 +48,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 
 		// Apply changes
 		style.height = `${targetHeight}px`;
-		style.overflowY = lines > maxRows ? 'auto' : 'hidden';
+		style.overflowY = lines > maxRows ? "auto" : "hidden";
 
 		// Restore scroll position if needed
 		if (scrollTop > 0 && lines > maxRows) {
@@ -92,11 +94,15 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 
 	return (
 		<div className={className}>
-			<label htmlFor={id} className="block text-sm font-semibold ym-text-primary mb-2">
-				{label}
-				{required && <span className="text-brand ml-1">*</span>}
-				{maxLength && <span className="ym-text-muted ml-2 font-normal">(Max {maxLength} chars)</span>}
-			</label>
+			{!hideLabel && label && (
+				<label htmlFor={id} className="block text-sm font-semibold ym-text-primary mb-2">
+					{label}
+					{required && <span className="text-brand ml-1">*</span>}
+					{maxLength && !hideCharCountInLabel && (
+						<span className="ym-text-muted ml-2 font-normal">(Max {maxLength} chars)</span>
+					)}
+				</label>
+			)}
 			<textarea
 				ref={textareaRef}
 				id={id}
@@ -108,16 +114,16 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 				maxLength={maxLength}
 				className={`w-full px-4 py-3 text-sm rounded-xl transition-all duration-150 ease-out focus:outline-none backdrop-blur-sm resize-none border ${
 					error
-						? 'input-error'
-						: 'ym-bg-card border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg'
+						? "input-error"
+						: "ym-bg-card border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-amber-400/40 focus:border-amber-300 focus:shadow-lg"
 				} ym-text-card placeholder-gray-400 font-medium`}
 				placeholder={placeholder}
 				style={
 					expandable
 						? {
 								minHeight: `${minRows * 1.5}rem`,
-								overflowY: 'hidden',
-								resize: 'none',
+								overflowY: "hidden",
+								resize: "none",
 						  }
 						: {}
 				}
@@ -137,10 +143,10 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 						<div
 							className={`h-full transition-all duration-300 ${
 								value.length > maxLength * 0.9
-									? 'bg-red-400'
+									? "bg-red-400"
 									: value.length > maxLength * 0.7
-									? 'ym-bg-orange-400'
-									: 'gradient-bg'
+									? "ym-bg-orange-400"
+									: "gradient-bg"
 							}`}
 							style={{ width: `${Math.min(100, (value.length / maxLength) * 100)}%` }}
 						/>

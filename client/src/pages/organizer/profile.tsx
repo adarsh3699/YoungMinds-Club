@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import axios, { AxiosResponse } from "axios";
 import {
 	PencilIcon,
 	CameraIcon,
@@ -15,15 +15,15 @@ import {
 	BriefcaseIcon,
 	ChatBubbleLeftRightIcon,
 	CameraIcon as InstagramIcon,
-} from '@heroicons/react/24/outline';
-import { FormInput, TextareaField, getErrorMessage } from '../../components/common';
+} from "@heroicons/react/24/outline";
+import { FormInput, TextareaField, getErrorMessage } from "../../components/common";
 import {
 	OrganizerProfileData,
 	OrganizerFormValues,
 	OrganizerFeedbackSummary,
 	OrganizerProfileApiResponse,
 	OrganizerProfilePictureResponse,
-} from '@/types';
+} from "@/types";
 
 const Profile: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -33,15 +33,15 @@ const Profile: React.FC = () => {
 	const [feedbackSummary, setFeedbackSummary] = useState<OrganizerFeedbackSummary | null>(null);
 	const [editMode, setEditMode] = useState<boolean>(false);
 	const [formValues, setFormValues] = useState<OrganizerFormValues>({
-		name: '',
-		organizationName: '',
-		bio: '',
-		email: '',
+		name: "",
+		organizationName: "",
+		bio: "",
+		email: "",
 		socialLinks: {
-			website: '',
-			linkedin: '',
-			twitter: '',
-			instagram: '',
+			website: "",
+			linkedin: "",
+			twitter: "",
+			instagram: "",
 		},
 	});
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,7 +52,7 @@ const Profile: React.FC = () => {
 			try {
 				// Get organizer profile data
 				const profileResponse: AxiosResponse<OrganizerProfileApiResponse> = await axios.get(
-					'/organizer/profile'
+					"/organizer/profile"
 				);
 				if (profileResponse.data.success) {
 					const profileData = profileResponse.data.profile;
@@ -60,27 +60,27 @@ const Profile: React.FC = () => {
 
 					// Set form values
 					setFormValues({
-						name: profileData.name || '',
-						organizationName: profileData.organizationName || '',
-						bio: profileData.bio || '',
-						email: profileData.email || '',
+						name: profileData.name || "",
+						organizationName: profileData.organizationName || "",
+						bio: profileData.bio || "",
+						email: profileData.email || "",
 						socialLinks: {
-							website: profileData.socialLinks?.website || '',
-							linkedin: profileData.socialLinks?.linkedin || '',
-							twitter: profileData.socialLinks?.twitter || '',
-							instagram: profileData.socialLinks?.instagram || '',
+							website: profileData.socialLinks?.website || "",
+							linkedin: profileData.socialLinks?.linkedin || "",
+							twitter: profileData.socialLinks?.twitter || "",
+							instagram: profileData.socialLinks?.instagram || "",
 						},
 					});
 				}
 
 				// Get feedback summary
 				const feedbackResponse: AxiosResponse<{ summary: OrganizerFeedbackSummary }> = await axios.get(
-					'/organizer/feedback/summary'
+					"/organizer/feedback/summary"
 				);
 				setFeedbackSummary(feedbackResponse.data.summary);
 			} catch (error) {
-				console.error('Error fetching profile data:', error);
-				setError('Failed to load profile data. Please try again.');
+				console.error("Error fetching profile data:", error);
+				setError("Failed to load profile data. Please try again.");
 			} finally {
 				setLoading(false);
 			}
@@ -93,15 +93,15 @@ const Profile: React.FC = () => {
 		if (editMode) {
 			// Reset form values when canceling edit
 			setFormValues({
-				name: organizerProfile?.name || '',
-				organizationName: organizerProfile?.organizationName || '',
-				bio: organizerProfile?.bio || '',
-				email: organizerProfile?.email || '',
+				name: organizerProfile?.name || "",
+				organizationName: organizerProfile?.organizationName || "",
+				bio: organizerProfile?.bio || "",
+				email: organizerProfile?.email || "",
 				socialLinks: {
-					website: organizerProfile?.socialLinks?.website || '',
-					linkedin: organizerProfile?.socialLinks?.linkedin || '',
-					twitter: organizerProfile?.socialLinks?.twitter || '',
-					instagram: organizerProfile?.socialLinks?.instagram || '',
+					website: organizerProfile?.socialLinks?.website || "",
+					linkedin: organizerProfile?.socialLinks?.linkedin || "",
+					twitter: organizerProfile?.socialLinks?.twitter || "",
+					instagram: organizerProfile?.socialLinks?.instagram || "",
 				},
 			});
 		}
@@ -132,7 +132,7 @@ const Profile: React.FC = () => {
 		setSaving(true);
 		try {
 			const response: AxiosResponse<OrganizerProfileApiResponse> = await axios.put(
-				'/organizer/profile',
+				"/organizer/profile",
 				formValues
 			);
 
@@ -145,8 +145,8 @@ const Profile: React.FC = () => {
 				setEditMode(false);
 			}
 		} catch (error) {
-			console.error('Error updating profile:', error);
-			setError('Failed to update profile. Please try again.');
+			console.error("Error updating profile:", error);
+			setError("Failed to update profile. Please try again.");
 		} finally {
 			setSaving(false);
 		}
@@ -165,28 +165,28 @@ const Profile: React.FC = () => {
 		// Check file size on frontend (2MB limit for logos)
 		const maxSize = 2 * 1024 * 1024; // 2MB in bytes
 		if (file.size > maxSize) {
-			setError('Logo file is too large. Please choose an image smaller than 2MB.');
+			setError("Logo file is too large. Please choose an image smaller than 2MB.");
 			return;
 		}
 
 		// Check file type
-		const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+		const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
 		if (!allowedTypes.includes(file.type)) {
-			setError('Invalid file type. Please upload a JPG, PNG, GIF, WebP, or SVG image.');
+			setError("Invalid file type. Please upload a JPG, PNG, GIF, WebP, or SVG image.");
 			return;
 		}
 
 		const formData = new FormData();
-		formData.append('organizerBrandLogo', file);
+		formData.append("organizerBrandLogo", file);
 
 		setSaving(true);
 		try {
 			const response: AxiosResponse<OrganizerProfilePictureResponse> = await axios.post(
-				'/organizer/profile/picture',
+				"/organizer/profile/picture",
 				formData,
 				{
 					headers: {
-						'Content-Type': 'multipart/form-data',
+						"Content-Type": "multipart/form-data",
 					},
 				}
 			);
@@ -200,7 +200,7 @@ const Profile: React.FC = () => {
 				setError(null);
 			}
 		} catch (error: unknown) {
-			console.error('Error uploading logo:', error);
+			console.error("Error uploading logo:", error);
 			setError(getErrorMessage(error));
 		} finally {
 			setSaving(false);
@@ -282,8 +282,8 @@ const Profile: React.FC = () => {
 											onClick={toggleEditMode}
 											className={`group flex items-center px-6 py-3 text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 ${
 												editMode
-													? 'bg-muted text-muted-foreground hover:bg-muted/80'
-													: 'bg-primary text-primary-foreground hover:bg-brand-dark shadow-lg hover:shadow-xl'
+													? "bg-muted text-muted-foreground hover:bg-muted/80"
+													: "bg-primary text-primary-foreground hover:bg-brand-dark shadow-lg hover:shadow-xl"
 											}`}
 										>
 											{editMode ? (
@@ -302,76 +302,82 @@ const Profile: React.FC = () => {
 
 								<div className="p-8">
 									<div className="flex flex-col md:flex-row gap-8">
-																			{/* Enhanced Profile Picture */}
-									<div className="flex-shrink-0">
-										<div className="relative group">
-											<div className="relative">
-												<div
-													className="h-40 w-40 rounded-2xl bg-gradient-to-br from-primary/20 to-brand-light flex items-center justify-center overflow-hidden cursor-pointer shadow-xl border-4 border-white/50 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
-													onClick={handleProfilePictureClick}
-												>
-													{organizerProfile.organizerBrandLogo ? (
-														<img
-															src={organizerProfile.organizerBrandLogo}
-															alt="Brand Logo"
-															className="h-full w-full object-cover rounded-xl"
-														/>
-													) : (
-														<span className="text-6xl font-bold text-primary/60">
-															{organizerProfile.name
-																? organizerProfile.name.charAt(0)
-																: '?'}
-														</span>
-													)}
-													
-													{/* Upload Loading Overlay */}
-													{saving && (
-														<div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-xl backdrop-blur-sm z-10">
-															<div className="text-center text-white">
-																<div role="status" className="mb-3">
-																	<svg 
-																		aria-hidden="true" 
-																		className="w-8 h-8 text-white/30 animate-spin fill-white mx-auto" 
-																		viewBox="0 0 100 101" 
-																		fill="none" 
-																		xmlns="http://www.w3.org/2000/svg"
-																	>
-																		<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-																		<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-																	</svg>
-																	<span className="sr-only">Loading...</span>
+										{/* Enhanced Profile Picture */}
+										<div className="flex-shrink-0">
+											<div className="relative group">
+												<div className="relative">
+													<div
+														className="h-40 w-40 rounded-2xl bg-gradient-to-br from-primary/20 to-brand-light flex items-center justify-center overflow-hidden cursor-pointer shadow-xl border-4 border-white/50 backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+														onClick={handleProfilePictureClick}
+													>
+														{organizerProfile.organizerBrandLogo ? (
+															<img
+																src={organizerProfile.organizerBrandLogo}
+																alt="Brand Logo"
+																className="h-full w-full object-cover rounded-xl"
+															/>
+														) : (
+															<span className="text-6xl font-bold text-primary/60">
+																{organizerProfile.name
+																	? organizerProfile.name.charAt(0)
+																	: "?"}
+															</span>
+														)}
+
+														{/* Upload Loading Overlay */}
+														{saving && (
+															<div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-xl backdrop-blur-sm z-10">
+																<div className="text-center text-white">
+																	<div role="status" className="mb-3">
+																		<svg
+																			aria-hidden="true"
+																			className="w-8 h-8 text-white/30 animate-spin fill-white mx-auto"
+																			viewBox="0 0 100 101"
+																			fill="none"
+																			xmlns="http://www.w3.org/2000/svg"
+																		>
+																			<path
+																				d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+																				fill="currentColor"
+																			/>
+																			<path
+																				d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+																				fill="currentFill"
+																			/>
+																		</svg>
+																		<span className="sr-only">Loading...</span>
+																	</div>
+																	<span className="text-sm font-medium">
+																		Uploading
+																	</span>
 																</div>
-																<span className="text-sm font-medium">
-																	Uploading
-																</span>
 															</div>
-														</div>
-													)}
-													
-													{/* Hover Overlay */}
-													{!saving && (
-														<div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl backdrop-blur-sm">
-															<div className="text-center text-white">
-																<CameraIcon className="h-8 w-8 mx-auto mb-2" />
-																<span className="text-sm font-medium">
-																	Change Logo
-																</span>
+														)}
+
+														{/* Hover Overlay */}
+														{!saving && (
+															<div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl backdrop-blur-sm">
+																<div className="text-center text-white">
+																	<CameraIcon className="h-8 w-8 mx-auto mb-2" />
+																	<span className="text-sm font-medium">
+																		Change Logo
+																	</span>
+																</div>
 															</div>
-														</div>
-													)}
+														)}
+													</div>
+													{/* Decorative ring */}
+													<div className="absolute -inset-1 bg-gradient-to-r from-primary via-brand-secondary to-brand-tertiary rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-300 -z-10"></div>
 												</div>
-												{/* Decorative ring */}
-												<div className="absolute -inset-1 bg-gradient-to-r from-primary via-brand-secondary to-brand-tertiary rounded-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-300 -z-10"></div>
+												<input
+													type="file"
+													ref={fileInputRef}
+													className="hidden"
+													accept="image/*"
+													onChange={handleFileChange}
+													disabled={saving}
+												/>
 											</div>
-											<input
-												type="file"
-												ref={fileInputRef}
-												className="hidden"
-												accept="image/*"
-												onChange={handleFileChange}
-												disabled={saving}
-											/>
-										</div>
 
 											{/* Enhanced Rating Display */}
 											{feedbackSummary && (
@@ -391,8 +397,8 @@ const Profile: React.FC = () => {
 																	className={`h-5 w-5 transition-colors duration-200 ${
 																		index <
 																		Math.floor(feedbackSummary.averageRating || 0)
-																			? 'text-brand-primary fill-current'
-																			: 'text-muted-foreground/30'
+																			? "text-brand-primary fill-current"
+																			: "text-muted-foreground/30"
 																	}`}
 																/>
 															))}
@@ -400,7 +406,7 @@ const Profile: React.FC = () => {
 														<span className="text-lg font-bold text-accent-foreground">
 															{feedbackSummary.averageRating
 																? feedbackSummary.averageRating.toFixed(1)
-																: 'N/A'}
+																: "N/A"}
 														</span>
 													</div>
 													<p className="text-xs text-muted-foreground mt-1">
@@ -482,15 +488,21 @@ const Profile: React.FC = () => {
 															{saving ? (
 																<>
 																	<div role="status" className="mr-2">
-																		<svg 
-																			aria-hidden="true" 
-																			className="w-4 h-4 text-white/30 animate-spin fill-white" 
-																			viewBox="0 0 100 101" 
-																			fill="none" 
+																		<svg
+																			aria-hidden="true"
+																			className="w-4 h-4 text-white/30 animate-spin fill-white"
+																			viewBox="0 0 100 101"
+																			fill="none"
 																			xmlns="http://www.w3.org/2000/svg"
 																		>
-																			<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-																			<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+																			<path
+																				d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+																				fill="currentColor"
+																			/>
+																			<path
+																				d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+																				fill="currentFill"
+																			/>
 																		</svg>
 																		<span className="sr-only">Loading...</span>
 																	</div>
@@ -510,21 +522,21 @@ const Profile: React.FC = () => {
 													</div>
 												</form>
 											) : (
-												<div className="space-y-6">
+												<div>
 													{[
 														{
 															icon: UserIcon,
-															label: 'Full Name',
+															label: "Full Name",
 															value: organizerProfile.name,
 														},
 														{
 															icon: BuildingOfficeIcon,
-															label: 'Organization',
-															value: organizerProfile.organizationName || 'Not specified',
+															label: "Organization",
+															value: organizerProfile.organizationName || "Not specified",
 														},
 														{
 															icon: EnvelopeIcon,
-															label: 'Email Address',
+															label: "Email Address",
 															value: organizerProfile.email,
 														},
 													].map((field, index) => (
@@ -552,7 +564,7 @@ const Profile: React.FC = () => {
 																	Bio
 																</p>
 															</div>
-															<p className="text-secondary ml-7 leading-relaxed">
+															<p className="text-primary ml-7 leading-relaxed">
 																{organizerProfile.bio}
 															</p>
 														</div>
@@ -581,24 +593,24 @@ const Profile: React.FC = () => {
 										<div className="space-y-6">
 											{[
 												{
-													name: 'website',
-													label: 'Website URL',
-													placeholder: 'https://yourwebsite.com',
+													name: "website",
+													label: "Website URL",
+													placeholder: "https://yourwebsite.com",
 												},
 												{
-													name: 'linkedin',
-													label: 'LinkedIn',
-													placeholder: 'https://linkedin.com/in/username',
+													name: "linkedin",
+													label: "LinkedIn",
+													placeholder: "https://linkedin.com/in/username",
 												},
 												{
-													name: 'twitter',
-													label: 'Twitter / X',
-													placeholder: 'https://twitter.com/username',
+													name: "twitter",
+													label: "Twitter / X",
+													placeholder: "https://twitter.com/username",
 												},
 												{
-													name: 'instagram',
-													label: 'Instagram',
-													placeholder: 'https://instagram.com/username',
+													name: "instagram",
+													label: "Instagram",
+													placeholder: "https://instagram.com/username",
 												},
 											].map((social, index) => (
 												<FormInput
@@ -606,7 +618,7 @@ const Profile: React.FC = () => {
 													type="url"
 													id={social.name}
 													name={social.name}
-													value={formValues.socialLinks[social.name] || ''}
+													value={formValues.socialLinks[social.name] || ""}
 													onChange={handleSocialLinkChange}
 													label={social.label}
 													placeholder={social.placeholder}
@@ -621,25 +633,25 @@ const Profile: React.FC = () => {
 												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 													{[
 														{
-															key: 'website',
-															label: 'Website',
+															key: "website",
+															label: "Website",
 															icon: <GlobeAltIcon className="h-5 w-5 text-primary" />,
 														},
 														{
-															key: 'linkedin',
-															label: 'LinkedIn',
+															key: "linkedin",
+															label: "LinkedIn",
 															icon: <BriefcaseIcon className="h-5 w-5 text-primary" />,
 														},
 														{
-															key: 'twitter',
-															label: 'Twitter / X',
+															key: "twitter",
+															label: "Twitter / X",
 															icon: (
 																<ChatBubbleLeftRightIcon className="h-5 w-5 text-primary" />
 															),
 														},
 														{
-															key: 'instagram',
-															label: 'Instagram',
+															key: "instagram",
+															label: "Instagram",
 															icon: <InstagramIcon className="h-5 w-5 text-primary" />,
 														},
 													].map(
@@ -709,8 +721,8 @@ const Profile: React.FC = () => {
 																	className={`h-8 w-8 transition-all duration-200 ${
 																		index <
 																		Math.floor(feedbackSummary.averageRating || 0)
-																			? 'text-brand-primary fill-current'
-																			: 'text-muted-foreground/20'
+																			? "text-brand-primary fill-current"
+																			: "text-muted-foreground/20"
 																	}`}
 																/>
 															))}
@@ -718,16 +730,16 @@ const Profile: React.FC = () => {
 														<span className="text-4xl font-bold text-accent-foreground">
 															{feedbackSummary.averageRating
 																? feedbackSummary.averageRating.toFixed(1)
-																: 'N/A'}
+																: "N/A"}
 														</span>
 														<span className="text-muted-foreground text-lg ml-1">/ 5</span>
 													</div>
 												</div>
 												<p className="text-center text-muted-foreground">
-													Based on{' '}
+													Based on{" "}
 													<span className="font-semibold text-accent-foreground">
 														{feedbackSummary.totalFeedbacks || 0}
-													</span>{' '}
+													</span>{" "}
 													feedback submissions
 												</p>
 											</div>
@@ -757,10 +769,10 @@ const Profile: React.FC = () => {
 																		<div
 																			className={`h-full rounded-full transition-all duration-500 ${
 																				rating >= 4
-																					? 'bg-gradient-to-r from-success to-success/80'
+																					? "bg-gradient-to-r from-success to-success/80"
 																					: rating >= 3
-																					? 'bg-gradient-to-r from-warning to-warning/80'
-																					: 'bg-gradient-to-r from-error to-error/80'
+																					? "bg-gradient-to-r from-warning to-warning/80"
+																					: "bg-gradient-to-r from-error to-error/80"
 																			}`}
 																			style={{ width: `${percentage}%` }}
 																		></div>
