@@ -16,7 +16,7 @@ const internshipSchema = new mongoose.Schema(
 		},
 		description: {
 			type: String,
-			required: [true, "Internship description is required"],
+			required: false,
 			trim: true,
 		},
 		shortDescription: {

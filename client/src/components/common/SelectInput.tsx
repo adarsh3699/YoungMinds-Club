@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { SelectInputProps, SelectOption } from '@/types';
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { SelectInputProps, SelectOption } from "@/types";
 
 const SelectInput: React.FC<SelectInputProps> = ({
 	id,
@@ -10,8 +10,8 @@ const SelectInput: React.FC<SelectInputProps> = ({
 	label,
 	options,
 	error,
-	className = '',
-	placeholder = 'Select an option',
+	className = "",
+	placeholder = "Select an option",
 	disabled = false,
 }) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -20,7 +20,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 
 	// Find the selected option object
 	const selectedOption: SelectOption = options.find((option) => option.value === value) || {
-		value: '',
+		value: "",
 		label: placeholder,
 	};
 
@@ -33,9 +33,9 @@ const SelectInput: React.FC<SelectInputProps> = ({
 			}
 		};
 
-		document.addEventListener('mousedown', handleClickOutside);
+		document.addEventListener("mousedown", handleClickOutside);
 		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
+			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, []);
 
@@ -85,14 +85,14 @@ const SelectInput: React.FC<SelectInputProps> = ({
 					className={`
 						relative w-full px-4 py-3 text-left transition-all duration-150 ease-out
 						rounded-xl backdrop-blur-sm shadow-sm text-[15px]
-						${disabled ? 'opacity-60 cursor-not-allowed ym-bg-card' : 'cursor-pointer hover:shadow-md active:scale-[0.99]'}
+						${disabled ? "opacity-60 cursor-not-allowed ym-bg-card" : "cursor-pointer hover:shadow-md active:scale-[0.99]"}
 						${
 							error
-								? 'input-error'
+								? "input-error"
 								: `${
 										isFocused || isOpen
-											? 'ym-bg-card ring-2 ring-amber-400/40 shadow-lg transform scale-[1.01]'
-											: 'ym-bg-card hover:ym-bg-card-hover'
+											? "ym-bg-card ring-2 ring-amber-400/40 shadow-lg transform scale-[1.01]"
+											: "ym-bg-card hover:ym-bg-card-hover"
 								  }`
 						}
 						focus:outline-none group
@@ -104,7 +104,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 				>
 					<span
 						className={`block truncate transition-colors duration-150 ${
-							selectedOption.value === '' ? 'ym-text-muted italic' : 'ym-text-card'
+							selectedOption.value === "" ? "ym-text-muted italic" : "ym-text-card"
 						}`}
 					>
 						{selectedOption.label}
@@ -115,10 +115,10 @@ const SelectInput: React.FC<SelectInputProps> = ({
 						<ChevronUpDownIcon
 							className={`h-5 w-5 transition-all duration-150 ${
 								error
-									? 'text-red-500'
+									? "text-red-500"
 									: isOpen
-									? 'ym-text-yellow-600 rotate-180 scale-110'
-									: 'ym-text-muted group-hover:ym-text-primary'
+									? "ym-text-yellow-600 rotate-180 scale-110"
+									: "ym-text-muted group-hover:ym-text-primary"
 							}`}
 							aria-hidden="true"
 						/>
@@ -135,7 +135,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 					<div
 						className="absolute z-[9999] mt-2 w-full"
 						style={{
-							animation: 'fadeInUpFast 150ms ease-out forwards',
+							animation: "fadeInUpFast 150ms ease-out forwards",
 						}}
 					>
 						<div
@@ -145,7 +145,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 							border-0
 						"
 							style={{
-								position: 'relative',
+								position: "relative",
 								zIndex: 9999,
 							}}
 						>
@@ -155,14 +155,13 @@ const SelectInput: React.FC<SelectInputProps> = ({
 										key={option.value}
 										className={`
 											cursor-pointer select-none relative py-3 pl-4 pr-10 
-											transition-all duration-150 ease-out
-											hover:scale-[1.02] hover:mx-1 hover:rounded-lg
+											transition-all duration-200 ease-out group
 											${
 												option.value === value
-													? 'ym-bg-amber-400 ym-text-white shadow-md mx-1 rounded-lg font-medium'
-													: 'ym-text-card hover:ym-bg-card-hover hover:ym-text-primary'
+													? "ym-bg-amber-400 ym-text-white shadow-md mx-1 rounded-lg font-medium"
+													: "ym-text-card hover:ym-bg-card-hover hover:ym-text-primary hover:scale-[1.01] hover:mx-1 hover:rounded-lg hover:shadow-sm"
 											}
-											${index === 0 ? 'mt-0' : ''}
+											${index === 0 ? "mt-0" : ""}
 										`}
 										onClick={() => handleSelect(option)}
 										style={{
@@ -170,8 +169,10 @@ const SelectInput: React.FC<SelectInputProps> = ({
 										}}
 									>
 										<span
-											className={`block truncate transition-all duration-150 ${
-												option.value === value ? 'font-medium pl-6' : 'font-normal'
+											className={`block truncate transition-all duration-200 ${
+												option.value === value
+													? "font-medium pl-6"
+													: "font-normal group-hover:translate-x-1"
 											}`}
 										>
 											{option.label}
@@ -189,7 +190,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
 
 										{/* Hover indicator */}
 										{option.value !== value && (
-											<div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150 rounded-r-full" />
+											<div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-r-full" />
 										)}
 									</div>
 								))}

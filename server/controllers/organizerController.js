@@ -1,21 +1,21 @@
-const User = require('../models/User');
-const Event = require('../models/Event');
-const EventRegistration = require('../models/EventRegistration');
-const Internship = require('../models/Internship');
-const InternshipApplication = require('../models/InternshipApplication');
-const { cloudinary } = require('../config/cloudinary');
-const { deleteImage, replaceImage } = require('../utils/cloudinary');
+const User = require("../models/User");
+const Event = require("../models/Event");
+const EventRegistration = require("../models/EventRegistration");
+const Internship = require("../models/Internship");
+const InternshipApplication = require("../models/InternshipApplication");
+const { cloudinary } = require("../config/cloudinary");
+const { deleteImage, replaceImage } = require("../utils/cloudinary");
 
 // Get organizer profile
 exports.getProfile = async (req, res) => {
 	try {
 		// Get organizer info without password
-		const user = await User.findById(req.user._id).select('-password');
+		const user = await User.findById(req.user._id).select("-password");
 
 		if (!user) {
 			return res.status(404).json({
 				success: false,
-				message: 'User not found',
+				message: "User not found",
 			});
 		}
 
@@ -24,14 +24,14 @@ exports.getProfile = async (req, res) => {
 			_id: user._id,
 			name: user.name,
 			email: user.email,
-			organizationName: user.organizationName || '',
-			bio: user.bio || '',
-			organizerBrandLogo: user.organizerBrandLogo || '',
+			organizationName: user.organizationName || "",
+			bio: user.bio || "",
+			organizerBrandLogo: user.organizerBrandLogo || "",
 			socialLinks: user.socialLinks || {
-				website: '',
-				linkedin: '',
-				twitter: '',
-				instagram: '',
+				website: "",
+				linkedin: "",
+				twitter: "",
+				instagram: "",
 			},
 		};
 
@@ -40,11 +40,11 @@ exports.getProfile = async (req, res) => {
 			profile,
 		});
 	} catch (error) {
-		console.error('Get organizer profile error:', error);
+		console.error("Get organizer profile error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch profile data',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch profile data",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -64,13 +64,13 @@ exports.updateProfile = async (req, res) => {
 
 		// Update user
 		const user = await User.findByIdAndUpdate(req.user._id, updateData, { new: true, runValidators: true }).select(
-			'-password'
+			"-password"
 		);
 
 		if (!user) {
 			return res.status(404).json({
 				success: false,
-				message: 'User not found',
+				message: "User not found",
 			});
 		}
 
@@ -79,28 +79,28 @@ exports.updateProfile = async (req, res) => {
 			_id: user._id,
 			name: user.name,
 			email: user.email,
-			organizationName: user.organizationName || '',
-			bio: user.bio || '',
-			organizerBrandLogo: user.organizerBrandLogo || '',
+			organizationName: user.organizationName || "",
+			bio: user.bio || "",
+			organizerBrandLogo: user.organizerBrandLogo || "",
 			socialLinks: user.socialLinks || {
-				website: '',
-				linkedin: '',
-				twitter: '',
-				instagram: '',
+				website: "",
+				linkedin: "",
+				twitter: "",
+				instagram: "",
 			},
 		};
 
 		res.status(200).json({
 			success: true,
-			message: 'Profile updated successfully',
+			message: "Profile updated successfully",
 			profile,
 		});
 	} catch (error) {
-		console.error('Update organizer profile error:', error);
+		console.error("Update organizer profile error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to update profile',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to update profile",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -111,16 +111,16 @@ exports.uploadProfilePicture = async (req, res) => {
 		if (!req.file) {
 			return res.status(400).json({
 				success: false,
-				message: 'No file uploaded',
+				message: "No file uploaded",
 			});
 		}
 
 		// Get current user to check for existing logo
-		const currentUser = await User.findById(req.user._id).select('organizerBrandLogo');
+		const currentUser = await User.findById(req.user._id).select("organizerBrandLogo");
 		if (!currentUser) {
 			return res.status(404).json({
 				success: false,
-				message: 'User not found',
+				message: "User not found",
 			});
 		}
 
@@ -129,13 +129,13 @@ exports.uploadProfilePicture = async (req, res) => {
 
 		// Update user with new organizer brand logo URL
 		const user = await User.findByIdAndUpdate(req.user._id, { organizerBrandLogo }, { new: true }).select(
-			'-password'
+			"-password"
 		);
 
 		if (!user) {
 			return res.status(404).json({
 				success: false,
-				message: 'User not found',
+				message: "User not found",
 			});
 		}
 
@@ -146,15 +146,15 @@ exports.uploadProfilePicture = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Brand logo updated successfully',
+			message: "Brand logo updated successfully",
 			organizerBrandLogo: user.organizerBrandLogo,
 		});
 	} catch (error) {
-		console.error('Upload brand logo error:', error);
+		console.error("Upload brand logo error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to upload brand logo',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to upload brand logo",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -163,24 +163,24 @@ exports.uploadProfilePicture = async (req, res) => {
 exports.getDashboard = async (req, res) => {
 	try {
 		// Get organizer info without password
-		const user = await User.findById(req.user._id).select('-password');
+		const user = await User.findById(req.user._id).select("-password");
 
 		// Get count of events organized by this user
 		const eventCount = await Event.countDocuments({ organizer: req.user._id });
 
 		// Get total attendees across all events
-		const events = await Event.find({ organizer: req.user._id }).select('_id');
+		const events = await Event.find({ organizer: req.user._id }).select("_id");
 		const eventIds = events.map((event) => event._id);
 
 		const attendeeCount = await EventRegistration.countDocuments({
 			event: { $in: eventIds },
-			status: { $in: ['registered', 'attended'] },
+			status: { $in: ["registered", "attended"] },
 		});
 
 		// Calculate total revenue (if applicable)
 		const revenue = await Event.aggregate([
 			{ $match: { organizer: req.user._id } },
-			{ $group: { _id: null, total: { $sum: '$price' } } },
+			{ $group: { _id: null, total: { $sum: "$price" } } },
 		]);
 
 		const totalRevenue = revenue.length > 0 ? revenue[0].total : 0;
@@ -189,12 +189,12 @@ exports.getDashboard = async (req, res) => {
 		const internshipCount = await Internship.countDocuments({ organizer: req.user._id });
 
 		// Get total applications across all internships
-		const internships = await Internship.find({ organizer: req.user._id }).select('_id');
+		const internships = await Internship.find({ organizer: req.user._id }).select("_id");
 		const internshipIds = internships.map((internship) => internship._id);
 
 		const applicationCount = await InternshipApplication.countDocuments({
 			internship: { $in: internshipIds },
-			status: { $in: ['pending', 'accepted', 'rejected'] },
+			status: { $in: ["pending", "accepted", "rejected"] },
 		});
 
 		// Count upcoming events and active internships
@@ -202,13 +202,13 @@ exports.getDashboard = async (req, res) => {
 		const upcomingEvents = await Event.countDocuments({
 			organizer: req.user._id,
 			date: { $gte: now },
-			status: 'published',
+			status: "published",
 		});
 
 		const activeInternships = await Internship.countDocuments({
 			organizer: req.user._id,
 			applicationDeadline: { $gte: now },
-			status: 'published',
+			status: "published",
 		});
 
 		res.status(200).json({
@@ -233,11 +233,11 @@ exports.getDashboard = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error('Get organizer dashboard error:', error);
+		console.error("Get organizer dashboard error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch dashboard data',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch dashboard data",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -253,11 +253,11 @@ exports.getEvents = async (req, res) => {
 			events,
 		});
 	} catch (error) {
-		console.error('Get organizer events error:', error);
+		console.error("Get organizer events error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch events',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch events",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -273,8 +273,8 @@ exports.createEvent = async (req, res) => {
 		// Reconstruct location object from dot-notation properties
 		const location = {};
 		Object.keys(req.body).forEach((key) => {
-			if (key.startsWith('location.')) {
-				const locationKey = key.split('.')[1];
+			if (key.startsWith("location.")) {
+				const locationKey = key.split(".")[1];
 				location[locationKey] = req.body[key];
 			}
 		});
@@ -284,7 +284,7 @@ exports.createEvent = async (req, res) => {
 
 			// Remove dot-notation location properties
 			Object.keys(eventData).forEach((key) => {
-				if (key.startsWith('location.')) {
+				if (key.startsWith("location.")) {
 					delete eventData[key];
 				}
 			});
@@ -299,15 +299,15 @@ exports.createEvent = async (req, res) => {
 
 		res.status(201).json({
 			success: true,
-			message: 'Event created successfully',
+			message: "Event created successfully",
 			event,
 		});
 	} catch (error) {
-		console.error('Create event error:', error);
+		console.error("Create event error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to create event',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to create event",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -323,13 +323,13 @@ exports.getEventDetails = async (req, res) => {
 		if (!event) {
 			return res.status(404).json({
 				success: false,
-				message: 'Event not found or you do not have permission',
+				message: "Event not found or you do not have permission",
 			});
 		}
 
 		// Get registrations for this event
 		const registrations = await EventRegistration.find({ event: event._id })
-			.populate('user', 'name email profilePicture')
+			.populate("user", "name email profilePicture")
 			.sort({ registrationDate: -1 });
 
 		// Get daily registration count for chart
@@ -338,7 +338,7 @@ exports.getEventDetails = async (req, res) => {
 			{
 				$group: {
 					_id: {
-						$dateToString: { format: '%Y-%m-%d', date: '$registrationDate' },
+						$dateToString: { format: "%Y-%m-%d", date: "$registrationDate" },
 					},
 					count: { $sum: 1 },
 				},
@@ -359,11 +359,11 @@ exports.getEventDetails = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error('Get event details error:', error);
+		console.error("Get event details error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch event details',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch event details",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -380,7 +380,7 @@ exports.updateEvent = async (req, res) => {
 		if (!event) {
 			return res.status(404).json({
 				success: false,
-				message: 'Event not found or you do not have permission',
+				message: "Event not found or you do not have permission",
 			});
 		}
 
@@ -390,8 +390,8 @@ exports.updateEvent = async (req, res) => {
 		// Reconstruct location object from dot-notation properties
 		const location = {};
 		Object.keys(req.body).forEach((key) => {
-			if (key.startsWith('location.')) {
-				const locationKey = key.split('.')[1];
+			if (key.startsWith("location.")) {
+				const locationKey = key.split(".")[1];
 				location[locationKey] = req.body[key];
 			}
 		});
@@ -401,7 +401,7 @@ exports.updateEvent = async (req, res) => {
 
 			// Remove dot-notation location properties
 			Object.keys(updateData).forEach((key) => {
-				if (key.startsWith('location.')) {
+				if (key.startsWith("location.")) {
 					delete updateData[key];
 				}
 			});
@@ -424,15 +424,15 @@ exports.updateEvent = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Event updated successfully',
+			message: "Event updated successfully",
 			event: updatedEvent,
 		});
 	} catch (error) {
-		console.error('Update event error:', error);
+		console.error("Update event error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to update event',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to update event",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -449,7 +449,7 @@ exports.deleteEvent = async (req, res) => {
 		if (!event) {
 			return res.status(404).json({
 				success: false,
-				message: 'Event not found or you do not have permission',
+				message: "Event not found or you do not have permission",
 			});
 		}
 
@@ -466,14 +466,14 @@ exports.deleteEvent = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Event deleted successfully',
+			message: "Event deleted successfully",
 		});
 	} catch (error) {
-		console.error('Delete event error:', error);
+		console.error("Delete event error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to delete event',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to delete event",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -490,16 +490,16 @@ exports.getEventAttendees = async (req, res) => {
 		if (!event) {
 			return res.status(404).json({
 				success: false,
-				message: 'Event not found or you do not have permission',
+				message: "Event not found or you do not have permission",
 			});
 		}
 
 		// Get registrations with user details
 		const attendees = await EventRegistration.find({
 			event: req.params.id,
-			status: { $in: ['registered', 'attended'] },
+			status: { $in: ["registered", "attended"] },
 		})
-			.populate('user', 'name email profilePicture')
+			.populate("user", "name email profilePicture")
 			.sort({ registrationDate: -1 });
 
 		res.status(200).json({
@@ -517,11 +517,11 @@ exports.getEventAttendees = async (req, res) => {
 			})),
 		});
 	} catch (error) {
-		console.error('Get event attendees error:', error);
+		console.error("Get event attendees error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch attendees',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch attendees",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -530,7 +530,7 @@ exports.getEventAttendees = async (req, res) => {
 exports.getFeedbackSummary = async (req, res) => {
 	try {
 		// Get all events by this organizer
-		const events = await Event.find({ organizer: req.user._id }).select('_id title');
+		const events = await Event.find({ organizer: req.user._id }).select("_id title");
 
 		// Get feedback for these events
 		const feedback = await EventRegistration.aggregate([
@@ -542,14 +542,14 @@ exports.getFeedbackSummary = async (req, res) => {
 			},
 			{
 				$group: {
-					_id: '$event',
-					averageRating: { $avg: '$feedback.rating' },
+					_id: "$event",
+					averageRating: { $avg: "$feedback.rating" },
 					totalFeedback: { $sum: 1 },
 					feedback: {
 						$push: {
-							rating: '$feedback.rating',
-							comment: '$feedback.comment',
-							date: '$feedback.date',
+							rating: "$feedback.rating",
+							comment: "$feedback.comment",
+							date: "$feedback.date",
 						},
 					},
 				},
@@ -584,11 +584,11 @@ exports.getFeedbackSummary = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error('Get feedback summary error:', error);
+		console.error("Get feedback summary error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch feedback summary',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch feedback summary",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -605,7 +605,7 @@ exports.getInternships = async (req, res) => {
 			internships.map(async (internship) => {
 				const applicationCount = await InternshipApplication.countDocuments({
 					internship: internship._id,
-					status: { $in: ['pending', 'accepted', 'rejected'] },
+					status: { $in: ["pending", "accepted", "rejected"] },
 				});
 
 				return {
@@ -621,11 +621,11 @@ exports.getInternships = async (req, res) => {
 			internships: internshipsWithCount,
 		});
 	} catch (error) {
-		console.error('Get organizer internships error:', error);
+		console.error("Get organizer internships error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch internships',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch internships",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -654,20 +654,20 @@ exports.createInternship = async (req, res) => {
 		} = req.body;
 
 		// Handle FormData format fallback for createInternship
-		if (!location && req.body['location.type']) {
+		if (!location && req.body["location.type"]) {
 			location = JSON.stringify({
-				type: req.body['location.type'] || 'remote',
-				city: req.body['location.city'] || '',
-				country: req.body['location.country'] || '',
-				address: req.body['location.address'] || '',
+				type: req.body["location.type"] || "remote",
+				city: req.body["location.city"] || "",
+				country: req.body["location.country"] || "",
+				address: req.body["location.address"] || "",
 			});
 		}
 
-		if (!compensation && req.body['compensation.type']) {
+		if (!compensation && req.body["compensation.type"]) {
 			compensation = JSON.stringify({
-				type: req.body['compensation.type'] || '',
-				amount: parseFloat(req.body['compensation.amount']) || 0,
-				currency: req.body['compensation.currency'] || 'USD',
+				type: req.body["compensation.type"] || "",
+				amount: parseFloat(req.body["compensation.amount"]) || 0,
+				currency: req.body["compensation.currency"] || "USD",
 			});
 		}
 
@@ -680,17 +680,17 @@ exports.createInternship = async (req, res) => {
 			parsedBenefits;
 
 		try {
-			parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
-			parsedCompensation = typeof compensation === 'string' ? JSON.parse(compensation) : compensation;
-			parsedSkills = typeof skills === 'string' ? JSON.parse(skills) : skills || [];
-			parsedRequirements = typeof requirements === 'string' ? JSON.parse(requirements) : requirements || [];
+			parsedLocation = typeof location === "string" ? JSON.parse(location) : location;
+			parsedCompensation = typeof compensation === "string" ? JSON.parse(compensation) : compensation;
+			parsedSkills = typeof skills === "string" ? JSON.parse(skills) : skills || [];
+			parsedRequirements = typeof requirements === "string" ? JSON.parse(requirements) : requirements || [];
 			parsedResponsibilities =
-				typeof responsibilities === 'string' ? JSON.parse(responsibilities) : responsibilities || [];
-			parsedBenefits = typeof benefits === 'string' ? JSON.parse(benefits) : benefits || [];
+				typeof responsibilities === "string" ? JSON.parse(responsibilities) : responsibilities || [];
+			parsedBenefits = typeof benefits === "string" ? JSON.parse(benefits) : benefits || [];
 		} catch (parseError) {
 			return res.status(400).json({
 				success: false,
-				message: 'Invalid JSON data provided',
+				message: "Invalid JSON data provided",
 			});
 		}
 
@@ -712,8 +712,8 @@ exports.createInternship = async (req, res) => {
 			responsibilities: parsedResponsibilities,
 			benefits: parsedBenefits,
 			company: req.user._id,
-			isPublished: isPublished === 'true' || isPublished === true,
-			status: isPublished === 'true' || isPublished === true ? 'published' : 'draft',
+			isPublished: isPublished === "true" || isPublished === true,
+			status: isPublished === "true" || isPublished === true ? "published" : "draft",
 		};
 
 		// Add poster URL if file was uploaded
@@ -726,28 +726,28 @@ exports.createInternship = async (req, res) => {
 
 		res.status(201).json({
 			success: true,
-			message: `Internship ${isPublished === 'true' ? 'published' : 'saved as draft'} successfully`,
+			message: `Internship ${isPublished === "true" ? "published" : "saved as draft"} successfully`,
 			internship: {
 				...internship.toObject(),
 				applicationCount: 0,
 			},
 		});
 	} catch (error) {
-		console.error('Create internship error:', error);
+		console.error("Create internship error:", error);
 
-		if (error.name === 'ValidationError') {
+		if (error.name === "ValidationError") {
 			const errors = Object.values(error.errors).map((err) => err.message);
 			return res.status(400).json({
 				success: false,
-				message: 'Validation failed',
+				message: "Validation failed",
 				errors,
 			});
 		}
 
 		res.status(500).json({
 			success: false,
-			message: 'Failed to create internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to create internship",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -763,14 +763,14 @@ exports.getInternshipDetails = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found or you do not have permission',
+				message: "Internship not found or you do not have permission",
 			});
 		}
 
 		// Get application count
 		const applicationCount = await InternshipApplication.countDocuments({
 			internship: req.params.id,
-			status: { $in: ['pending', 'accepted', 'rejected'] },
+			status: { $in: ["pending", "accepted", "rejected"] },
 		});
 
 		res.status(200).json({
@@ -781,11 +781,11 @@ exports.getInternshipDetails = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		console.error('Get internship details error:', error);
+		console.error("Get internship details error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch internship details',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch internship details",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -801,7 +801,7 @@ exports.updateInternship = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found or you do not have permission',
+				message: "Internship not found or you do not have permission",
 			});
 		}
 
@@ -833,17 +833,17 @@ exports.updateInternship = async (req, res) => {
 			parsedBenefits;
 
 		try {
-			parsedLocation = typeof location === 'string' ? JSON.parse(location) : location;
-			parsedCompensation = typeof compensation === 'string' ? JSON.parse(compensation) : compensation;
-			parsedSkills = typeof skills === 'string' ? JSON.parse(skills) : skills || [];
-			parsedRequirements = typeof requirements === 'string' ? JSON.parse(requirements) : requirements || [];
+			parsedLocation = typeof location === "string" ? JSON.parse(location) : location;
+			parsedCompensation = typeof compensation === "string" ? JSON.parse(compensation) : compensation;
+			parsedSkills = typeof skills === "string" ? JSON.parse(skills) : skills || [];
+			parsedRequirements = typeof requirements === "string" ? JSON.parse(requirements) : requirements || [];
 			parsedResponsibilities =
-				typeof responsibilities === 'string' ? JSON.parse(responsibilities) : responsibilities || [];
-			parsedBenefits = typeof benefits === 'string' ? JSON.parse(benefits) : benefits || [];
+				typeof responsibilities === "string" ? JSON.parse(responsibilities) : responsibilities || [];
+			parsedBenefits = typeof benefits === "string" ? JSON.parse(benefits) : benefits || [];
 		} catch (parseError) {
 			return res.status(400).json({
 				success: false,
-				message: 'Invalid JSON data provided',
+				message: "Invalid JSON data provided",
 			});
 		}
 
@@ -863,8 +863,8 @@ exports.updateInternship = async (req, res) => {
 			requirements: parsedRequirements,
 			responsibilities: parsedResponsibilities,
 			benefits: parsedBenefits,
-			isPublished: isPublished === 'true' || isPublished === true,
-			status: isPublished === 'true' || isPublished === true ? 'published' : 'draft',
+			isPublished: isPublished === "true" || isPublished === true,
+			status: isPublished === "true" || isPublished === true ? "published" : "draft",
 		};
 
 		// If there's a new poster file
@@ -885,23 +885,23 @@ exports.updateInternship = async (req, res) => {
 		// Get application count
 		const applicationCount = await InternshipApplication.countDocuments({
 			internship: req.params.id,
-			status: { $in: ['pending', 'accepted', 'rejected'] },
+			status: { $in: ["pending", "accepted", "rejected"] },
 		});
 
 		res.status(200).json({
 			success: true,
-			message: 'Internship updated successfully',
+			message: "Internship updated successfully",
 			internship: {
 				...updatedInternship.toObject(),
 				applicationCount,
 			},
 		});
 	} catch (error) {
-		console.error('Update internship error:', error);
+		console.error("Update internship error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to update internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to update internship",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -917,7 +917,7 @@ exports.deleteInternship = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found or you do not have permission',
+				message: "Internship not found or you do not have permission",
 			});
 		}
 
@@ -934,14 +934,14 @@ exports.deleteInternship = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Internship deleted successfully',
+			message: "Internship deleted successfully",
 		});
 	} catch (error) {
-		console.error('Delete internship error:', error);
+		console.error("Delete internship error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to delete internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to delete internship",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
@@ -957,7 +957,7 @@ exports.getInternshipApplicants = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found or you do not have permission',
+				message: "Internship not found or you do not have permission",
 			});
 		}
 
@@ -965,7 +965,7 @@ exports.getInternshipApplicants = async (req, res) => {
 		const applicants = await InternshipApplication.find({
 			internship: req.params.id,
 		})
-			.populate('user', 'name email profilePicture')
+			.populate("user", "name email profilePicture")
 			.sort({ applicationDate: -1 });
 
 		res.status(200).json({
@@ -984,11 +984,11 @@ exports.getInternshipApplicants = async (req, res) => {
 			})),
 		});
 	} catch (error) {
-		console.error('Get internship applicants error:', error);
+		console.error("Get internship applicants error:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to fetch applicants',
-			error: process.env.NODE_ENV === 'development' ? error.message : null,
+			message: "Failed to fetch applicants",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}
 };
