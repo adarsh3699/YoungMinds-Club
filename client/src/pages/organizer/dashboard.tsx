@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { BriefcaseIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import CreateEventModal from '../../components/organizer/CreateEventModal';
-import CreateInternshipModal from '../../components/organizer/CreateInternshipModal';
+import React, { useState, useEffect } from "react";
+import axios, { AxiosResponse } from "axios";
+import { BriefcaseIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import CreateEventModal from "../../components/organizer/CreateEventModal";
+import CreateInternshipModal from "../../components/organizer/CreateInternshipModal";
 import {
 	DashboardOverview,
 	EventRegistrationChart,
@@ -11,7 +11,7 @@ import {
 	InternshipsList,
 	LoadingState,
 	ErrorState,
-} from '../../components/organizer/dashboard';
+} from "../../components/organizer/dashboard";
 
 import {
 	OrganizerEvent,
@@ -21,7 +21,7 @@ import {
 	OrganizerEventsApiResponse,
 	OrganizerInternshipsApiResponse,
 	OrganizerFeedbackApiResponse,
-} from '@/types';
+} from "@/types";
 
 const Dashboard: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -29,11 +29,11 @@ const Dashboard: React.FC = () => {
 	const [events, setEvents] = useState<OrganizerEvent[]>([]);
 	const [internships, setInternships] = useState<OrganizerInternship[]>([]);
 	const [feedbackSummary, setFeedbackSummary] = useState<OrganizerFeedbackSummary | null>(null);
-	const [eventFilter, setEventFilter] = useState<string>('all');
-	const [internshipFilter, setInternshipFilter] = useState<string>('all');
+	const [eventFilter, setEventFilter] = useState<string>("all");
+	const [internshipFilter, setInternshipFilter] = useState<string>("all");
 	const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
 	const [showCreateInternshipModal, setShowCreateInternshipModal] = useState<boolean>(false);
-	const [activeTab, setActiveTab] = useState<string>('events');
+	const [activeTab, setActiveTab] = useState<string>("events");
 
 	// Fetch dashboard data
 	useEffect(() => {
@@ -42,25 +42,25 @@ const Dashboard: React.FC = () => {
 				setLoading(true);
 
 				// Fetch events
-				const eventsResponse: AxiosResponse<OrganizerEventsApiResponse> = await axios.get('/organizer/events');
+				const eventsResponse: AxiosResponse<OrganizerEventsApiResponse> = await axios.get("/organizer/events");
 				setEvents(Array.isArray(eventsResponse.data.events) ? eventsResponse.data.events : []);
 
 				// Fetch internships
 				try {
 					const internshipsResponse: AxiosResponse<OrganizerInternshipsApiResponse> = await axios.get(
-						'/organizer/internships'
+						"/organizer/internships"
 					);
 					setInternships(
 						Array.isArray(internshipsResponse.data.internships) ? internshipsResponse.data.internships : []
 					);
 				} catch (internshipError) {
-					console.error('Error fetching internships:', internshipError);
+					console.error("Error fetching internships:", internshipError);
 					setInternships([]);
 				}
 
 				// Fetch feedback summary
 				const feedbackResponse: AxiosResponse<OrganizerFeedbackApiResponse> = await axios.get(
-					'/organizer/feedback/summary'
+					"/organizer/feedback/summary"
 				);
 				if (feedbackResponse.data.success) {
 					setFeedbackSummary(feedbackResponse.data.summary);
@@ -68,8 +68,8 @@ const Dashboard: React.FC = () => {
 
 				setLoading(false);
 			} catch (error) {
-				console.error('Error fetching dashboard data:', error);
-				setError('Failed to load dashboard data. Please try again.');
+				console.error("Error fetching dashboard data:", error);
+				setError("Failed to load dashboard data. Please try again.");
 				setLoading(false);
 			}
 		};
@@ -96,22 +96,22 @@ const Dashboard: React.FC = () => {
 	};
 
 	const eventFilterOptions: FilterOption[] = [
-		{ value: 'all', label: 'All Events' },
-		{ value: 'upcoming', label: 'Upcoming Events' },
-		{ value: 'past', label: 'Past Events' },
-		{ value: 'draft', label: 'Draft Events' },
+		{ value: "all", label: "All Events" },
+		{ value: "upcoming", label: "Upcoming Events" },
+		{ value: "past", label: "Past Events" },
+		{ value: "draft", label: "Draft Events" },
 	];
 
 	const internshipFilterOptions: FilterOption[] = [
-		{ value: 'all', label: 'All Internships' },
-		{ value: 'active', label: 'Active Internships' },
-		{ value: 'expired', label: 'Expired Internships' },
-		{ value: 'draft', label: 'Draft Internships' },
+		{ value: "all", label: "All Internships" },
+		{ value: "active", label: "Active Internships" },
+		{ value: "expired", label: "Expired Internships" },
+		{ value: "draft", label: "Draft Internships" },
 	];
 
 	const tabs = [
-		{ id: 'events', label: 'Events', count: events.length },
-		{ id: 'internships', label: 'Internships', count: internships.length },
+		{ id: "events", label: "Events", count: events.length },
+		{ id: "internships", label: "Internships", count: internships.length },
 	];
 
 	const calculatedTotalRegistrations: number = events.reduce((sum, event) => sum + (event.registrationCount || 0), 0);
@@ -143,10 +143,12 @@ const Dashboard: React.FC = () => {
 				{/* Create Internship Modal */}
 				{showCreateInternshipModal && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40 p-2 sm:p-4">
+						<div className="ym-bg-card rounded-xl shadow-xl w-full max-w-6xl mx-auto overflow-hidden">
 							<CreateInternshipModal
 								onClose={toggleCreateInternshipModal}
 								onSuccess={handleInternshipCreated}
 							/>
+						</div>
 					</div>
 				)}
 
@@ -170,8 +172,8 @@ const Dashboard: React.FC = () => {
 									onClick={() => setActiveTab(tab.id)}
 									className={`flex-1 py-4 px-6 font-medium text-center transition-all duration-200 ${
 										activeTab === tab.id
-											? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
-											: 'ym-text-muted hover:ym-text-secondary hover:bg-gray-50'
+											? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg"
+											: "ym-text-muted hover:ym-text-secondary hover:bg-gray-50"
 									}`}
 								>
 									<div className="flex items-center justify-center space-x-2">
@@ -179,8 +181,8 @@ const Dashboard: React.FC = () => {
 										<span
 											className={`px-2 py-1 rounded-full text-xs ${
 												activeTab === tab.id
-													? 'bg-white/20 text-white'
-													: 'ym-bg-gray-100 ym-text-muted'
+													? "bg-white/20 text-white"
+													: "ym-bg-gray-100 ym-text-muted"
 											}`}
 										>
 											{tab.count}
@@ -193,7 +195,7 @@ const Dashboard: React.FC = () => {
 				</div>
 
 				{/* Tab Content */}
-				{activeTab === 'events' ? (
+				{activeTab === "events" ? (
 					<div className="space-y-8">
 						{/* Events Dashboard Overview */}
 						<DashboardOverview
@@ -205,11 +207,11 @@ const Dashboard: React.FC = () => {
 							totalEvents={events.length}
 							totalRegistrations={calculatedTotalRegistrations}
 							upcomingEvents={
-								events.filter((event) => new Date(event.date) >= new Date() && event.status !== 'draft')
+								events.filter((event) => new Date(event.date) >= new Date() && event.status !== "draft")
 									.length
 							}
 							averageRating={
-								feedbackSummary?.averageRating ? feedbackSummary.averageRating.toFixed(1) : 'N/A'
+								feedbackSummary?.averageRating ? feedbackSummary.averageRating.toFixed(1) : "N/A"
 							}
 						/>
 
@@ -243,7 +245,7 @@ const Dashboard: React.FC = () => {
 								internships.filter(
 									(internship) =>
 										new Date(internship.applicationDeadline) >= new Date() &&
-										internship.status !== 'draft'
+										internship.status !== "draft"
 								).length
 							}
 							avgApplications={

@@ -1134,7 +1134,7 @@ const CreateInternshipModal = ({
 	};
 
 	return (
-		<div className="ym-bg-card rounded-2xl shadow-2xl w-full max-w-6xl h-[95vh] flex flex-col">
+		<div className="ym-bg-card w-full h-[95vh] flex flex-col">
 			{/* Message Alert */}
 			{alertMessage && (
 				<div className="flex-shrink-0">

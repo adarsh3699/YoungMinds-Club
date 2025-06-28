@@ -186,10 +186,10 @@ exports.getDashboard = async (req, res) => {
 		const totalRevenue = revenue.length > 0 ? revenue[0].total : 0;
 
 		// Get internship statistics
-		const internshipCount = await Internship.countDocuments({ organizer: req.user._id });
+		const internshipCount = await Internship.countDocuments({ organizerId: req.user._id });
 
 		// Get total applications across all internships
-		const internships = await Internship.find({ organizer: req.user._id }).select("_id");
+		const internships = await Internship.find({ organizerId: req.user._id }).select("_id");
 		const internshipIds = internships.map((internship) => internship._id);
 
 		const applicationCount = await InternshipApplication.countDocuments({
@@ -206,7 +206,7 @@ exports.getDashboard = async (req, res) => {
 		});
 
 		const activeInternships = await Internship.countDocuments({
-			organizer: req.user._id,
+			organizerId: req.user._id,
 			applicationDeadline: { $gte: now },
 			status: "published",
 		});
@@ -598,7 +598,7 @@ exports.getFeedbackSummary = async (req, res) => {
 // Get organizer's internships
 exports.getInternships = async (req, res) => {
 	try {
-		const internships = await Internship.find({ organizer: req.user._id }).sort({ createdAt: -1 });
+		const internships = await Internship.find({ organizerId: req.user._id }).sort({ createdAt: -1 });
 
 		// Add application count to each internship
 		const internshipsWithCount = await Promise.all(
@@ -711,7 +711,7 @@ exports.createInternship = async (req, res) => {
 			requirements: parsedRequirements,
 			responsibilities: parsedResponsibilities,
 			benefits: parsedBenefits,
-			company: req.user._id,
+			organizerId: req.user._id,
 			isPublished: isPublished === "true" || isPublished === true,
 			status: isPublished === "true" || isPublished === true ? "published" : "draft",
 		};
@@ -757,7 +757,7 @@ exports.getInternshipDetails = async (req, res) => {
 	try {
 		const internship = await Internship.findOne({
 			_id: req.params.id,
-			organizer: req.user._id,
+			organizerId: req.user._id,
 		});
 
 		if (!internship) {
@@ -795,7 +795,7 @@ exports.updateInternship = async (req, res) => {
 	try {
 		const internship = await Internship.findOne({
 			_id: req.params.id,
-			organizer: req.user._id,
+			organizerId: req.user._id,
 		});
 
 		if (!internship) {
@@ -911,7 +911,7 @@ exports.deleteInternship = async (req, res) => {
 	try {
 		const internship = await Internship.findOne({
 			_id: req.params.id,
-			organizer: req.user._id,
+			organizerId: req.user._id,
 		});
 
 		if (!internship) {
@@ -951,7 +951,7 @@ exports.getInternshipApplicants = async (req, res) => {
 	try {
 		const internship = await Internship.findOne({
 			_id: req.params.id,
-			organizer: req.user._id,
+			organizerId: req.user._id,
 		});
 
 		if (!internship) {

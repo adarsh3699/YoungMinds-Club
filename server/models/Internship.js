@@ -72,10 +72,10 @@ const internshipSchema = new mongoose.Schema(
 				required: false,
 			},
 		},
-		company: {
+		organizerId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
-			required: [true, "Company/Recruiter is required"],
+			required: [true, "Organizer is required"],
 		},
 		applicationCount: {
 			type: Number,
@@ -256,9 +256,9 @@ internshipSchema.index({ isPublished: 1, isFlagged: 1 });
 
 // Virtual for logo - dynamically get from organizer's brand logo
 internshipSchema.virtual("logo").get(function () {
-	// If company is populated and has organizerBrandLogo, use it
-	if (this.company && typeof this.company === "object" && this.company.organizerBrandLogo) {
-		return this.company.organizerBrandLogo;
+	// If organizerId is populated and has organizerBrandLogo, use it
+	if (this.organizerId && typeof this.organizerId === "object" && this.organizerId.organizerBrandLogo) {
+		return this.organizerId.organizerBrandLogo;
 	}
 	// Return null/undefined if not available
 	return null;

@@ -1,7 +1,7 @@
-const Internship = require('../models/Internship');
-const InternshipApplication = require('../models/InternshipApplication');
-const UserActivity = require('../models/UserActivity');
-const mongoose = require('mongoose');
+const Internship = require("../models/Internship");
+const InternshipApplication = require("../models/InternshipApplication");
+const UserActivity = require("../models/UserActivity");
+const mongoose = require("mongoose");
 
 // Get all internships with pagination and filters
 exports.getAllInternships = async (req, res) => {
@@ -15,7 +15,7 @@ exports.getAllInternships = async (req, res) => {
 			// Only show published and non-flagged internships to public
 			isPublished: true,
 			isFlagged: false,
-			status: 'published',
+			status: "published",
 		};
 
 		// Filter by category
@@ -30,7 +30,7 @@ exports.getAllInternships = async (req, res) => {
 
 		// Filter by compensation type
 		if (req.query.compensation) {
-			filter['compensation.type'] = req.query.compensation;
+			filter["compensation.type"] = req.query.compensation;
 		}
 
 		// Filter by duration
@@ -40,7 +40,7 @@ exports.getAllInternships = async (req, res) => {
 
 		// Filter by location type
 		if (req.query.locationType) {
-			filter['location.type'] = req.query.locationType;
+			filter["location.type"] = req.query.locationType;
 		}
 
 		// Filter by date range (start date)
@@ -58,36 +58,36 @@ exports.getAllInternships = async (req, res) => {
 
 		// Filter by city
 		if (req.query.city) {
-			filter['location.city'] = new RegExp(req.query.city, 'i');
+			filter["location.city"] = new RegExp(req.query.city, "i");
 		}
 
 		// Filter by remote only
-		if (req.query.remote === 'true') {
-			filter['location.type'] = 'remote';
+		if (req.query.remote === "true") {
+			filter["location.type"] = "remote";
 		}
 
 		// Filter by compensation amount range
 		if (req.query.minAmount || req.query.maxAmount) {
-			filter['compensation.amount'] = {};
+			filter["compensation.amount"] = {};
 
 			if (req.query.minAmount) {
-				filter['compensation.amount'].$gte = parseInt(req.query.minAmount);
+				filter["compensation.amount"].$gte = parseInt(req.query.minAmount);
 			}
 
 			if (req.query.maxAmount) {
-				filter['compensation.amount'].$lte = parseInt(req.query.maxAmount);
+				filter["compensation.amount"].$lte = parseInt(req.query.maxAmount);
 			}
 		}
 
 		// Search by text (title, skills, company name, benefits)
 		if (req.query.search) {
-			const searchRegex = new RegExp(req.query.search, 'i');
+			const searchRegex = new RegExp(req.query.search, "i");
 			filter.$or = [
 				{ title: searchRegex },
 				{ companyName: searchRegex },
 				{ skills: searchRegex },
 				{ benefits: searchRegex },
-				{ 'location.city': searchRegex },
+				{ "location.city": searchRegex },
 			];
 		}
 
@@ -101,16 +101,16 @@ exports.getAllInternships = async (req, res) => {
 
 		if (req.query.sort) {
 			switch (req.query.sort) {
-				case 'deadline':
+				case "deadline":
 					sortOptions = { applicationDeadline: 1 };
 					break;
-				case 'popular':
+				case "popular":
 					sortOptions = { applicationCount: -1 };
 					break;
-				case 'amount':
-					sortOptions = { 'compensation.amount': -1 };
+				case "amount":
+					sortOptions = { "compensation.amount": -1 };
 					break;
-				case 'startDate':
+				case "startDate":
 					sortOptions = { startDate: 1 };
 					break;
 				default:
@@ -122,7 +122,7 @@ exports.getAllInternships = async (req, res) => {
 			.sort(sortOptions)
 			.skip(skip)
 			.limit(limit)
-			.populate('company', 'name email organizationName organizerBrandLogo');
+			.populate("organizerId", "name email organizationName organizerBrandLogo");
 
 		const total = await Internship.countDocuments(filter);
 
@@ -135,11 +135,11 @@ exports.getAllInternships = async (req, res) => {
 			internships,
 		});
 	} catch (error) {
-		console.error('Error getting internships:', error);
+		console.error("Error getting internships:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Server error',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Server error",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -148,19 +148,19 @@ exports.getAllInternships = async (req, res) => {
 exports.getInternshipById = async (req, res) => {
 	try {
 		const internship = await Internship.findById(req.params.id).populate(
-			'company',
-			'name email organizationName organizerBrandLogo website description'
+			"organizerId",
+			"name email organizationName organizerBrandLogo website description"
 		);
 
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found',
+				message: "Internship not found",
 			});
 		}
 
 		// Check if the internship is published and not flagged (public access)
-		if (internship.isPublished && !internship.isFlagged && internship.status === 'published') {
+		if (internship.isPublished && !internship.isFlagged && internship.status === "published") {
 			return res.status(200).json({
 				success: true,
 				internship,
@@ -171,12 +171,12 @@ exports.getInternshipById = async (req, res) => {
 		if (!req.user) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found',
+				message: "Internship not found",
 			});
 		}
 
 		// Allow admin to view any internship
-		if (req.user.role === 'admin') {
+		if (req.user.role === "admin") {
 			return res.status(200).json({
 				success: true,
 				internship,
@@ -184,7 +184,7 @@ exports.getInternshipById = async (req, res) => {
 		}
 
 		// Allow company/recruiter to view their own internships
-		if (req.user.role === 'organizer' && internship.company._id.toString() === req.user._id.toString()) {
+		if (req.user.role === "organizer" && internship.organizerId._id.toString() === req.user._id.toString()) {
 			return res.status(200).json({
 				success: true,
 				internship,
@@ -194,14 +194,14 @@ exports.getInternshipById = async (req, res) => {
 		// For all other cases, deny access
 		return res.status(404).json({
 			success: false,
-			message: 'Internship not found',
+			message: "Internship not found",
 		});
 	} catch (error) {
-		console.error('Error getting internship:', error);
+		console.error("Error getting internship:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Server error',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Server error",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -209,22 +209,22 @@ exports.getInternshipById = async (req, res) => {
 // Create a new internship (organizer or admin only)
 exports.createInternship = async (req, res) => {
 	try {
-		// Add the current user as the company
-		req.body.company = req.user.id;
+		// Add the current user as the organizer
+		req.body.organizerId = req.user.id;
 
 		const internship = await Internship.create(req.body);
 
 		res.status(201).json({
 			success: true,
-			message: 'Internship created successfully',
+			message: "Internship created successfully",
 			internship,
 		});
 	} catch (error) {
-		console.error('Error creating internship:', error);
+		console.error("Error creating internship:", error);
 		res.status(400).json({
 			success: false,
-			message: 'Internship creation failed',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Internship creation failed",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -246,17 +246,17 @@ exports.applyForInternship = async (req, res) => {
 			session.endSession();
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found',
+				message: "Internship not found",
 			});
 		}
 
 		// Check if internship is still accepting applications
-		if (internship.status !== 'published') {
+		if (internship.status !== "published") {
 			await session.abortTransaction();
 			session.endSession();
 			return res.status(400).json({
 				success: false,
-				message: 'This internship is no longer accepting applications',
+				message: "This internship is no longer accepting applications",
 			});
 		}
 
@@ -266,7 +266,7 @@ exports.applyForInternship = async (req, res) => {
 			session.endSession();
 			return res.status(400).json({
 				success: false,
-				message: 'Application deadline has passed',
+				message: "Application deadline has passed",
 			});
 		}
 
@@ -276,7 +276,7 @@ exports.applyForInternship = async (req, res) => {
 			session.endSession();
 			return res.status(400).json({
 				success: false,
-				message: 'Internship has reached maximum applications',
+				message: "Internship has reached maximum applications",
 			});
 		}
 
@@ -291,7 +291,7 @@ exports.applyForInternship = async (req, res) => {
 			session.endSession();
 			return res.status(400).json({
 				success: false,
-				message: 'You have already applied for this internship',
+				message: "You have already applied for this internship",
 			});
 		}
 
@@ -350,7 +350,7 @@ exports.applyForInternship = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Successfully applied for internship',
+			message: "Successfully applied for internship",
 			xp: xpAwarded,
 			application: application[0],
 		});
@@ -358,20 +358,20 @@ exports.applyForInternship = async (req, res) => {
 		await session.abortTransaction();
 		session.endSession();
 
-		console.error('Error applying for internship:', error);
+		console.error("Error applying for internship:", error);
 
 		// Handle duplicate application error
 		if (error.code === 11000) {
 			return res.status(400).json({
 				success: false,
-				message: 'You have already applied for this internship',
+				message: "You have already applied for this internship",
 			});
 		}
 
 		res.status(500).json({
 			success: false,
-			message: 'Application failed',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Application failed",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -393,7 +393,7 @@ exports.saveInternship = async (req, res) => {
 
 			return res.status(200).json({
 				success: true,
-				message: 'Internship saved successfully',
+				message: "Internship saved successfully",
 				isSaved: true,
 			});
 		}
@@ -413,7 +413,7 @@ exports.saveInternship = async (req, res) => {
 
 			return res.status(200).json({
 				success: true,
-				message: 'Internship removed from saved',
+				message: "Internship removed from saved",
 				isSaved: false,
 			});
 		} else {
@@ -423,16 +423,16 @@ exports.saveInternship = async (req, res) => {
 
 			return res.status(200).json({
 				success: true,
-				message: 'Internship saved successfully',
+				message: "Internship saved successfully",
 				isSaved: true,
 			});
 		}
 	} catch (error) {
-		console.error('Error saving internship:', error);
+		console.error("Error saving internship:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to save internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Failed to save internship",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -445,15 +445,15 @@ exports.updateInternship = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found',
+				message: "Internship not found",
 			});
 		}
 
 		// Check permissions
-		if (req.user.role !== 'admin' && internship.company.toString() !== req.user.id) {
+		if (req.user.role !== "admin" && internship.organizerId.toString() !== req.user.id) {
 			return res.status(403).json({
 				success: false,
-				message: 'Not authorized to update this internship',
+				message: "Not authorized to update this internship",
 			});
 		}
 
@@ -464,15 +464,15 @@ exports.updateInternship = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Internship updated successfully',
+			message: "Internship updated successfully",
 			internship: updatedInternship,
 		});
 	} catch (error) {
-		console.error('Error updating internship:', error);
+		console.error("Error updating internship:", error);
 		res.status(400).json({
 			success: false,
-			message: 'Failed to update internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Failed to update internship",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
@@ -485,15 +485,15 @@ exports.deleteInternship = async (req, res) => {
 		if (!internship) {
 			return res.status(404).json({
 				success: false,
-				message: 'Internship not found',
+				message: "Internship not found",
 			});
 		}
 
 		// Check permissions
-		if (req.user.role !== 'admin' && internship.company.toString() !== req.user.id) {
+		if (req.user.role !== "admin" && internship.organizerId.toString() !== req.user.id) {
 			return res.status(403).json({
 				success: false,
-				message: 'Not authorized to delete this internship',
+				message: "Not authorized to delete this internship",
 			});
 		}
 
@@ -501,14 +501,14 @@ exports.deleteInternship = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Internship deleted successfully',
+			message: "Internship deleted successfully",
 		});
 	} catch (error) {
-		console.error('Error deleting internship:', error);
+		console.error("Error deleting internship:", error);
 		res.status(500).json({
 			success: false,
-			message: 'Failed to delete internship',
-			error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+			message: "Failed to delete internship",
+			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
 	}
 };
