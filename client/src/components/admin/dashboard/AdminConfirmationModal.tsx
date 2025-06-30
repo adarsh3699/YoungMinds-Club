@@ -1,90 +1,90 @@
-import React, { memo, useMemo, useCallback } from 'react';
-import { ExclamationTriangleIcon, FlagIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
-import { Modal } from '../../common';
-import { AdminConfirmationModalProps, ModalConfiguration } from '@/types';
+import React, { memo, useMemo, useCallback } from "react";
+import { ExclamationTriangleIcon, FlagIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
+import { Modal } from "../../common";
+import { AdminConfirmationModalProps, ModalConfiguration } from "@/types";
 
 // Constants for better maintainability and performance
 const MODAL_TYPES = {
-	DELETE: 'delete' as const,
-	STATUS: 'status' as const,
-	FLAG: 'flag' as const,
-	DEMOTE: 'demote' as const,
+	DELETE: "delete" as const,
+	STATUS: "status" as const,
+	FLAG: "flag" as const,
+	DEMOTE: "demote" as const,
 } as const;
 
 type ModalType = (typeof MODAL_TYPES)[keyof typeof MODAL_TYPES];
 
 // Context-aware configuration factory
-const getModalConfigurations = (context: 'user' | 'event' = 'user'): Record<ModalType, ModalConfiguration> => {
-	const isEvent = context === 'event';
-	const entityType = isEvent ? 'Event' : 'User';
+const getModalConfigurations = (context: "user" | "event" = "user"): Record<ModalType, ModalConfiguration> => {
+	const isEvent = context === "event";
+	const entityType = isEvent ? "Event" : "User";
 
 	return {
 		[MODAL_TYPES.DELETE]: {
 			title: `Delete ${entityType}`,
-			iconBg: 'bg-destructive/10',
-			headerTitle: `Delete ${entityType}${isEvent ? '' : ' Account'}`,
+			iconBg: "bg-destructive/10",
+			headerTitle: `Delete ${entityType}${isEvent ? "" : " Account"}`,
 			baseMessage: `Are you sure you want to delete "${
-				isEvent ? '{userName}' : '{userName}'
+				isEvent ? "{userName}" : "{userName}"
 			}"? This action cannot be undone.`,
-			confirmClass: 'bg-destructive text-destructive-foreground hover:bg-destructive/80',
+			confirmClass: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
 			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
 			getConfirmText: (deleteAllData: boolean) =>
-				deleteAllData ? 'Delete Everything' : `Delete ${entityType} Only`,
+				deleteAllData ? "Delete Everything" : `Delete ${entityType} Only`,
 		},
 		[MODAL_TYPES.STATUS]: {
-			iconBg: 'bg-warning/10',
-			confirmClass: '',
+			iconBg: "bg-warning/10",
+			confirmClass: "",
 			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-warning" />,
 			getConfig: (isActivating: boolean) => ({
 				title: isActivating ? `Activate ${entityType}` : `Suspend ${entityType}`,
 				headerTitle: isActivating
-					? `Activate ${entityType}${isEvent ? '' : ' Account'}`
-					: `Suspend ${entityType}${isEvent ? '' : ' Account'}`,
+					? `Activate ${entityType}${isEvent ? "" : " Account"}`
+					: `Suspend ${entityType}${isEvent ? "" : " Account"}`,
 				message: isActivating
-					? `Are you sure you want to reactivate "${isEvent ? '{userName}' : '{userName}'}"? ${
+					? `Are you sure you want to reactivate "${isEvent ? "{userName}" : "{userName}"}"? ${
 							isEvent
-								? 'The event will be visible to users again.'
-								: 'They will regain access to the platform.'
+								? "The event will be visible to users again."
+								: "They will regain access to the platform."
 					  }`
-					: `Are you sure you want to suspend "${isEvent ? '{userName}' : '{userName}'}"? ${
+					: `Are you sure you want to suspend "${isEvent ? "{userName}" : "{userName}"}"? ${
 							isEvent
-								? 'The event will be hidden from users.'
-								: 'They will not be able to login until reactivated.'
+								? "The event will be hidden from users."
+								: "They will not be able to login until reactivated."
 					  }`,
-				confirmText: isActivating ? 'Activate' : 'Suspend',
+				confirmText: isActivating ? "Activate" : "Suspend",
 				confirmClass: isActivating
-					? 'bg-success text-white hover:bg-success/80'
-					: 'bg-warning text-white hover:bg-warning/80',
+					? "bg-success text-white hover:bg-success/80"
+					: "bg-warning text-white hover:bg-warning/80",
 			}),
 		},
 		[MODAL_TYPES.FLAG]: {
-			iconBg: 'bg-info/10',
-			confirmClass: 'bg-info text-white hover:bg-info/80',
+			iconBg: "bg-info/10",
+			confirmClass: "bg-info text-white hover:bg-info/80",
 			getIcon: () => <FlagIcon className="w-8 h-8 text-info" />,
 			getConfig: (isFlagged: boolean) => ({
 				title: isFlagged ? `Unflag ${entityType}` : `Flag ${entityType}`,
-				headerTitle: isFlagged ? 'Remove Flag' : `Flag ${entityType}`,
+				headerTitle: isFlagged ? "Remove Flag" : `Flag ${entityType}`,
 				message: isFlagged
-					? `Are you sure you want to remove the flag from "${isEvent ? '{userName}' : '{userName}'}"?`
-					: `Please specify a reason for flagging "${isEvent ? '{userName}' : '{userName}'}":`,
-				confirmText: isFlagged ? 'Remove Flag' : `Flag ${entityType}`,
+					? `Are you sure you want to remove the flag from "${isEvent ? "{userName}" : "{userName}"}"?`
+					: `Please specify a reason for flagging "${isEvent ? "{userName}" : "{userName}"}":`,
+				confirmText: isFlagged ? "Remove Flag" : `Flag ${entityType}`,
 			}),
 		},
 		[MODAL_TYPES.DEMOTE]: {
-			title: 'Demote Organizer',
-			iconBg: 'bg-warning/10',
-			headerTitle: 'Demote to Regular User',
+			title: "Demote Organizer",
+			iconBg: "bg-warning/10",
+			headerTitle: "Demote to Regular User",
 			baseMessage: 'Are you sure you want to demote "{userName}" to a regular user?',
-			confirmText: 'Demote to User',
-			confirmClass: 'bg-warning text-white hover:bg-warning/80',
+			confirmText: "Demote to User",
+			confirmClass: "bg-warning text-white hover:bg-warning/80",
 			getIcon: () => <ArrowDownIcon className="w-8 h-8 text-warning" />,
 		},
 	};
 };
 
-const BASE_BUTTON_CLASSES = 'flex-1 px-4 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg';
+const BASE_BUTTON_CLASSES = "flex-1 px-4 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg";
 const DISABLED_BUTTON_CLASSES = `${BASE_BUTTON_CLASSES} bg-muted text-muted-foreground cursor-not-allowed opacity-50`;
-const ACTIVE_BUTTON_TRANSFORM = 'transform hover:scale-105';
+const ACTIVE_BUTTON_TRANSFORM = "transform hover:scale-105";
 
 interface ExtendedConfig extends ModalConfiguration {
 	title: string;
@@ -104,17 +104,17 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 		onToggleDeleteAllData,
 		currentStatus,
 		isFlagged = false,
-		flagReason = '',
+		flagReason = "",
 		onFlagReasonChange,
 		onConfirm,
-		context = 'user', // Default to 'user' for backward compatibility
+		context = "user", // Default to 'user' for backward compatibility
 	}) => {
 		// Memoized modal configuration with optimized logic
 		const config = useMemo((): ExtendedConfig => {
 			const baseConfig = getModalConfigurations(context)[modalType];
 			if (!baseConfig) return {} as ExtendedConfig;
 
-			const message = (baseConfig.baseMessage || baseConfig.message || '').replace('{userName}', userName);
+			const message = (baseConfig.baseMessage || baseConfig.message || "").replace("{userName}", userName);
 
 			switch (modalType) {
 				case MODAL_TYPES.DELETE:
@@ -127,25 +127,27 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 						confirmText: baseConfig.getConfirmText!(deleteAllData),
 					};
 
-				case MODAL_TYPES.STATUS:
-					const isActivating = currentStatus === 'suspended';
+				case MODAL_TYPES.STATUS: {
+					const isActivating = currentStatus === "suspended";
 					const statusConfig = baseConfig.getConfig!(isActivating);
 					return {
 						...baseConfig,
 						...statusConfig,
-						message: statusConfig.message.replace('{userName}', userName),
+						message: statusConfig.message.replace("{userName}", userName),
 						icon: baseConfig.getIcon!(),
 						confirmClass: statusConfig.confirmClass || baseConfig.confirmClass,
 					};
+				}
 
-				case MODAL_TYPES.FLAG:
+				case MODAL_TYPES.FLAG: {
 					const flagConfig = baseConfig.getConfig!(isFlagged);
 					return {
 						...baseConfig,
 						...flagConfig,
-						message: flagConfig.message.replace('{userName}', userName),
+						message: flagConfig.message.replace("{userName}", userName),
 						icon: baseConfig.getIcon!(),
 					};
+				}
 
 				case MODAL_TYPES.DEMOTE:
 					return {
@@ -179,7 +181,7 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 			() => (
 				<>
 					<p className="text-muted-foreground mb-6">{config.message}</p>
-					{context === 'user' && (
+					{context === "user" && (
 						<>
 							<div className="bg-muted/50 rounded-xl p-4 mb-6">
 								<div className="flex items-start gap-3">
@@ -205,19 +207,19 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 							<div
 								className={`p-4 rounded-xl ${
 									deleteAllData
-										? 'bg-destructive/10 border border-destructive/20'
-										: 'bg-warning/10 border border-warning/20'
+										? "bg-destructive/10 border border-destructive/20"
+										: "bg-warning/10 border border-warning/20"
 								}`}
 							>
-								<p className={`text-sm ${deleteAllData ? 'text-destructive' : 'text-warning'}`}>
+								<p className={`text-sm ${deleteAllData ? "text-destructive" : "text-warning"}`}>
 									{deleteAllData
 										? "⚠️ All user data will be permanently deleted, including events they've created, registrations, and activity history."
-										: 'ℹ️ The user account will be deleted, but their data will remain in the system.'}
+										: "ℹ️ The user account will be deleted, but their data will remain in the system."}
 								</p>
 							</div>
 						</>
 					)}
-					{context === 'event' && (
+					{context === "event" && (
 						<div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl">
 							<p className="text-sm text-destructive">
 								⚠️ This will permanently delete the event and all associated data, including
@@ -248,8 +250,8 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 							/>
 							{!flagReason?.trim() && (
 								<p className="text-sm text-muted-foreground mt-2 italic">
-									⚠️ Please provide a reason to enable the Flag{' '}
-									{context === 'event' ? 'Event' : 'User'} button
+									⚠️ Please provide a reason to enable the Flag{" "}
+									{context === "event" ? "Event" : "User"} button
 								</p>
 							)}
 						</>
@@ -334,6 +336,6 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 	}
 );
 
-AdminConfirmationModal.displayName = 'AdminConfirmationModal';
+AdminConfirmationModal.displayName = "AdminConfirmationModal";
 
 export default AdminConfirmationModal;

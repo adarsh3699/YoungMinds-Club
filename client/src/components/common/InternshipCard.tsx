@@ -127,7 +127,6 @@ const InternshipCard = ({ internship, isRecruiter = false, onManage, onEdit, onS
 
 	// Memoized location display
 	const getLocationDisplay = useMemo(() => {
-		console.log(internship);
 		switch (internship.location?.type) {
 			case "remote":
 				return "Work from home";
@@ -205,7 +204,7 @@ const InternshipCard = ({ internship, isRecruiter = false, onManage, onEdit, onS
 			// Has complete company profile (name and logo)
 			hasCompleteProfile: !!(
 				internship.company?.name &&
-				internship.company.name !== "Company Name" &&
+				internship.company?.name !== "Company Name" &&
 				(internship.logo || internship.companyLogo)
 			),
 

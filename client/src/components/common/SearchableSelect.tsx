@@ -43,8 +43,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
 	// Memoize display value
 	const displayValue = useMemo(
-		() => searchTerm || (selectedOption ? selectedOption.label : ""),
-		[searchTerm, selectedOption]
+		() => searchTerm || (selectedOption ? selectedOption.label : value || ""),
+		[searchTerm, selectedOption, value]
 	);
 
 	// Memoize filtered options to avoid filtering on every render
@@ -60,12 +60,19 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 	}, [options, searchTerm]);
 
 	// Close dropdown when clicking outside
-	const handleClickOutside = useCallback((event: MouseEvent) => {
-		if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-			setIsOpen(false);
-			setSearchTerm("");
-		}
-	}, []);
+	const handleClickOutside = useCallback(
+		(event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				// If there's a search term and no exact matches, use the search term as custom value
+				if (searchTerm && filteredOptions.length === 0) {
+					onChange({ target: { name, value: searchTerm } });
+				}
+				setIsOpen(false);
+				setSearchTerm("");
+			}
+		},
+		[searchTerm, filteredOptions.length, onChange, name]
+	);
 
 	// Handle input focus - open dropdown and select text
 	const handleInputFocus = useCallback(() => {
@@ -103,6 +110,19 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 					setSearchTerm("");
 					inputRef.current?.blur();
 					break;
+				case "Enter":
+					e.preventDefault();
+					if (searchTerm && filteredOptions.length === 0) {
+						// Use search term as custom value if no matches found
+						onChange({ target: { name, value: searchTerm } });
+						setIsOpen(false);
+						setSearchTerm("");
+						inputRef.current?.blur();
+					} else if (filteredOptions.length === 1) {
+						// Auto-select if only one option matches
+						handleSelectOption(filteredOptions[0].value);
+					}
+					break;
 				case "ArrowDown":
 					if (!isOpen) setIsOpen(true);
 					break;
@@ -115,7 +135,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 					break;
 			}
 		},
-		[isOpen, searchTerm, value, onChange, name]
+		[isOpen, searchTerm, value, onChange, name, filteredOptions, handleSelectOption]
 	);
 
 	// Setup click outside listener
@@ -176,10 +196,10 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 						</div>
 						<div
 							className="cursor-pointer select-none relative py-3 pl-4 pr-10 transition-all duration-200 ease-out group ym-text-card hover:ym-bg-card-hover hover:ym-text-primary hover:scale-[1.01] hover:mx-1 hover:rounded-lg hover:shadow-sm"
-							onClick={() => handleSelectOption("Other")}
+							onClick={() => handleSelectOption(searchTerm)}
 						>
 							<span className="block truncate transition-all duration-200 font-normal group-hover:translate-x-1">
-								Other
+								Use "{searchTerm}" as custom value
 							</span>
 							<div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-r-full" />
 						</div>

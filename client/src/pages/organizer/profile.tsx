@@ -16,7 +16,7 @@ import {
 	ChatBubbleLeftRightIcon,
 	CameraIcon as InstagramIcon,
 } from "@heroicons/react/24/outline";
-import { FormInput, TextareaField, getErrorMessage } from "../../components/common";
+import { FormInput, TextareaField, SearchableSelect, getErrorMessage } from "../../components/common";
 import {
 	OrganizerProfileData,
 	OrganizerFormValues,
@@ -32,6 +32,22 @@ const Profile: React.FC = () => {
 	const [organizerProfile, setOrganizerProfile] = useState<OrganizerProfileData | null>(null);
 	const [feedbackSummary, setFeedbackSummary] = useState<OrganizerFeedbackSummary | null>(null);
 	const [editMode, setEditMode] = useState<boolean>(false);
+	const [cityOptions, setCityOptions] = useState<{ value: string; label: string }[]>([]);
+	const [stateOptions, setStateOptions] = useState<{ value: string; label: string; iso2?: string }[]>([]);
+	const [countryOptions, setCountryOptions] = useState<{ value: string; label: string; iso2: string }[]>([]);
+	const [selectedCountryIso, setSelectedCountryIso] = useState<string>("IN");
+	const [loadingCountries, setLoadingCountries] = useState<boolean>(false);
+	const [loadingStates, setLoadingStates] = useState<boolean>(false);
+	const [loadingCities, setLoadingCities] = useState<boolean>(false);
+	const [locationCache, setLocationCache] = useState<{
+		countries: { value: string; label: string; iso2: string }[];
+		states: { [countryIso: string]: { value: string; label: string; iso2?: string }[] };
+		cities: { [key: string]: { value: string; label: string }[] };
+	}>({
+		countries: [],
+		states: {},
+		cities: {},
+	});
 	const [formValues, setFormValues] = useState<OrganizerFormValues>({
 		name: "",
 		organizationName: "",
@@ -43,8 +59,110 @@ const Profile: React.FC = () => {
 			twitter: "",
 			instagram: "",
 		},
+		location: {
+			city: "",
+			state: "",
+			country: "India",
+			address: "",
+		},
 	});
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	// Generic API fetch function with caching
+	const fetchLocationData = async (
+		endpoint: string,
+		cacheKey: string,
+		cacheType: "countries" | "states" | "cities"
+	): Promise<{ value: string; label: string; iso2?: string }[]> => {
+		// Check cache first
+		if (cacheType === "countries" && locationCache.countries.length > 0) {
+			return locationCache.countries;
+		}
+		if (cacheType === "states" && locationCache.states[cacheKey]) {
+			return locationCache.states[cacheKey];
+		}
+		if (cacheType === "cities" && locationCache.cities[cacheKey]) {
+			return locationCache.cities[cacheKey];
+		}
+
+		// Set loading state
+		if (cacheType === "countries") setLoadingCountries(true);
+		else if (cacheType === "states") setLoadingStates(true);
+		else if (cacheType === "cities") setLoadingCities(true);
+
+		try {
+			const response = await axios.get(endpoint);
+			if (response.data.success) {
+				const data = response.data[cacheType];
+
+				// Update cache
+				setLocationCache((prev) => {
+					const newCache = { ...prev };
+					if (cacheType === "countries") {
+						newCache.countries = data;
+					} else if (cacheType === "states") {
+						newCache.states[cacheKey] = data;
+					} else if (cacheType === "cities") {
+						newCache.cities[cacheKey] = data;
+					}
+					return newCache;
+				});
+
+				return data;
+			}
+			return [];
+		} catch (error) {
+			console.error(`Error fetching ${cacheType}:`, error);
+			return [];
+		} finally {
+			// Clear loading state
+			if (cacheType === "countries") setLoadingCountries(false);
+			else if (cacheType === "states") setLoadingStates(false);
+			else if (cacheType === "cities") setLoadingCities(false);
+		}
+	};
+
+	const loadLocationOptions = async (countryIso?: string, stateIso?: string): Promise<void> => {
+		try {
+			// Load countries if not cached
+			if (locationCache.countries.length === 0) {
+				const countries = await fetchLocationData("/filters/countries", "", "countries");
+				setCountryOptions(countries as { value: string; label: string; iso2: string }[]);
+
+				// Set default country ISO if countries loaded
+				if (!countryIso && countries.length > 0) {
+					const defaultCountry = countries.find((c) => c.value === "India");
+					if (defaultCountry && defaultCountry.iso2) {
+						setSelectedCountryIso(defaultCountry.iso2);
+						countryIso = defaultCountry.iso2;
+					}
+				}
+			} else {
+				setCountryOptions(locationCache.countries);
+			}
+
+			// Load states for specified country
+			if (countryIso) {
+				const states = await fetchLocationData(`/filters/states/${countryIso}`, countryIso, "states");
+				setStateOptions(states);
+
+				// Load cities if state is specified
+				if (stateIso) {
+					const cityKey = `${countryIso}-${stateIso}`;
+					const cities = await fetchLocationData(
+						`/filters/cities/${countryIso}/${stateIso}`,
+						cityKey,
+						"cities"
+					);
+					setCityOptions(cities);
+				} else {
+					setCityOptions([]);
+				}
+			}
+		} catch (error) {
+			console.error("Error loading location options:", error);
+		}
+	};
 
 	useEffect(() => {
 		const fetchProfileData = async (): Promise<void> => {
@@ -70,6 +188,12 @@ const Profile: React.FC = () => {
 							twitter: profileData.socialLinks?.twitter || "",
 							instagram: profileData.socialLinks?.instagram || "",
 						},
+						location: {
+							city: profileData.location?.city || "",
+							state: profileData.location?.state || "",
+							country: profileData.location?.country || "India",
+							address: profileData.location?.address || "",
+						},
 					});
 				}
 
@@ -78,6 +202,9 @@ const Profile: React.FC = () => {
 					"/organizer/feedback/summary"
 				);
 				setFeedbackSummary(feedbackResponse.data.summary);
+
+				// Don't load location data on page load - only when entering edit mode
+				// This improves performance and reduces unnecessary API calls
 			} catch (error) {
 				console.error("Error fetching profile data:", error);
 				setError("Failed to load profile data. Please try again.");
@@ -92,6 +219,8 @@ const Profile: React.FC = () => {
 	const toggleEditMode = (): void => {
 		if (editMode) {
 			// Reset form values when canceling edit
+			const resetCountry = organizerProfile?.location?.country || "India";
+
 			setFormValues({
 				name: organizerProfile?.name || "",
 				organizationName: organizerProfile?.organizationName || "",
@@ -103,7 +232,25 @@ const Profile: React.FC = () => {
 					twitter: organizerProfile?.socialLinks?.twitter || "",
 					instagram: organizerProfile?.socialLinks?.instagram || "",
 				},
+				location: {
+					city: organizerProfile?.location?.city || "",
+					state: organizerProfile?.location?.state || "",
+					country: resetCountry,
+					address: organizerProfile?.location?.address || "",
+				},
 			});
+		} else {
+			// Load location data when entering edit mode (non-blocking)
+			// Only load if we don't have cached data
+			if (locationCache.countries.length === 0) {
+				loadLocationOptions("IN"); // Default to India - don't await this
+			} else {
+				// Set options from cache immediately
+				setCountryOptions(locationCache.countries);
+				if (locationCache.states["IN"]) {
+					setStateOptions(locationCache.states["IN"]);
+				}
+			}
 		}
 		setEditMode(!editMode);
 	};
@@ -125,6 +272,57 @@ const Profile: React.FC = () => {
 				[name]: value,
 			},
 		});
+	};
+
+	const handleLocationChange = async (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { name: string; value: string } }
+	): Promise<void> => {
+		const { name, value } = e.target;
+
+		// If country is changed, load states for the new country
+		if (name === "country") {
+			const selectedCountry = countryOptions.find((c) => c.value === value);
+			if (selectedCountry) {
+				setSelectedCountryIso(selectedCountry.iso2);
+				await loadLocationOptions(selectedCountry.iso2);
+			}
+			// Reset state and city when country changes
+			setFormValues({
+				...formValues,
+				location: {
+					...formValues.location,
+					[name]: value,
+					state: "",
+					city: "",
+				},
+			});
+		} else if (name === "state") {
+			// If state is changed, load cities for the new state
+			const selectedState = stateOptions.find((s) => s.value === value);
+			if (selectedState && selectedState.iso2) {
+				await loadLocationOptions(selectedCountryIso, selectedState.iso2);
+			} else {
+				// If state doesn't have ISO code (fallback), clear cities
+				setCityOptions([]);
+			}
+			// Reset city when state changes
+			setFormValues({
+				...formValues,
+				location: {
+					...formValues.location,
+					[name]: value,
+					city: "",
+				},
+			});
+		} else {
+			setFormValues({
+				...formValues,
+				location: {
+					...formValues.location,
+					[name]: value,
+				},
+			});
+		}
 	};
 
 	const saveProfile = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -472,6 +670,77 @@ const Profile: React.FC = () => {
 														className="animate-fade-in"
 													/>
 
+													{/* Location Fields */}
+													<div className="space-y-6">
+														<h3 className="text-lg font-semibold text-card-foreground flex items-center">
+															<GlobeAltIcon className="h-5 w-5 text-primary mr-2" />
+															Location Details
+														</h3>
+														<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+															<SearchableSelect
+																id="city"
+																name="city"
+																value={formValues.location.city || ""}
+																onChange={handleLocationChange}
+																options={cityOptions}
+																placeholder={
+																	loadingCities
+																		? "Loading cities..."
+																		: "Select your city"
+																}
+																searchPlaceholder="Search Indian cities..."
+																label="City"
+																disabled={loadingCities}
+															/>
+
+															<SearchableSelect
+																id="state"
+																name="state"
+																value={formValues.location.state || ""}
+																onChange={handleLocationChange}
+																options={stateOptions}
+																placeholder={
+																	loadingStates
+																		? "Loading states..."
+																		: "Select your state"
+																}
+																searchPlaceholder="Search Indian states..."
+																label="State"
+																disabled={loadingStates}
+															/>
+														</div>
+
+														<div className="grid grid-cols-1 gap-6">
+															<SearchableSelect
+																id="country"
+																name="country"
+																value={formValues.location.country || ""}
+																onChange={handleLocationChange}
+																options={countryOptions}
+																placeholder={
+																	loadingCountries
+																		? "Loading countries..."
+																		: "Select your country"
+																}
+																searchPlaceholder="Search countries..."
+																label="Country"
+																disabled={loadingCountries}
+															/>
+														</div>
+
+														<TextareaField
+															id="address"
+															name="address"
+															value={formValues.location.address || ""}
+															onChange={handleLocationChange}
+															label="Complete Address"
+															placeholder="Enter your complete address..."
+															rows={3}
+															maxLength={200}
+															className="animate-fade-in"
+														/>
+													</div>
+
 													<div className="flex justify-end space-x-4 pt-6">
 														<button
 															type="button"
@@ -567,6 +836,63 @@ const Profile: React.FC = () => {
 															<p className="text-primary ml-7 leading-relaxed">
 																{organizerProfile.bio}
 															</p>
+														</div>
+													)}
+
+													{/* Location Information */}
+													{(organizerProfile.location?.city ||
+														organizerProfile.location?.state ||
+														organizerProfile.location?.country ||
+														organizerProfile.location?.address) && (
+														<div className="group p-4 rounded-xl hover:bg-muted/30 transition-all duration-200">
+															<div className="flex items-center mb-3">
+																<GlobeAltIcon className="h-5 w-5 text-primary mr-2" />
+																<p className="text-sm font-medium text-muted-foreground">
+																	Location
+																</p>
+															</div>
+															<div className="ml-7 space-y-2">
+																{organizerProfile.location?.city && (
+																	<div>
+																		<span className="text-sm text-muted-foreground">
+																			City:{" "}
+																		</span>
+																		<span className="text-base font-medium text-card-foreground">
+																			{organizerProfile.location.city}
+																		</span>
+																	</div>
+																)}
+																{organizerProfile.location?.state && (
+																	<div>
+																		<span className="text-sm text-muted-foreground">
+																			State:{" "}
+																		</span>
+																		<span className="text-base font-medium text-card-foreground">
+																			{organizerProfile.location.state}
+																		</span>
+																	</div>
+																)}
+																{organizerProfile.location?.country && (
+																	<div>
+																		<span className="text-sm text-muted-foreground">
+																			Country:{" "}
+																		</span>
+																		<span className="text-base font-medium text-card-foreground">
+																			{organizerProfile.location.country}
+																		</span>
+																	</div>
+																)}
+																{organizerProfile.location?.address && (
+																	<div>
+																		<span className="text-sm text-muted-foreground">
+																			Address:{" "}
+																		</span>
+																		<span className="text-base text-card-foreground">
+																			{organizerProfile.location.address}
+																		</span>
+																	</div>
+																)}
+															</div>
 														</div>
 													)}
 												</div>

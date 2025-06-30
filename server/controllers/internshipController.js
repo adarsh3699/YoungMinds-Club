@@ -149,7 +149,7 @@ exports.getInternshipById = async (req, res) => {
 	try {
 		const internship = await Internship.findById(req.params.id).populate(
 			"organizerId",
-			"name email organizationName organizerBrandLogo website description"
+			"name email organizationName organizerBrandLogo website description bio socialLinks"
 		);
 
 		if (!internship) {
@@ -159,12 +159,38 @@ exports.getInternshipById = async (req, res) => {
 			});
 		}
 
-		// Check if the internship is published and not flagged (public access)
-		if (internship.isPublished && !internship.isFlagged && internship.status === "published") {
-			return res.status(200).json({
-				success: true,
-				internship,
+		// Prepare response data
+		let responseData = {
+			success: true,
+			internship,
+		};
+
+		// Add user status if user is authenticated
+		if (req.user) {
+			const userId = req.user.id;
+
+			// Check if user has applied for this internship
+			const hasApplied = await InternshipApplication.findOne({
+				user: userId,
+				internship: req.params.id,
 			});
+
+			// Check if user has saved this internship
+			const UserActivity = require("../models/UserActivity");
+			const userActivity = await UserActivity.findOne({ user: userId });
+			const hasSaved = userActivity?.savedInternships?.includes(req.params.id) || false;
+
+			responseData.userStatus = {
+				isApplied: !!hasApplied,
+				isSaved: hasSaved,
+			};
+		}
+
+		// Check access permissions for non-public internships
+		const isPublicAccess = internship.isPublished && !internship.isFlagged && internship.status === "published";
+
+		if (isPublicAccess) {
+			return res.status(200).json(responseData);
 		}
 
 		// For draft or flagged internships, check user permissions
@@ -177,18 +203,12 @@ exports.getInternshipById = async (req, res) => {
 
 		// Allow admin to view any internship
 		if (req.user.role === "admin") {
-			return res.status(200).json({
-				success: true,
-				internship,
-			});
+			return res.status(200).json(responseData);
 		}
 
 		// Allow company/recruiter to view their own internships
 		if (req.user.role === "organizer" && internship.organizerId._id.toString() === req.user._id.toString()) {
-			return res.status(200).json({
-				success: true,
-				internship,
-			});
+			return res.status(200).json(responseData);
 		}
 
 		// For all other cases, deny access

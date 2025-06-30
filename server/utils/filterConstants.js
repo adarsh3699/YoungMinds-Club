@@ -1361,7 +1361,49 @@ const CITY_ARRAY = [
 	"Zirakpur",
 ];
 
+// Indian States and Union Territories
+const STATE_ARRAY = [
+	"Andhra Pradesh",
+	"Arunachal Pradesh",
+	"Assam",
+	"Bihar",
+	"Chhattisgarh",
+	"Goa",
+	"Gujarat",
+	"Haryana",
+	"Himachal Pradesh",
+	"Jammu and Kashmir",
+	"Jharkhand",
+	"Karnataka",
+	"Kerala",
+	"Ladakh",
+	"Madhya Pradesh",
+	"Maharashtra",
+	"Manipur",
+	"Meghalaya",
+	"Mizoram",
+	"Nagaland",
+	"Odisha",
+	"Punjab",
+	"Rajasthan",
+	"Sikkim",
+	"Tamil Nadu",
+	"Telangana",
+	"Tripura",
+	"Uttarakhand",
+	"Uttar Pradesh",
+	"West Bengal",
+	// Union Territories
+	"Andaman and Nicobar Islands",
+	"Chandigarh",
+	"Dadra and Nagar Haveli and Daman and Diu",
+	"Delhi",
+	"Lakshadweep",
+	"Puducherry",
+];
+
 module.exports = {
 	CATEGORY_ARRAY,
 	CITY_ARRAY,
+	STATE_ARRAY,
 };

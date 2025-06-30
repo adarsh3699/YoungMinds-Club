@@ -57,10 +57,10 @@ export interface OrganizerFeedbackApiResponse {
 // Organizer Dashboard Component Props
 export interface DashboardOverviewProps {
   type?: 'events' | 'internships';
-  onCreateAction: any;
-  title?: any;
-  subtitle?: any;
-  buttonText?: any;
+  onCreateAction: () => void;
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
   // Direct data props for events
   totalEvents?: number;
   totalRegistrations?: number;
@@ -170,6 +170,13 @@ export interface SocialLinks {
   instagram?: string;
 }
 
+export interface OrganizerLocation {
+  city?: string;
+  state?: string;
+  country?: string;
+  address?: string;
+}
+
 export interface OrganizerProfileData {
   _id?: string;
   name: string;
@@ -178,6 +185,7 @@ export interface OrganizerProfileData {
   email: string;
   organizerBrandLogo?: string;
   socialLinks?: SocialLinks;
+  location?: OrganizerLocation;
   rating?: number;
   totalEvents?: number;
   totalRevenue?: number;
@@ -191,6 +199,7 @@ export interface OrganizerFormValues {
   bio: string;
   email: string;
   socialLinks: SocialLinks;
+  location: OrganizerLocation;
 }
 
 export interface OrganizerProfileApiResponse {

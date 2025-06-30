@@ -33,6 +33,12 @@ exports.getProfile = async (req, res) => {
 				twitter: "",
 				instagram: "",
 			},
+			location: user.location || {
+				city: "",
+				state: "",
+				country: "India",
+				address: "",
+			},
 		};
 
 		res.status(200).json({
@@ -52,7 +58,7 @@ exports.getProfile = async (req, res) => {
 // Update organizer profile
 exports.updateProfile = async (req, res) => {
 	try {
-		const { name, email, organizationName, bio, socialLinks } = req.body;
+		const { name, email, organizationName, bio, socialLinks, location } = req.body;
 
 		// Create object with allowed fields
 		const updateData = {};
@@ -61,6 +67,7 @@ exports.updateProfile = async (req, res) => {
 		if (organizationName !== undefined) updateData.organizationName = organizationName;
 		if (bio !== undefined) updateData.bio = bio;
 		if (socialLinks) updateData.socialLinks = socialLinks;
+		if (location) updateData.location = location;
 
 		// Update user
 		const user = await User.findByIdAndUpdate(req.user._id, updateData, { new: true, runValidators: true }).select(
@@ -87,6 +94,12 @@ exports.updateProfile = async (req, res) => {
 				linkedin: "",
 				twitter: "",
 				instagram: "",
+			},
+			location: user.location || {
+				city: "",
+				state: "",
+				country: "India",
+				address: "",
 			},
 		};
 

@@ -66,7 +66,7 @@ export interface StatsCardProps {
 }
 
 // Loading Component Props
-export interface LoadingComponentProps {}
+export type LoadingComponentProps = Record<string, never>;
 
 // Admin Table Header Configuration
 export interface AdminTableColumn {
@@ -78,10 +78,12 @@ export interface AdminTableColumn {
 // Admin Table Props (formerly UsersTableProps)
 export interface AdminTableProps {
   loading: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filteredItems: any[];
   searchTerm: string;
   roleFilter?: string;
   statusFilter: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderRow: (item: any, index: number) => React.ReactNode;
   columns: AdminTableColumn[];
   emptyStateConfig?: {
@@ -119,10 +121,12 @@ export interface LoadingSpinnerProps {
 // Backward compatibility - deprecated, use AdminTableProps instead
 export interface UsersTableProps {
   loading: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filteredUsers: any[];
   searchTerm: string;
   roleFilter?: string;
   statusFilter: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderUserRow: (userData: any, index: number) => React.ReactNode;
 }
 

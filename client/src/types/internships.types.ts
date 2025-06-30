@@ -96,6 +96,7 @@ export interface InternshipCompany {
 export interface InternshipDetailsData {
   _id: string;
   title: string;
+  companyName?: string;
   internshipDescription?: string;
   companyDescription?: string;
   startDate: string;
@@ -112,7 +113,23 @@ export interface InternshipDetailsData {
   stipend?: number;
   duration: string;
   logo: string;
-  company: InternshipCompany;
+  company?: InternshipCompany;
+  organizerId?: {
+    _id: string;
+    name: string;
+    email: string;
+    organizationName?: string;
+    organizerBrandLogo?: string;
+    website?: string;
+    description?: string;
+    bio?: string;
+    socialLinks?: {
+      website?: string;
+      linkedin?: string;
+      twitter?: string;
+      instagram?: string;
+    };
+  };
   applicationCount: number;
   capacity: number;
   tags?: string[];
@@ -128,6 +145,15 @@ export interface InternshipDetailsData {
   updatedAt: string;
 }
 
+export interface InternshipDetailsResponse {
+  success: boolean;
+  internship: InternshipDetailsData;
+  userStatus?: {
+    isApplied: boolean;
+    isSaved: boolean;
+  };
+}
+
 // Internship Application Response Types
 export interface InternshipApplicationResponse {
   success: boolean;
@@ -140,12 +166,6 @@ export interface InternshipSaveResponse {
   success: boolean;
   message: string;
   isSaved: boolean;
-}
-
-export interface UserInternshipsResponse {
-  success: boolean;
-  internships?: Array<{ id: string; title: string; startDate: string }>;
-  savedInternships?: Array<{ id: string; title: string; startDate: string }>;
 }
 
 // Internship Details Component Props

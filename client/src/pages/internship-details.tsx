@@ -8,7 +8,7 @@ import {
 	InternshipDetailsData,
 	InternshipApplicationResponse,
 	InternshipSaveResponse,
-	UserInternshipsResponse,
+	InternshipDetailsResponse,
 } from "@/types";
 
 const InternshipDetails: React.FC = () => {
@@ -46,34 +46,17 @@ const InternshipDetails: React.FC = () => {
 
 			setLoading(true);
 			try {
-				const response: AxiosResponse<{ success: boolean; internship: InternshipDetailsData }> =
-					await axios.get(`/internships/${id}`);
+				const response: AxiosResponse<InternshipDetailsResponse> = await axios.get(`/internships/${id}`);
 				setInternship(response.data.internship || null);
 
-				// If user is authenticated, check if they've saved or applied for this internship
-				if (isAuthenticated) {
-					try {
-						const userInternshipsResponse: AxiosResponse<UserInternshipsResponse> = await axios.get(
-							"/user/internships"
-						);
-
-						// Check if internship is saved
-						const internshipIsSaved = userInternshipsResponse.data.savedInternships?.some(
-							(savedInternship) => savedInternship.id === id
-						);
-						setIsSaved(internshipIsSaved || false);
-
-						// Check if internship is applied
-						const internshipIsApplied = userInternshipsResponse.data.internships?.some(
-							(appliedInternship) => appliedInternship.id === id
-						);
-						setIsApplied(internshipIsApplied || false);
-					} catch (userDataError) {
-						// Silently handle the case where user internships endpoint doesn't exist
-						console.log("User internships data not available \n", userDataError);
-						setIsSaved(false);
-						setIsApplied(false);
-					}
+				// Set user status from the response (if authenticated)
+				if (response.data.userStatus) {
+					setIsSaved(response.data.userStatus.isSaved);
+					setIsApplied(response.data.userStatus.isApplied);
+				} else {
+					// Reset status if not authenticated
+					setIsSaved(false);
+					setIsApplied(false);
 				}
 			} catch (error) {
 				console.error("Error fetching internship details:", error);
@@ -136,7 +119,9 @@ const InternshipDetails: React.FC = () => {
 		if (!internship) return "#";
 
 		const startDate = formatDate(internship.startDate);
-		const shareText = `Check out this internship: "${internship.title}" at ${internship.company.name}. Starts ${startDate}. Apply here: ${window.location.href}`;
+		const shareText = `Check out this internship: "${internship.title}" at ${
+			internship.companyName || internship.company?.name || "this company"
+		}. Starts ${startDate}. Apply here: ${window.location.href}`;
 
 		return `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 	};
@@ -269,7 +254,7 @@ const InternshipDetails: React.FC = () => {
 						<div className="rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
 							<img
 								src={internship.logo || "https://via.placeholder.com/400x300?text=Company+Logo"}
-								alt={internship.company.name}
+								alt={internship.companyName || internship.company?.name || "Company Logo"}
 								className="w-full h-auto object-cover"
 							/>
 						</div>
@@ -374,7 +359,9 @@ const InternshipDetails: React.FC = () => {
 									</h1>
 									<p className="ym-text-secondary mb-3">{internship.companyDescription}</p>
 									<p className="text-lg font-semibold ym-text-primary mb-3">
-										{internship.company.name}
+										{internship.companyName ||
+											internship.company?.name ||
+											"Company Name Not Available"}
 									</p>
 								</div>
 
@@ -639,27 +626,299 @@ const InternshipDetails: React.FC = () => {
 									label: "Company",
 									content: (
 										<div className="space-y-6">
-											<div>
-												<h3 className="text-lg font-semibold ym-text-primary mb-3">
-													About {internship.company.name}
-												</h3>
-												<div className="ym-text-secondary">
-													{internship.company.description ||
-														"Company information not available."}
+											{/* Company Header with Logo */}
+											<div className="flex items-start gap-4">
+												{/* Company Logo */}
+												{(internship.organizerId?.organizerBrandLogo || internship.logo) && (
+													<div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
+														<img
+															src={
+																internship.organizerId?.organizerBrandLogo ||
+																internship.logo
+															}
+															alt="Company Logo"
+															className="w-full h-full object-cover"
+														/>
+													</div>
+												)}
+
+												{/* Company Info */}
+												<div className="flex-1">
+													<h3 className="text-xl font-bold ym-text-primary">
+														{internship.organizerId?.organizationName ||
+															internship.companyName ||
+															"Company Name"}
+													</h3>
 												</div>
 											</div>
 
-											{internship.company.website && (
+											{/* Company Details Grid */}
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+												{/* Contact Information */}
+												<div className="space-y-4">
+													<h4 className="font-semibold ym-text-primary text-lg">
+														Contact Information
+													</h4>
+
+													{internship.organizerId?.email && (
+														<div className="flex items-center gap-3">
+															<div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+																<svg
+																	className="w-4 h-4 text-blue-600"
+																	fill="currentColor"
+																	viewBox="0 0 20 20"
+																>
+																	<path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+																	<path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+																</svg>
+															</div>
+															<div>
+																<p className="text-sm font-medium ym-text-primary">
+																	Email
+																</p>
+																<a
+																	href={`mailto:${internship.organizerId.email}`}
+																	className="text-blue-600 hover:text-blue-800 underline text-sm"
+																>
+																	{internship.organizerId.email}
+																</a>
+															</div>
+														</div>
+													)}
+
+													{internship.organizerId?.website && (
+														<div className="flex items-center gap-3">
+															<div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+																<svg
+																	className="w-4 h-4 text-green-600"
+																	fill="currentColor"
+																	viewBox="0 0 20 20"
+																>
+																	<path
+																		fillRule="evenodd"
+																		d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z"
+																		clipRule="evenodd"
+																	/>
+																</svg>
+															</div>
+															<div>
+																<p className="text-sm font-medium ym-text-primary">
+																	Website
+																</p>
+																<a
+																	href={
+																		internship.organizerId.website.startsWith(
+																			"http"
+																		)
+																			? internship.organizerId.website
+																			: `https://${internship.organizerId.website}`
+																	}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="text-blue-600 hover:text-blue-800 underline text-sm"
+																>
+																	{internship.organizerId.website}
+																</a>
+															</div>
+														</div>
+													)}
+												</div>
+
+												{/* Organization Details */}
+												<div className="space-y-4">
+													<h4 className="font-semibold ym-text-primary text-lg">
+														Organization Details
+													</h4>
+
+													{internship.organizerId?.name && (
+														<div className="flex items-center gap-3">
+															<div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+																<svg
+																	className="w-4 h-4 text-purple-600"
+																	fill="currentColor"
+																	viewBox="0 0 20 20"
+																>
+																	<path
+																		fillRule="evenodd"
+																		d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+																		clipRule="evenodd"
+																	/>
+																</svg>
+															</div>
+															<div>
+																<p className="text-sm font-medium ym-text-primary">
+																	Organizer
+																</p>
+																<p className="text-sm ym-text-secondary">
+																	{internship.organizerId.name}
+																</p>
+															</div>
+														</div>
+													)}
+
+													<div className="flex items-center gap-3">
+														<div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+															<svg
+																className="w-4 h-4 text-indigo-600"
+																fill="currentColor"
+																viewBox="0 0 20 20"
+															>
+																<path
+																	fillRule="evenodd"
+																	d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+																	clipRule="evenodd"
+																/>
+															</svg>
+														</div>
+														<div>
+															<p className="text-sm font-medium ym-text-primary">
+																Organization Type
+															</p>
+															<p className="text-sm ym-text-secondary">
+																{internship.organizerId?.organizationName
+																	? "Organization"
+																	: "Individual"}
+															</p>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											{/* Social Media Links */}
+											{((internship.organizerId?.socialLinks &&
+												(internship.organizerId.socialLinks?.linkedin ||
+													internship.organizerId.socialLinks?.twitter ||
+													internship.organizerId.socialLinks?.instagram ||
+													internship.organizerId.socialLinks?.website)) ||
+												internship.organizerId?.website) && (
 												<div>
-													<h4 className="font-semibold ym-text-primary mb-2">Website</h4>
-													<a
-														href={internship.company.website}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="text-blue-600 hover:text-blue-800 underline"
-													>
-														{internship.company.website}
-													</a>
+													<h4 className="font-semibold ym-text-primary text-lg mb-3">
+														Connect with Us
+													</h4>
+													<div className="flex flex-wrap gap-3">
+														{(internship.organizerId?.socialLinks?.website ||
+															internship.organizerId?.website) && (
+															<a
+																href={
+																	(
+																		internship.organizerId.socialLinks?.website ||
+																		internship.organizerId.website
+																	)?.startsWith("http")
+																		? internship.organizerId.socialLinks?.website ||
+																		  internship.organizerId.website
+																		: `https://${
+																				internship.organizerId.socialLinks
+																					?.website ||
+																				internship.organizerId.website
+																		  }`
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium"
+															>
+																<svg
+																	className="w-4 h-4"
+																	fill="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path
+																		fillRule="evenodd"
+																		d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z"
+																		clipRule="evenodd"
+																	/>
+																</svg>
+																Website
+															</a>
+														)}
+
+														{internship.organizerId?.socialLinks?.linkedin && (
+															<a
+																href={
+																	internship.organizerId?.socialLinks?.linkedin?.startsWith(
+																		"http"
+																	)
+																		? internship.organizerId.socialLinks.linkedin
+																		: `https://linkedin.com/in/${internship.organizerId?.socialLinks?.linkedin}`
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+															>
+																<svg
+																	className="w-4 h-4"
+																	fill="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+																</svg>
+																LinkedIn
+															</a>
+														)}
+
+														{internship.organizerId?.socialLinks?.twitter && (
+															<a
+																href={
+																	internship.organizerId?.socialLinks?.twitter?.startsWith(
+																		"http"
+																	)
+																		? internship.organizerId?.socialLinks?.twitter
+																		: `https://twitter.com/${internship.organizerId?.socialLinks?.twitter}`
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors text-sm font-medium"
+															>
+																<svg
+																	className="w-4 h-4"
+																	fill="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+																</svg>
+																Twitter
+															</a>
+														)}
+
+														{internship.organizerId?.socialLinks?.instagram && (
+															<a
+																href={
+																	internship.organizerId?.socialLinks?.instagram?.startsWith(
+																		"http"
+																	)
+																		? internship.organizerId?.socialLinks?.instagram
+																		: `https://instagram.com/${internship.organizerId?.socialLinks?.instagram}`
+																}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg transition-colors text-sm font-medium"
+															>
+																<svg
+																	className="w-4 h-4"
+																	fill="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+																</svg>
+																Instagram
+															</a>
+														)}
+													</div>
+												</div>
+											)}
+
+											{/* Additional Company Description */}
+											{(internship.companyDescription ||
+												internship.organizerId?.description ||
+												internship.organizerId?.bio) && (
+												<div>
+													<h4 className="font-semibold ym-text-primary text-lg mb-3">
+														About the Company
+													</h4>
+													<div className="ym-text-secondary text-sm leading-relaxed">
+														{internship.companyDescription ||
+															internship.organizerId?.description ||
+															internship.organizerId?.bio}
+													</div>
 												</div>
 											)}
 										</div>

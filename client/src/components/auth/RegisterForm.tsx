@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { FormInput, Button, SelectInput } from '../common';
-import { SocialLogin } from './';
-import { RegisterFormData, AuthFormErrors, RoleOption } from '@/types';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { FormInput, Button, SelectInput } from "../common";
+import { SocialLogin } from "./";
+import { RegisterFormData, AuthFormErrors, RoleOption } from "@/types";
 
 const RegisterForm: React.FC = () => {
 	const [formData, setFormData] = useState<RegisterFormData>({
-		name: '',
-		email: '',
-		password: '',
-		confirmPassword: '',
-		role: 'user',
+		name: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+		role: "user",
 	});
 	const [formErrors, setFormErrors] = useState<AuthFormErrors>({});
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const { register, error } = useAuth();
 	const navigate = useNavigate();
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: string | number } }): void => {
+	const handleChange = (
+		e: React.ChangeEvent<HTMLInputElement> | { target: { name: string; value: string | number } }
+	): void => {
 		const { name, value } = e.target;
 		setFormData({
 			...formData,
@@ -30,23 +32,23 @@ const RegisterForm: React.FC = () => {
 		const errors: AuthFormErrors = {};
 
 		if (!data.name?.trim()) {
-			errors.name = 'Name is required';
+			errors.name = "Name is required";
 		}
 
 		if (!data.email) {
-			errors.email = 'Email is required';
+			errors.email = "Email is required";
 		} else if (!/\S+@\S+\.\S+/.test(data.email)) {
-			errors.email = 'Email is invalid';
+			errors.email = "Email is invalid";
 		}
 
 		if (!data.password) {
-			errors.password = 'Password is required';
+			errors.password = "Password is required";
 		} else if (data.password.length < 6) {
-			errors.password = 'Password must be at least 6 characters';
+			errors.password = "Password must be at least 6 characters";
 		}
 
 		if (data.password !== data.confirmPassword) {
-			errors.confirmPassword = 'Passwords do not match';
+			errors.confirmPassword = "Passwords do not match";
 		}
 
 		return errors;
@@ -60,6 +62,7 @@ const RegisterForm: React.FC = () => {
 
 		if (Object.keys(errors).length === 0) {
 			// Remove confirmPassword before sending to API
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { confirmPassword, ...registerData } = formData;
 
 			setIsSubmitting(true);
@@ -70,9 +73,9 @@ const RegisterForm: React.FC = () => {
 					password: registerData.password,
 					role: registerData.role,
 				});
-				navigate('/dashboard');
+				navigate("/dashboard");
 			} catch (error) {
-				console.error('Registration error:', error);
+				console.error("Registration error:", error);
 			} finally {
 				setIsSubmitting(false);
 			}
@@ -80,8 +83,8 @@ const RegisterForm: React.FC = () => {
 	};
 
 	const roleOptions: RoleOption[] = [
-		{ value: 'user', label: 'Attendee' },
-		{ value: 'organizer', label: 'Event Organizer' },
+		{ value: "user", label: "Attendee" },
+		{ value: "organizer", label: "Event Organizer" },
 	];
 
 	return (
@@ -178,14 +181,14 @@ const RegisterForm: React.FC = () => {
 							Registering...
 						</div>
 					) : (
-						'Register'
+						"Register"
 					)}
 				</Button>
 			</form>
 
 			<div className="mt-8 text-center">
 				<p className="ym-text-secondary">
-					Already have an account?{' '}
+					Already have an account?{" "}
 					<Link
 						to="/login"
 						className="ym-text-yellow-600 hover:ym-text-yellow-700 font-medium transition-colors hover:underline"
@@ -200,4 +203,4 @@ const RegisterForm: React.FC = () => {
 	);
 };
 
-export default RegisterForm; 
+export default RegisterForm;

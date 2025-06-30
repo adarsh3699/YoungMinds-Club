@@ -1,27 +1,27 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
 	{
 		name: {
 			type: String,
-			required: [true, 'Name is required'],
+			required: [true, "Name is required"],
 			trim: true,
 		},
 		email: {
 			type: String,
-			required: [true, 'Email is required'],
+			required: [true, "Email is required"],
 			unique: true,
 			lowercase: true,
 			trim: true,
-			match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
+			match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"],
 		},
 		password: {
 			type: String,
 			required: function () {
 				return !this.googleId; // Password not required if user signed up with Google
 			},
-			minlength: [6, 'Password must be at least 6 characters long'],
+			minlength: [6, "Password must be at least 6 characters long"],
 		},
 		// Google authentication fields
 		googleId: {
@@ -32,13 +32,13 @@ const userSchema = new mongoose.Schema(
 		googleRefreshToken: String,
 		role: {
 			type: String,
-			enum: ['user', 'organizer', 'admin'],
-			default: 'user',
+			enum: ["user", "organizer", "admin"],
+			default: "user",
 		},
 		status: {
 			type: String,
-			enum: ['active', 'suspended'],
-			default: 'active',
+			enum: ["active", "suspended"],
+			default: "active",
 		},
 		college: {
 			type: String,
@@ -67,6 +67,26 @@ const userSchema = new mongoose.Schema(
 				trim: true,
 			},
 			instagram: {
+				type: String,
+				trim: true,
+			},
+		},
+		// Organizer location fields
+		location: {
+			city: {
+				type: String,
+				trim: true,
+			},
+			state: {
+				type: String,
+				trim: true,
+			},
+			country: {
+				type: String,
+				trim: true,
+				default: "India",
+			},
+			address: {
 				type: String,
 				trim: true,
 			},
@@ -105,8 +125,8 @@ const userSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-userSchema.pre('save', async function (next) {
-	if (!this.isModified('password') || !this.password) return next();
+userSchema.pre("save", async function (next) {
+	if (!this.isModified("password") || !this.password) return next();
 
 	try {
 		const salt = await bcrypt.genSalt(10);
@@ -124,19 +144,19 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Method to check if user is admin
 userSchema.methods.isAdmin = function () {
-	return this.role === 'admin';
+	return this.role === "admin";
 };
 
 // Method to check if user is organizer
 userSchema.methods.isOrganizer = function () {
-	return this.role === 'organizer' || this.role === 'admin';
+	return this.role === "organizer" || this.role === "admin";
 };
 
 // Method to check if user account is active
 userSchema.methods.isActive = function () {
-	return this.status === 'active';
+	return this.status === "active";
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

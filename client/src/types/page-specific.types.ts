@@ -28,9 +28,6 @@ export interface UserProfileResponse {
   };
 }
 
-// Navigation Props (no props needed for this component)
-export interface NavigationProps {}
-
 // ClassNames utility function type
 export type ClassNamesFunction = (...classes: (string | boolean | undefined | null)[]) => string;
 
@@ -52,13 +49,13 @@ export interface AuthFormErrors {
   [key: string]: string;
 }
 
-export interface LoginFormProps {}
+export type LoginFormProps = Record<string, never>;
 
-export interface RegisterFormProps {}
+export type RegisterFormProps = Record<string, never>;
 
-export interface SocialLoginProps {}
+export type SocialLoginProps = Record<string, never>;
 
-export interface GoogleCallbackProps {}
+export type GoogleCallbackProps = Record<string, never>;
 
 // Auth API Response Types
 export interface AuthMeResponse {
@@ -105,15 +102,15 @@ export interface FAQItem {
   answer: string;
 }
 
-export interface HeroSectionProps {}
+export type HeroSectionProps = Record<string, never>;
 
-export interface FeaturesSectionProps {}
+export type FeaturesSectionProps = Record<string, never>;
 
-export interface EventsSectionProps {}
+export type EventsSectionProps = Record<string, never>;
 
-export interface FAQSectionProps {}
+export type FAQSectionProps = Record<string, never>;
 
-export interface CTASectionProps {}
+export type CTASectionProps = Record<string, never>;
 
 // Contact Form Types
 export interface ContactFormData {
@@ -123,4 +120,4 @@ export interface ContactFormData {
   message: string;
 }
 
-export interface ContactProps {} 
+export type ContactProps = Record<string, never>; 

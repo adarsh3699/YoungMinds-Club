@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import axios, { AxiosResponse } from 'axios';
-import { format } from 'date-fns';
-import { ExclamationTriangleIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
-import Button from '@/components/common/Button';
-import Tabs from '@/components/common/Tabs';
-import { AdminConfirmationModal, AdminPageHeader } from '@/components/admin/dashboard';
-import { FlaggedItems, ModerationApiResponse, FlaggedUser, FlaggedEvent } from '@/types';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
+import axios, { AxiosResponse } from "axios";
+import { format } from "date-fns";
+import { ExclamationTriangleIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
+import Button from "@/components/common/Button";
+import Tabs from "@/components/common/Tabs";
+import { AdminConfirmationModal, AdminPageHeader } from "@/components/admin/dashboard";
+import { FlaggedItems, ModerationApiResponse, FlaggedUser, FlaggedEvent } from "@/types";
 
 // Unified modal state management
 type ModalState = {
 	isOpen: boolean;
-	type: 'unflag-user' | 'unflag-event' | 'delete-event' | 'status-user' | null;
+	type: "unflag-user" | "unflag-event" | "delete-event" | "status-user" | null;
 	targetId: string | null;
 	targetName: string;
 	currentStatus?: string;
-	context: 'user' | 'event';
+	context: "user" | "event";
 };
 
 // Empty State Component
@@ -43,7 +43,7 @@ const FlagReasonBadge: React.FC<{ reason?: string | null }> = React.memo(({ reas
 	<div className="mb-4">
 		<p className="text-sm ym-text-muted mb-1">Flag Reason:</p>
 		<span className="text-sm font-medium text-warning bg-warning-10 px-2 py-1 rounded">
-			{reason || 'No reason provided'}
+			{reason || "No reason provided"}
 		</span>
 	</div>
 ));
@@ -51,7 +51,7 @@ const FlagReasonBadge: React.FC<{ reason?: string | null }> = React.memo(({ reas
 // User Card Component
 const UserCard: React.FC<{
 	user: FlaggedUser;
-	onAction: (type: ModalState['type'], id: string, name: string, status?: string) => void;
+	onAction: (type: ModalState["type"], id: string, name: string, status?: string) => void;
 }> = React.memo(({ user, onAction }) => (
 	<div className="ym-bg-card ym-border-card border rounded-lg p-6 hover:shadow-lg transition-all duration-300 bg-gradient-primary-light">
 		<div className="flex items-center justify-between">
@@ -68,10 +68,10 @@ const UserCard: React.FC<{
 						</span>
 						<span
 							className={`text-xs px-2 py-1 rounded-full ${
-								user.status === 'active' ? 'bg-success-10 text-success' : 'bg-destructive-10 text-error'
+								user.status === "active" ? "bg-success-10 text-success" : "bg-destructive-10 text-error"
 							}`}
 						>
-							{user.status || 'active'}
+							{user.status || "active"}
 						</span>
 					</div>
 				</div>
@@ -80,16 +80,16 @@ const UserCard: React.FC<{
 				<FlagReasonBadge reason={user.flagReason} />
 				<div className="flex space-x-2">
 					<Button
-						onClick={() => onAction('unflag-user', user._id, user.name)}
+						onClick={() => onAction("unflag-user", user._id, user.name)}
 						className="btn-secondary text-sm"
 					>
 						Unflag
 					</Button>
 					<Button
-						onClick={() => onAction('status-user', user._id, user.name, user.status || 'active')}
-						className={user.status !== 'suspended' ? 'bg-warning text-sm' : 'bg-success text-sm'}
+						onClick={() => onAction("status-user", user._id, user.name, user.status || "active")}
+						className={user.status !== "suspended" ? "bg-warning text-sm" : "bg-success text-sm"}
 					>
-						{user.status !== 'suspended' ? 'Suspend' : 'Activate'}
+						{user.status !== "suspended" ? "Suspend" : "Activate"}
 					</Button>
 					<Link to="/admin/users">
 						<Button className="ym-btn-secondary text-sm">View Details</Button>
@@ -103,7 +103,7 @@ const UserCard: React.FC<{
 // Event Card Component
 const EventCard: React.FC<{
 	event: FlaggedEvent;
-	onAction: (type: ModalState['type'], id: string, name: string) => void;
+	onAction: (type: ModalState["type"], id: string, name: string) => void;
 }> = React.memo(({ event, onAction }) => (
 	<div className="ym-bg-card ym-border-card border rounded-lg p-6 hover:shadow-lg transition-all duration-300 bg-gradient-brand-tertiary-light">
 		<div className="flex items-start space-x-4">
@@ -112,7 +112,7 @@ const EventCard: React.FC<{
 				alt={event.title}
 				className="w-16 h-16 object-cover rounded-lg border-2 border-brand-primary shadow-sm"
 				onError={(e) => {
-					(e.target as HTMLImageElement).src = 'https://via.placeholder.com/100?text=Event';
+					(e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=Event";
 				}}
 			/>
 			<div className="flex-1">
@@ -122,29 +122,29 @@ const EventCard: React.FC<{
 						<div className="flex items-center space-x-4 ym-text-muted text-sm mb-2">
 							<span className="flex items-center space-x-1">
 								<UserIcon className="w-4 h-4" />
-								<span>{event.organizer?.name || 'Unknown'}</span>
+								<span>{event.organizer?.name || "Unknown"}</span>
 							</span>
 							<span className="flex items-center space-x-1">
 								<CalendarIcon className="w-4 h-4" />
-								<span>{format(new Date(event.date), 'PPP')}</span>
+								<span>{format(new Date(event.date), "PPP")}</span>
 							</span>
 						</div>
 						<div className="mb-3">
 							<span className="text-sm ym-text-muted">Flag Reason: </span>
 							<span className="text-sm font-medium text-warning bg-warning-10 px-2 py-1 rounded">
-								{event.flagReason || 'No reason provided'}
+								{event.flagReason || "No reason provided"}
 							</span>
 						</div>
 					</div>
 					<div className="flex space-x-2">
 						<Button
-							onClick={() => onAction('unflag-event', event._id, event.title)}
+							onClick={() => onAction("unflag-event", event._id, event.title)}
 							className="btn-secondary text-sm"
 						>
 							Unflag
 						</Button>
 						<Button
-							onClick={() => onAction('delete-event', event._id, event.title)}
+							onClick={() => onAction("delete-event", event._id, event.title)}
 							className="bg-destructive text-sm"
 						>
 							Delete
@@ -187,15 +187,15 @@ const ModerationPage: React.FC = () => {
 	const [flaggedItems, setFlaggedItems] = useState<FlaggedItems>({ users: [], events: [] });
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-	const [activeTab, setActiveTab] = useState<string>('users');
+	const [activeTab, setActiveTab] = useState<string>("users");
 
 	// Unified modal state
 	const [modal, setModal] = useState<ModalState>({
 		isOpen: false,
 		type: null,
 		targetId: null,
-		targetName: '',
-		context: 'user',
+		targetName: "",
+		context: "user",
 	});
 
 	// Memoized API call
@@ -203,13 +203,13 @@ const ModerationPage: React.FC = () => {
 		try {
 			setLoading(true);
 			setError(null);
-			const response: AxiosResponse<ModerationApiResponse> = await axios.get('/admin/moderation/flagged');
+			const response: AxiosResponse<ModerationApiResponse> = await axios.get("/admin/moderation/flagged");
 			if (response.data.success) {
 				setFlaggedItems(response.data.flaggedItems);
 			}
 		} catch (error) {
-			console.error('Error fetching flagged items:', error);
-			setError('Failed to load flagged items. Please try again later.');
+			console.error("Error fetching flagged items:", error);
+			setError("Failed to load flagged items. Please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -220,8 +220,8 @@ const ModerationPage: React.FC = () => {
 	}, [fetchFlaggedItems]);
 
 	// Unified modal handlers
-	const openModal = useCallback((type: ModalState['type'], id: string, name: string, status?: string) => {
-		const context = type?.includes('user') ? 'user' : 'event';
+	const openModal = useCallback((type: ModalState["type"], id: string, name: string, status?: string) => {
+		const context = type?.includes("user") ? "user" : "event";
 		setModal({
 			isOpen: true,
 			type,
@@ -242,7 +242,7 @@ const ModerationPage: React.FC = () => {
 
 		try {
 			switch (modal.type) {
-				case 'unflag-user':
+				case "unflag-user":
 					await axios.put(`/admin/users/${modal.targetId}/flag`, { isFlagged: false });
 					setFlaggedItems((prev) => ({
 						...prev,
@@ -250,7 +250,7 @@ const ModerationPage: React.FC = () => {
 					}));
 					break;
 
-				case 'unflag-event':
+				case "unflag-event":
 					await axios.put(`/admin/events/${modal.targetId}/flag`, { isFlagged: false });
 					setFlaggedItems((prev) => ({
 						...prev,
@@ -258,7 +258,7 @@ const ModerationPage: React.FC = () => {
 					}));
 					break;
 
-				case 'delete-event':
+				case "delete-event":
 					await axios.delete(`/admin/events/${modal.targetId}`);
 					setFlaggedItems((prev) => ({
 						...prev,
@@ -266,8 +266,8 @@ const ModerationPage: React.FC = () => {
 					}));
 					break;
 
-				case 'status-user':
-					const newStatus = modal.currentStatus === 'suspended' ? 'active' : 'suspended';
+				case "status-user": {
+					const newStatus = modal.currentStatus === "suspended" ? "active" : "suspended";
 					await axios.put(`/admin/users/${modal.targetId}/status`, { status: newStatus });
 					setFlaggedItems((prev) => ({
 						...prev,
@@ -276,11 +276,12 @@ const ModerationPage: React.FC = () => {
 						),
 					}));
 					break;
+				}
 			}
 			closeModal();
 		} catch (error) {
-			console.error('Error performing action:', error);
-			setError('Failed to complete action. Please try again.');
+			console.error("Error performing action:", error);
+			setError("Failed to complete action. Please try again.");
 		}
 	}, [modal, closeModal]);
 
@@ -323,13 +324,13 @@ const ModerationPage: React.FC = () => {
 	const tabs = useMemo(
 		() => [
 			{
-				id: 'users',
+				id: "users",
 				label: `Flagged Users (${flaggedItems.users.length})`,
 				icon: <UserIcon className="w-4 h-4" />,
 				content: UserContent,
 			},
 			{
-				id: 'events',
+				id: "events",
 				label: `Flagged Events (${flaggedItems.events.length})`,
 				icon: <CalendarIcon className="w-4 h-4" />,
 				content: EventContent,
@@ -340,17 +341,17 @@ const ModerationPage: React.FC = () => {
 
 	// Memoized modal props
 	const modalProps = useMemo(() => {
-		const getModalType = (): 'flag' | 'delete' | 'status' | 'demote' => {
+		const getModalType = (): "flag" | "delete" | "status" | "demote" => {
 			switch (modal.type) {
-				case 'unflag-user':
-				case 'unflag-event':
-					return 'flag';
-				case 'delete-event':
-					return 'delete';
-				case 'status-user':
-					return 'status';
+				case "unflag-user":
+				case "unflag-event":
+					return "flag";
+				case "delete-event":
+					return "delete";
+				case "status-user":
+					return "status";
 				default:
-					return 'delete';
+					return "delete";
 			}
 		};
 
@@ -359,8 +360,8 @@ const ModerationPage: React.FC = () => {
 			isOpen: modal.isOpen,
 			onClose: closeModal,
 			userName: modal.targetName,
-			isFlagged: modal.type?.includes('unflag'),
-			flagReason: '',
+			isFlagged: modal.type?.includes("unflag"),
+			flagReason: "",
 			currentStatus: modal.currentStatus,
 			onConfirm: handleModalConfirm,
 			context: modal.context,

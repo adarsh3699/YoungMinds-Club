@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { format } from 'date-fns';
-import { AdminPageHeader, AdminTable, AdminConfirmationModal, StatsCard } from '../../components/admin/dashboard';
-import { SearchAndFilter } from '../../components/common';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { format } from "date-fns";
+import { AdminPageHeader, AdminTable, AdminConfirmationModal, StatsCard } from "../../components/admin/dashboard";
+import { SearchAndFilter } from "../../components/common";
 import {
 	ExclamationTriangleIcon,
 	CalendarIcon,
@@ -13,15 +13,15 @@ import {
 	DocumentCheckIcon,
 	SparklesIcon,
 	PencilIcon,
-} from '@heroicons/react/24/outline';
-import { AdminEventData } from '@/types';
-import CreateEventModal from '../../components/organizer/CreateEventModal';
-import { EVENT_CATEGORIES, EVENT_TYPES } from '../../utils/eventConstants';
+} from "@heroicons/react/24/outline";
+import { AdminEventData } from "@/types";
+import CreateEventModal from "../../components/organizer/CreateEventModal";
+import { EVENT_CATEGORIES, EVENT_TYPES } from "../../utils/eventConstants";
 
 // Enhanced modal state type to include edit
 type EventModalState = {
 	isOpen: boolean;
-	type: 'delete' | 'flag' | 'edit' | null;
+	type: "delete" | "flag" | "edit" | null;
 	eventId: string | null;
 	eventTitle: string;
 	isFlagged: boolean;
@@ -39,37 +39,37 @@ const EventsManagement: React.FC = () => {
 		isOpen: false,
 		type: null,
 		eventId: null,
-		eventTitle: '',
+		eventTitle: "",
 		isFlagged: false,
-		flagReason: '',
+		flagReason: "",
 		eventData: null,
 	});
 
 	// Filter options
 	const statusOptions = [
-		{ value: '', label: 'All Status' },
-		{ value: 'published', label: 'Published' },
-		{ value: 'draft', label: 'Draft' },
-		{ value: 'featured', label: 'Featured' },
-		{ value: 'flagged', label: 'Flagged' },
+		{ value: "", label: "All Status" },
+		{ value: "published", label: "Published" },
+		{ value: "draft", label: "Draft" },
+		{ value: "featured", label: "Featured" },
+		{ value: "flagged", label: "Flagged" },
 	];
 
 	// Table columns
 	const columns = [
-		{ key: 'event', label: 'Event' },
-		{ key: 'date', label: 'Date & Time' },
-		{ key: 'organizer', label: 'Organizer' },
-		{ key: 'category', label: 'Category' },
-		{ key: 'status', label: 'Status' },
-		{ key: 'actions', label: 'Actions' },
+		{ key: "event", label: "Event" },
+		{ key: "date", label: "Date & Time" },
+		{ key: "organizer", label: "Organizer" },
+		{ key: "category", label: "Category" },
+		{ key: "status", label: "Status" },
+		{ key: "actions", label: "Actions" },
 	];
 
 	// Empty state config
 	const emptyStateConfig = {
 		icon: <CalendarIcon className="w-16 h-16 text-muted-foreground/50" />,
-		title: 'No events found',
-		description: 'Try adjusting your search or filters',
-		noFiltersDescription: 'No events have been created yet',
+		title: "No events found",
+		description: "Try adjusting your search or filters",
+		noFiltersDescription: "No events have been created yet",
 	};
 
 	// Optimized stats calculation
@@ -91,49 +91,49 @@ const EventsManagement: React.FC = () => {
 	// Stats cards data
 	const statsCards = [
 		{
-			title: 'Total Events',
+			title: "Total Events",
 			value: stats.total,
-			description: 'All registered events',
+			description: "All registered events",
 			icon: <CalendarIcon className="h-6 w-6 text-primary" />,
-			bgClass: 'bg-gradient-primary-light',
-			borderClass: 'border-primary-20',
-			iconBgClass: 'bg-primary-5',
+			bgClass: "bg-gradient-primary-light",
+			borderClass: "border-primary-20",
+			iconBgClass: "bg-primary-5",
 		},
 		{
-			title: 'Published',
+			title: "Published",
 			value: stats.published,
-			description: 'Live & visible events',
+			description: "Live & visible events",
 			icon: <EyeIcon className="h-6 w-6 text-success" />,
-			bgClass: 'bg-gradient-success-light',
-			borderClass: 'border-success-20',
-			iconBgClass: 'bg-success-5',
+			bgClass: "bg-gradient-success-light",
+			borderClass: "border-success-20",
+			iconBgClass: "bg-success-5",
 		},
 		{
-			title: 'Draft',
+			title: "Draft",
 			value: stats.draft,
-			description: 'Unpublished events',
+			description: "Unpublished events",
 			icon: <DocumentCheckIcon className="h-6 w-6 text-warning" />,
-			bgClass: 'bg-warning-10',
-			borderClass: 'border-warning-20',
-			iconBgClass: 'bg-warning-5',
+			bgClass: "bg-warning-10",
+			borderClass: "border-warning-20",
+			iconBgClass: "bg-warning-5",
 		},
 		{
-			title: 'Featured',
+			title: "Featured",
 			value: stats.featured,
-			description: 'Highlighted events',
+			description: "Highlighted events",
 			icon: <SparklesIcon className="h-6 w-6 text-purple" />,
-			bgClass: 'bg-purple-10',
-			borderClass: 'border-purple-20',
-			iconBgClass: 'bg-purple-10',
+			bgClass: "bg-purple-10",
+			borderClass: "border-purple-20",
+			iconBgClass: "bg-purple-10",
 		},
 		{
-			title: 'Flagged',
+			title: "Flagged",
 			value: stats.flagged,
-			description: 'Requiring attention',
+			description: "Requiring attention",
 			icon: <FlagIcon className="h-6 w-6 text-destructive" />,
-			bgClass: 'bg-destructive-10',
-			borderClass: 'border-destructive-20',
-			iconBgClass: 'bg-destructive-10',
+			bgClass: "bg-destructive-10",
+			borderClass: "border-destructive-20",
+			iconBgClass: "bg-destructive-10",
 		},
 	];
 
@@ -147,14 +147,14 @@ const EventsManagement: React.FC = () => {
 		try {
 			setLoading(true);
 			setError(null);
-			const { data } = await axios.get('/admin/events');
+			const { data } = await axios.get("/admin/events");
 			if (data.success) {
 				setEvents(data.events);
 				setFilteredEvents(data.events);
 			}
 		} catch (error) {
-			console.error('Error fetching events:', error);
-			setError('Failed to load events. Please try again later.');
+			console.error("Error fetching events:", error);
+			setError("Failed to load events. Please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -170,8 +170,8 @@ const EventsManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error deleting event:', error);
-			setError('Failed to delete event. Please try again.');
+			console.error("Error deleting event:", error);
+			setError("Failed to delete event. Please try again.");
 		}
 	}, [modal.eventId]);
 
@@ -199,8 +199,8 @@ const EventsManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error updating event flag status:', error);
-			setError('Failed to update event flag status. Please try again.');
+			console.error("Error updating event flag status:", error);
+			setError("Failed to update event flag status. Please try again.");
 		}
 	}, [modal.eventId, modal.isFlagged, modal.flagReason]);
 
@@ -209,7 +209,7 @@ const EventsManagement: React.FC = () => {
 			// Find the event to check if it's published
 			const event = events.find((e) => e._id === eventId);
 			if (!event?.isPublished && !currentFeaturedStatus) {
-				setError('Only published events can be featured. Please publish the event first.');
+				setError("Only published events can be featured. Please publish the event first.");
 				return;
 			}
 
@@ -228,23 +228,23 @@ const EventsManagement: React.FC = () => {
 					setError(null);
 				}
 			} catch (error) {
-				console.error('Error updating event featured status:', error);
-				setError('Failed to update event featured status. Please try again.');
+				console.error("Error updating event featured status:", error);
+				setError("Failed to update event featured status. Please try again.");
 			}
 		},
 		[events]
 	);
 
 	// Modal handlers
-	const openModal = useCallback((type: 'delete' | 'flag' | 'edit', event: AdminEventData) => {
+	const openModal = useCallback((type: "delete" | "flag" | "edit", event: AdminEventData) => {
 		setModal({
 			isOpen: true,
 			type,
 			eventId: event._id,
 			eventTitle: event.title,
 			isFlagged: event.isFlagged || false,
-			flagReason: event.flagReason || '',
-			eventData: type === 'edit' ? event : null,
+			flagReason: event.flagReason || "",
+			eventData: type === "edit" ? event : null,
 		});
 	}, []);
 
@@ -258,9 +258,9 @@ const EventsManagement: React.FC = () => {
 	}, []);
 
 	const handleConfirm = useCallback(() => {
-		if (modal.type === 'delete') {
+		if (modal.type === "delete") {
 			deleteEvent();
-		} else if (modal.type === 'flag') {
+		} else if (modal.type === "flag") {
 			toggleFlag();
 		}
 		// Edit is handled by the CreateEventModal's onSuccess callback
@@ -283,7 +283,7 @@ const EventsManagement: React.FC = () => {
 			<tr
 				key={event._id}
 				className={`group hover:bg-card-hover transition-colors ${
-					event.isFlagged ? 'bg-destructive-5 border-l-4 border-l-destructive' : ''
+					event.isFlagged ? "bg-destructive-5 border-l-4 border-l-destructive" : ""
 				}`}
 			>
 				{/* Event Details */}
@@ -295,7 +295,7 @@ const EventsManagement: React.FC = () => {
 								alt={event.title}
 								className="w-16 h-16 object-cover rounded-lg shadow-md"
 								onError={(e) => {
-									(e.target as HTMLImageElement).src = 'https://via.placeholder.com/100?text=Event';
+									(e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=Event";
 								}}
 							/>
 							{event.isFeatured && (
@@ -321,13 +321,13 @@ const EventsManagement: React.FC = () => {
 
 				{/* Date & Time */}
 				<td className="py-4 px-6 text-sm text-card-foreground">
-					<div className="font-medium">{format(new Date(event.date), 'PPP')}</div>
-					<div className="text-xs text-muted-foreground mt-1">{format(new Date(event.date), 'p')}</div>
+					<div className="font-medium">{format(new Date(event.date), "PPP")}</div>
+					<div className="text-xs text-muted-foreground mt-1">{format(new Date(event.date), "p")}</div>
 				</td>
 
 				{/* Organizer */}
 				<td className="py-4 px-6 text-sm text-card-foreground">
-					<div className="font-medium">{event.organizer?.name || 'Unknown'}</div>
+					<div className="font-medium">{event.organizer?.name || "Unknown"}</div>
 				</td>
 
 				{/* Category */}
@@ -343,11 +343,11 @@ const EventsManagement: React.FC = () => {
 						<span
 							className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
 								event.isPublished
-									? 'bg-success-10 text-success border border-success-20'
-									: 'bg-warning-10 text-warning border border-warning-20'
+									? "bg-success-10 text-success border border-success-20"
+									: "bg-warning-10 text-warning border border-warning-20"
 							}`}
 						>
-							{event.isPublished ? 'Published' : 'Draft'}
+							{event.isPublished ? "Published" : "Draft"}
 						</span>
 						{event.isFeatured && (
 							<span className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-purple-10 text-purple rounded-full border border-purple-20">
@@ -361,7 +361,7 @@ const EventsManagement: React.FC = () => {
 				<td className="py-4 px-6">
 					<div className="flex flex-wrap gap-1.5">
 						<button
-							onClick={() => openModal('edit', event)}
+							onClick={() => openModal("edit", event)}
 							className="px-2.5 py-1.5 text-xs font-medium bg-primary-10 text-primary rounded-lg hover:bg-primary-20 transition-all border border-primary-20"
 						>
 							<PencilIcon className="w-3 h-3 mr-1 inline" />
@@ -373,37 +373,37 @@ const EventsManagement: React.FC = () => {
 							disabled={!event.isPublished}
 							title={
 								!event.isPublished
-									? 'Only published events can be featured'
+									? "Only published events can be featured"
 									: event.isFeatured
-									? 'Remove from featured events'
-									: 'Add to featured events'
+									? "Remove from featured events"
+									: "Add to featured events"
 							}
 							className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
 								!event.isPublished
-									? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+									? "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
 									: event.isFeatured
-									? 'bg-purple text-white hover:bg-purple-10'
-									: 'bg-purple-10 text-purple hover:bg-purple-30 border border-purple'
+									? "bg-purple text-white hover:bg-purple-10"
+									: "bg-purple-10 text-purple hover:bg-purple-30 border border-purple"
 							}`}
 						>
 							<SparklesIcon className="w-3 h-3 mr-1 inline" />
-							{event.isFeatured ? 'Unfeature' : 'Feature'}
+							{event.isFeatured ? "Unfeature" : "Feature"}
 						</button>
 
 						<button
-							onClick={() => openModal('flag', event)}
+							onClick={() => openModal("flag", event)}
 							className={`px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
 								event.isFlagged
-									? 'bg-info text-white hover:bg-info-80'
-									: 'bg-warning text-white hover:bg-warning-80'
+									? "bg-info text-white hover:bg-info-80"
+									: "bg-warning text-white hover:bg-warning-80"
 							}`}
 						>
 							<FlagIcon className="w-3 h-3 mr-1 inline" />
-							{event.isFlagged ? 'Unflag' : 'Flag'}
+							{event.isFlagged ? "Unflag" : "Flag"}
 						</button>
 
 						<button
-							onClick={() => openModal('delete', event)}
+							onClick={() => openModal("delete", event)}
 							className="px-2.5 py-1.5 text-xs font-medium bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive-80 transition-all"
 						>
 							<TrashIcon className="w-3 h-3 mr-1 inline" />
@@ -490,8 +490,8 @@ const EventsManagement: React.FC = () => {
 
 				{/* Admin Confirmation Modal */}
 				<AdminConfirmationModal
-					modalType={modal.type === 'edit' ? 'delete' : modal.type || 'delete'}
-					isOpen={modal.isOpen && modal.type !== 'edit'}
+					modalType={modal.type === "edit" ? "delete" : modal.type || "delete"}
+					isOpen={modal.isOpen && modal.type !== "edit"}
 					onClose={closeModal}
 					userName={modal.eventTitle}
 					isFlagged={modal.isFlagged}
@@ -502,7 +502,7 @@ const EventsManagement: React.FC = () => {
 				/>
 
 				{/* Edit Event Modal */}
-				{modal.isOpen && modal.type === 'edit' && modal.eventData && (
+				{modal.isOpen && modal.type === "edit" && modal.eventData && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black-40">
 						<div className="ym-bg-card w-full h-full sm:rounded-xl sm:shadow-xl sm:w-full sm:max-w-5xl sm:mx-auto sm:h-auto overflow-hidden">
 							<CreateEventModal
