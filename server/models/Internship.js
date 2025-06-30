@@ -125,6 +125,23 @@ const internshipSchema = new mongoose.Schema(
 				trim: true,
 			},
 		],
+		thirdPartyRegistrationLink: {
+			type: String,
+			required: false,
+			trim: true,
+			validate: {
+				validator: function (value) {
+					if (!value) return true; // Allow empty/null values since it's optional
+					try {
+						new URL(value);
+						return true;
+					} catch {
+						return false;
+					}
+				},
+				message: "Third party registration link must be a valid URL",
+			},
+		},
 		isPublished: {
 			type: Boolean,
 			default: true,

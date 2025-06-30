@@ -95,6 +95,7 @@ const CreateInternshipModal = ({
 		responsibilities: [],
 		benefits: [],
 		skills: [],
+		thirdPartyRegistrationLink: "",
 		isPublished: false,
 	};
 
@@ -253,6 +254,7 @@ const CreateInternshipModal = ({
 				responsibilities: internshipToEdit.responsibilities || [],
 				benefits: internshipToEdit.benefits || [],
 				skills: internshipToEdit.skills || [],
+				thirdPartyRegistrationLink: internshipToEdit.thirdPartyRegistrationLink || "",
 			});
 		}
 	}, [isEditing, internshipToEdit]);
@@ -352,6 +354,15 @@ const CreateInternshipModal = ({
 				if (!formData.type) newErrors.type = "Internship type is required";
 				if (!formData.category) newErrors.category = "Category is required";
 				if (!formData.compensation.type) newErrors["compensation.type"] = "Compensation type is required";
+
+				// Validation for 3rd party registration link (optional but must be valid URL if provided)
+				if (formData.thirdPartyRegistrationLink) {
+					try {
+						new URL(formData.thirdPartyRegistrationLink);
+					} catch {
+						newErrors.thirdPartyRegistrationLink = "Please enter a valid URL (e.g., https://example.com)";
+					}
+				}
 
 				// Validation for paid internships
 				if (formData.compensation.type === "Paid") {
@@ -643,6 +654,28 @@ const CreateInternshipModal = ({
 							error={errors.category}
 							required
 							disabled={filterData.loading}
+						/>
+
+						<FormInput
+							id="thirdPartyRegistrationLink"
+							label="3rd Party Registration Link (Optional)"
+							name="thirdPartyRegistrationLink"
+							type="url"
+							value={formData.thirdPartyRegistrationLink}
+							onChange={handleChange}
+							placeholder="https://example.com/apply"
+							error={errors.thirdPartyRegistrationLink}
+							icon={
+								<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+									/>
+								</svg>
+							}
+							tooltip="If provided, applicants will be redirected to this external link instead of the internal application form"
 						/>
 
 						{formData.compensation.type === "Paid" && (
@@ -1022,6 +1055,19 @@ const CreateInternshipModal = ({
 										{formData.compensation.type === "Paid" &&
 											` (${formData.compensation.amount} ${formData.compensation.currency})`}
 									</p>
+									{formData.thirdPartyRegistrationLink && (
+										<p className="text-sm ym-text-muted mt-1">
+											<span className="font-medium">External Registration:</span>{" "}
+											<a
+												href={formData.thirdPartyRegistrationLink}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-blue-600 hover:text-blue-800 underline"
+											>
+												{formData.thirdPartyRegistrationLink}
+											</a>
+										</p>
+									)}
 								</div>
 
 								<div>

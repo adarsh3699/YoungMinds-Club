@@ -353,6 +353,12 @@ exports.applyForInternship = async (req, res) => {
 		} else {
 			// Update existing activity
 			userActivity.totalXP += xpAwarded;
+
+			// Initialize internshipApplications if it doesn't exist
+			if (!userActivity.internshipApplications) {
+				userActivity.internshipApplications = [];
+			}
+
 			userActivity.internshipApplications.push({
 				internship: internshipId,
 				appliedAt: new Date(),

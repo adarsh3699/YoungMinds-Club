@@ -96,6 +96,13 @@ const InternshipDetails: React.FC = () => {
 
 		if (!id) return;
 
+		// Check if there's a third-party registration link
+		if (internship?.thirdPartyRegistrationLink) {
+			// Redirect to the external registration link
+			window.open(internship.thirdPartyRegistrationLink, "_blank", "noopener,noreferrer");
+			return;
+		}
+
 		setApplicationError(null);
 
 		try {
@@ -139,6 +146,19 @@ const InternshipDetails: React.FC = () => {
 		const now = new Date();
 		const diffTime = deadline.getTime() - now.getTime();
 		return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+	};
+
+	// Get apply button text based on application type
+	const getApplyButtonText = (): string => {
+		if (internship?.thirdPartyRegistrationLink) {
+			return "Apply Externally";
+		}
+		return "Apply Now";
+	};
+
+	// Check if this is an external application
+	const isExternalApplication = (): boolean => {
+		return !!internship?.thirdPartyRegistrationLink;
 	};
 
 	// Format compensation display
@@ -288,7 +308,22 @@ const InternshipDetails: React.FC = () => {
 									onClick={handleApply}
 									className="w-full gradient-bg text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-center"
 								>
-									Apply Now
+									{getApplyButtonText()}
+									{isExternalApplication() && (
+										<svg
+											className="ml-2 h-4 w-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+											/>
+										</svg>
+									)}
 								</button>
 							) : isApplied ? (
 								<button
@@ -406,7 +441,22 @@ const InternshipDetails: React.FC = () => {
 									onClick={handleApply}
 									className="gradient-bg text-white py-2 px-6 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center"
 								>
-									Apply Now
+									{getApplyButtonText()}
+									{isExternalApplication() && (
+										<svg
+											className="ml-2 h-4 w-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+											/>
+										</svg>
+									)}
 								</button>
 							) : isApplied ? (
 								<button
@@ -516,6 +566,32 @@ const InternshipDetails: React.FC = () => {
 								<h3 className="font-semibold ym-text-primary mb-2">💰 Compensation</h3>
 								<p className="ym-text-secondary text-sm">{formatCompensation()}</p>
 							</div>
+
+							{/* External Application Indicator */}
+							{isExternalApplication() && (
+								<div className="ym-bg-blue-50 border border-blue-200 rounded-lg p-4 md:col-span-2">
+									<div className="flex items-center gap-2 mb-2">
+										<svg
+											className="h-5 w-5 text-blue-600"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+											/>
+										</svg>
+										<h3 className="font-semibold text-blue-800">🔗 External Application</h3>
+									</div>
+									<p className="text-blue-700 text-sm">
+										This internship uses an external application system. You'll be redirected to the
+										company's website to complete your application.
+									</p>
+								</div>
+							)}
 						</div>
 
 						{/* Tabs for detailed information */}

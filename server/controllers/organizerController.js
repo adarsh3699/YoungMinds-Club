@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const Event = require("../models/Event");
 const EventRegistration = require("../models/EventRegistration");
@@ -663,6 +664,7 @@ exports.createInternship = async (req, res) => {
 			requirements,
 			responsibilities,
 			benefits,
+			thirdPartyRegistrationLink,
 			isPublished,
 		} = req.body;
 
@@ -724,6 +726,7 @@ exports.createInternship = async (req, res) => {
 			requirements: parsedRequirements,
 			responsibilities: parsedResponsibilities,
 			benefits: parsedBenefits,
+			thirdPartyRegistrationLink: thirdPartyRegistrationLink || "",
 			organizerId: req.user._id,
 			isPublished: isPublished === "true" || isPublished === true,
 			status: isPublished === "true" || isPublished === true ? "published" : "draft",
@@ -771,7 +774,10 @@ exports.getInternshipDetails = async (req, res) => {
 		const internship = await Internship.findOne({
 			_id: req.params.id,
 			organizerId: req.user._id,
-		});
+		}).populate(
+			"organizerId",
+			"name email organizationName organizerBrandLogo website description bio socialLinks"
+		);
 
 		if (!internship) {
 			return res.status(404).json({
@@ -780,17 +786,44 @@ exports.getInternshipDetails = async (req, res) => {
 			});
 		}
 
-		// Get application count
-		const applicationCount = await InternshipApplication.countDocuments({
-			internship: req.params.id,
-			status: { $in: ["pending", "accepted", "rejected"] },
+		// Get detailed application statistics
+		const applicationStats = await InternshipApplication.aggregate([
+			{ $match: { internship: new mongoose.Types.ObjectId(req.params.id) } },
+			{
+				$group: {
+					_id: "$status",
+					count: { $sum: 1 },
+				},
+			},
+		]);
+
+		// Transform stats into a more usable format
+		const stats = {
+			total: 0,
+			pending: 0,
+			accepted: 0,
+			rejected: 0,
+		};
+
+		applicationStats.forEach((stat) => {
+			stats[stat._id] = stat.count;
+			stats.total += stat.count;
 		});
+
+		// Check if application deadline has passed
+		const isDeadlinePast = new Date() > new Date(internship.applicationDeadline);
+
+		// Check if internship is at capacity
+		const isAtCapacity = stats.total >= internship.capacity;
 
 		res.status(200).json({
 			success: true,
 			internship: {
 				...internship.toObject(),
-				applicationCount,
+				applicationCount: stats.total, // Keep for backward compatibility
+				applicationStats: stats,
+				isDeadlinePast,
+				isAtCapacity,
 			},
 		});
 	} catch (error) {
@@ -818,7 +851,7 @@ exports.updateInternship = async (req, res) => {
 			});
 		}
 
-		const {
+		let {
 			title,
 			companyName,
 			companyDescription,
@@ -830,12 +863,32 @@ exports.updateInternship = async (req, res) => {
 			location,
 			compensation,
 			duration,
+			capacity,
 			skills,
 			requirements,
 			responsibilities,
 			benefits,
+			thirdPartyRegistrationLink,
 			isPublished,
 		} = req.body;
+
+		// Handle FormData format fallback for updateInternship
+		if (!location && req.body["location.type"]) {
+			location = JSON.stringify({
+				type: req.body["location.type"] || "remote",
+				city: req.body["location.city"] || "",
+				country: req.body["location.country"] || "",
+				address: req.body["location.address"] || "",
+			});
+		}
+
+		if (!compensation && req.body["compensation.type"]) {
+			compensation = JSON.stringify({
+				type: req.body["compensation.type"] || "",
+				amount: parseFloat(req.body["compensation.amount"]) || 0,
+				currency: req.body["compensation.currency"] || "INR",
+			});
+		}
 
 		// Parse JSON fields
 		let parsedLocation,
@@ -872,10 +925,12 @@ exports.updateInternship = async (req, res) => {
 			location: parsedLocation,
 			compensation: parsedCompensation,
 			duration,
+			capacity: parseInt(capacity) || 1,
 			skills: parsedSkills,
 			requirements: parsedRequirements,
 			responsibilities: parsedResponsibilities,
 			benefits: parsedBenefits,
+			thirdPartyRegistrationLink: thirdPartyRegistrationLink || "",
 			isPublished: isPublished === "true" || isPublished === true,
 			status: isPublished === "true" || isPublished === true ? "published" : "draft",
 		};
@@ -911,6 +966,16 @@ exports.updateInternship = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Update internship error:", error);
+
+		if (error.name === "ValidationError") {
+			const errors = Object.values(error.errors).map((err) => err.message);
+			return res.status(400).json({
+				success: false,
+				message: "Validation failed",
+				errors,
+			});
+		}
+
 		res.status(500).json({
 			success: false,
 			message: "Failed to update internship",

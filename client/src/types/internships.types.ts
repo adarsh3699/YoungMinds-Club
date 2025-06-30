@@ -137,6 +137,7 @@ export interface InternshipDetailsData {
   skills?: string[];
   responsibilities?: string[];
   benefits?: string[];
+  thirdPartyRegistrationLink?: string;
   status: 'draft' | 'published' | 'closed' | 'completed';
   isPublished: boolean;
   isFlagged?: boolean;
