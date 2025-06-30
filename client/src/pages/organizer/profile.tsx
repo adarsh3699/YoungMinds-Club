@@ -164,6 +164,62 @@ const Profile: React.FC = () => {
 		}
 	};
 
+	// Helper function to load location data based on saved user values
+	const loadSavedLocationData = async (): Promise<void> => {
+		const savedCountry = organizerProfile?.location?.country || "India";
+		const savedState = organizerProfile?.location?.state || "";
+
+		try {
+			// First, ensure countries are loaded
+			let countries = locationCache.countries;
+			if (countries.length === 0) {
+				const fetchedCountries = await fetchLocationData("/filters/countries", "", "countries");
+				// Filter countries that have iso2 and cast to proper type
+				countries = fetchedCountries.filter((c): c is { value: string; label: string; iso2: string } =>
+					Boolean(c.iso2)
+				);
+				setCountryOptions(countries);
+			} else {
+				setCountryOptions(countries);
+			}
+
+			// Find the saved country's ISO code
+			const savedCountryObj = countries.find((c) => c.value === savedCountry);
+			const countryIso = savedCountryObj?.iso2 || "IN";
+			setSelectedCountryIso(countryIso);
+
+			// Load states for the saved country
+			let states = locationCache.states[countryIso];
+			if (!states) {
+				states = await fetchLocationData(`/filters/states/${countryIso}`, countryIso, "states");
+			}
+			setStateOptions(states);
+
+			// Load cities for the saved state if it exists
+			if (savedState) {
+				const savedStateObj = states.find((s) => s.value === savedState);
+				if (savedStateObj?.iso2) {
+					const cityKey = `${countryIso}-${savedStateObj.iso2}`;
+					let cities = locationCache.cities[cityKey];
+					if (!cities) {
+						cities = await fetchLocationData(
+							`/filters/cities/${countryIso}/${savedStateObj.iso2}`,
+							cityKey,
+							"cities"
+						);
+					}
+					setCityOptions(cities);
+				} else {
+					setCityOptions([]);
+				}
+			} else {
+				setCityOptions([]);
+			}
+		} catch (error) {
+			console.error("Error loading saved location data:", error);
+		}
+	};
+
 	useEffect(() => {
 		const fetchProfileData = async (): Promise<void> => {
 			setLoading(true);
@@ -241,16 +297,8 @@ const Profile: React.FC = () => {
 			});
 		} else {
 			// Load location data when entering edit mode (non-blocking)
-			// Only load if we don't have cached data
-			if (locationCache.countries.length === 0) {
-				loadLocationOptions("IN"); // Default to India - don't await this
-			} else {
-				// Set options from cache immediately
-				setCountryOptions(locationCache.countries);
-				if (locationCache.states["IN"]) {
-					setStateOptions(locationCache.states["IN"]);
-				}
-			}
+			// Use the helper function to handle saved location data properly
+			loadSavedLocationData();
 		}
 		setEditMode(!editMode);
 	};
