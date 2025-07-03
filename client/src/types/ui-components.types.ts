@@ -59,6 +59,7 @@ export interface FormInputProps {
   tooltip?: string;
   disabled?: boolean;
   allowNegative?: boolean;
+  showPasswordToggle?: boolean; // New prop for password visibility toggle
 }
 
 // Select Option Interface

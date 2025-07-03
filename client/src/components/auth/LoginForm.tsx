@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { FormInput, Button } from '../common';
-import { SocialLogin } from './';
-import { LoginFormData, AuthFormErrors } from '@/types';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { FormInput, Button } from "../common";
+import { SocialLogin } from "./";
+import { LoginFormData, AuthFormErrors } from "@/types";
 
 const LoginForm: React.FC = () => {
 	const [formData, setFormData] = useState<LoginFormData>({
-		email: '',
-		password: '',
+		email: "",
+		password: "",
 	});
 	const [formErrors, setFormErrors] = useState<AuthFormErrors>({});
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -27,13 +27,13 @@ const LoginForm: React.FC = () => {
 		const errors: AuthFormErrors = {};
 
 		if (!data.email) {
-			errors.email = 'Email is required';
+			errors.email = "Email is required";
 		} else if (!/\S+@\S+\.\S+/.test(data.email)) {
-			errors.email = 'Email is invalid';
+			errors.email = "Email is invalid";
 		}
 
 		if (!data.password) {
-			errors.password = 'Password is required';
+			errors.password = "Password is required";
 		}
 
 		return errors;
@@ -49,9 +49,9 @@ const LoginForm: React.FC = () => {
 			setIsSubmitting(true);
 			try {
 				await login(formData);
-				navigate('/dashboard');
+				navigate("/dashboard");
 			} catch (error) {
-				console.error('Login error:', error);
+				console.error("Login error:", error);
 			} finally {
 				setIsSubmitting(false);
 			}
@@ -90,7 +90,9 @@ const LoginForm: React.FC = () => {
 					onChange={handleChange}
 					label="Password"
 					error={formErrors.password}
+					placeholder="Enter your password"
 					disabled={isSubmitting}
+					showPasswordToggle={true}
 				/>
 
 				<Button type="submit" className="w-full py-3 text-base font-medium mt-8" disabled={isSubmitting}>
@@ -119,14 +121,14 @@ const LoginForm: React.FC = () => {
 							Logging in...
 						</div>
 					) : (
-						'Log In'
+						"Log In"
 					)}
 				</Button>
 			</form>
 
 			<div className="mt-8 text-center">
 				<p className="ym-text-secondary">
-					Don't have an account?{' '}
+					Don't have an account?{" "}
 					<Link
 						to="/register"
 						className="ym-text-yellow-600 hover:ym-text-yellow-700 font-medium transition-colors hover:underline"
@@ -141,4 +143,4 @@ const LoginForm: React.FC = () => {
 	);
 };
 
-export default LoginForm; 
+export default LoginForm;

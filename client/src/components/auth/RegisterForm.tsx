@@ -43,8 +43,8 @@ const RegisterForm: React.FC = () => {
 
 		if (!data.password) {
 			errors.password = "Password is required";
-		} else if (data.password.length < 6) {
-			errors.password = "Password must be at least 6 characters";
+		} else if (data.password.length < 8) {
+			errors.password = "Password must be at least 8 characters";
 		}
 
 		if (data.password !== data.confirmPassword) {
@@ -131,7 +131,9 @@ const RegisterForm: React.FC = () => {
 					onChange={handleChange}
 					label="Password"
 					error={formErrors.password}
+					placeholder="Create a password (min 8 characters)"
 					disabled={isSubmitting}
+					showPasswordToggle={true}
 				/>
 
 				<FormInput
@@ -142,7 +144,9 @@ const RegisterForm: React.FC = () => {
 					onChange={handleChange}
 					label="Confirm Password"
 					error={formErrors.confirmPassword}
+					placeholder="Re-enter your password"
 					disabled={isSubmitting}
+					showPasswordToggle={true}
 				/>
 
 				<SelectInput
