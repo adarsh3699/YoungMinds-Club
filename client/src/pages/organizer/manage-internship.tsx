@@ -321,10 +321,8 @@ const InternshipManagePage: React.FC = () => {
 					</div>
 
 					<div className="bg-gray-600 p-4 rounded-lg shadow-sm">
-						<h4 className="text-sm font-medium text-gray-300 mb-2">Capacity Filled</h4>
-						<p className="text-3xl font-bold text-green-400">
-							{Math.round((internship.applicationCount / internship.capacity) * 100)}%
-						</p>
+						<h4 className="text-sm font-medium text-gray-300 mb-2">Positions to Fill</h4>
+						<p className="text-3xl font-bold text-green-400">{internship.capacity}</p>
 					</div>
 
 					<div className="bg-gray-600 p-4 rounded-lg shadow-sm">
@@ -494,10 +492,10 @@ const InternshipManagePage: React.FC = () => {
 					<h3 className="text-xl font-semibold mb-4 text-gray-200">Internship Stats</h3>
 					<div className="space-y-4">
 						<div className="bg-gray-700 p-4 rounded-lg">
-							<p className="text-sm text-gray-300">Applications</p>
+							<p className="text-sm text-gray-300">Applications Received</p>
 							<div className="flex items-end justify-between">
 								<p className="text-3xl font-bold text-blue-400">{internship.applicationCount}</p>
-								<p className="text-sm text-gray-400">of {internship.capacity} capacity</p>
+								<p className="text-sm text-gray-400">({internship.capacity} positions to fill)</p>
 							</div>
 							<div className="mt-2 bg-gray-600 rounded-full h-2.5">
 								<div
@@ -505,7 +503,7 @@ const InternshipManagePage: React.FC = () => {
 									style={{
 										width: `${Math.min(
 											100,
-											(internship.applicationCount / internship.capacity) * 100
+											(internship.applicationCount / Math.max(internship.capacity * 5, 10)) * 100
 										)}%`,
 									}}
 								></div>

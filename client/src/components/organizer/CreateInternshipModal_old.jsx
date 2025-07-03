@@ -442,7 +442,7 @@ const CreateInternshipModal = ({
 			type: "Internship type is required",
 			category: "Category is required",
 			duration: "Duration is required",
-			capacity: "Number of positions is required",
+			capacity: "Number of positions to fill is required",
 			"compensation.type": "Compensation type is required",
 			applicationDeadline: "Application deadline is required",
 			startDate: "Start date is required",
@@ -480,11 +480,11 @@ const CreateInternshipModal = ({
 		if (formData.capacity) {
 			const capacityNumber = Number(formData.capacity);
 			if (isNaN(capacityNumber)) {
-				newErrors.capacity = "Number of positions must be a valid number";
+				newErrors.capacity = "Number of positions to fill must be a valid number";
 			} else if (capacityNumber < 1) {
-				newErrors.capacity = "Number of positions must be at least 1";
+				newErrors.capacity = "Number of positions to fill must be at least 1";
 			} else if (!Number.isInteger(capacityNumber)) {
-				newErrors.capacity = "Number of positions must be a whole number";
+				newErrors.capacity = "Number of positions to fill must be a whole number";
 			}
 		}
 
@@ -1082,7 +1082,7 @@ const CreateInternshipModal = ({
 
 									<FormInput
 										id="capacity"
-										label="Number of Positions"
+										label="Number of Positions to Fill"
 										name="capacity"
 										type="number"
 										min="1"
@@ -1092,6 +1092,7 @@ const CreateInternshipModal = ({
 										error={errors.capacity}
 										required
 										icon={<UsersIcon className="h-5 w-5" />}
+										tooltip="This is the number of people you plan to hire for this internship. Any number of people can apply, but you'll select the best candidates to fill these positions."
 									/>
 								</div>
 							</div>

@@ -752,7 +752,15 @@ exports.createInternship = async (req, res) => {
 		console.error("Create internship error:", error);
 
 		if (error.name === "ValidationError") {
-			const errors = Object.values(error.errors).map((err) => err.message);
+			// Handle both mongoose validation errors and custom validation errors
+			let errors = [];
+			if (error.errors) {
+				// Standard mongoose validation errors
+				errors = Object.values(error.errors).map((err) => err.message);
+			} else {
+				// Custom validation errors (like from pre-save hooks)
+				errors = [error.message];
+			}
 			return res.status(400).json({
 				success: false,
 				message: "Validation failed",
@@ -813,8 +821,9 @@ exports.getInternshipDetails = async (req, res) => {
 		// Check if application deadline has passed
 		const isDeadlinePast = new Date() > new Date(internship.applicationDeadline);
 
-		// Check if internship is at capacity
-		const isAtCapacity = stats.total >= internship.capacity;
+		// Note: We don't limit applications based on capacity.
+		// Capacity represents the number of positions to be filled, not the limit on applications.
+		const isAtCapacity = false; // Always false since we don't limit applications
 
 		res.status(200).json({
 			success: true,
@@ -968,7 +977,15 @@ exports.updateInternship = async (req, res) => {
 		console.error("Update internship error:", error);
 
 		if (error.name === "ValidationError") {
-			const errors = Object.values(error.errors).map((err) => err.message);
+			// Handle both mongoose validation errors and custom validation errors
+			let errors = [];
+			if (error.errors) {
+				// Standard mongoose validation errors
+				errors = Object.values(error.errors).map((err) => err.message);
+			} else {
+				// Custom validation errors (like from pre-save hooks)
+				errors = [error.message];
+			}
 			return res.status(400).json({
 				success: false,
 				message: "Validation failed",

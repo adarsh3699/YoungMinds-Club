@@ -83,7 +83,8 @@ const internshipSchema = new mongoose.Schema(
 		},
 		capacity: {
 			type: Number,
-			required: [true, "Number of positions is required"],
+			required: [true, "Number of positions to fill is required"],
+			min: [1, "Number of positions must be at least 1"],
 		},
 		compensation: {
 			type: {
@@ -201,8 +202,8 @@ const internshipSchema = new mongoose.Schema(
 internshipSchema.pre("save", async function (next) {
 	if (this.location && this.location.type) {
 		if (this.location.type === "on-site" || this.location.type === "hybrid") {
-			if (!this.location.city || !this.location.state) {
-				const error = new Error("City and state are required for on-site and hybrid internships");
+			if (!this.location.city || !this.location.country) {
+				const error = new Error("City and country are required for on-site and hybrid internships");
 				error.name = "ValidationError";
 				return next(error);
 			}
@@ -226,7 +227,7 @@ internshipSchema.pre("findOneAndUpdate", async function (next) {
 	const update = this.getUpdate();
 
 	// Check if location is being updated
-	if (update.location || update["location.type"] || update["location.city"] || update["location.state"]) {
+	if (update.location || update["location.type"] || update["location.city"] || update["location.country"]) {
 		try {
 			// Get the current document to check existing values
 			const currentDoc = await this.model.findOne(this.getQuery());
@@ -243,13 +244,13 @@ internshipSchema.pre("findOneAndUpdate", async function (next) {
 					(update.location && update.location.city) ||
 					(currentDoc && currentDoc.location && currentDoc.location.city);
 
-				const state =
-					update["location.state"] ||
-					(update.location && update.location.state) ||
-					(currentDoc && currentDoc.location && currentDoc.location.state);
+				const country =
+					update["location.country"] ||
+					(update.location && update.location.country) ||
+					(currentDoc && currentDoc.location && currentDoc.location.country);
 
-				if (!city || !state) {
-					const error = new Error("City and state are required for on-site and hybrid internships");
+				if (!city || !country) {
+					const error = new Error("City and country are required for on-site and hybrid internships");
 					error.name = "ValidationError";
 					return next(error);
 				}

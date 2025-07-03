@@ -382,7 +382,7 @@ const CreateInternshipModal = ({
 
 			case 3: // Location & Schedule
 				if (!formData.duration) newErrors.duration = "Duration is required";
-				if (!formData.capacity) newErrors.capacity = "Number of positions is required";
+				if (!formData.capacity) newErrors.capacity = "Number of positions to fill is required";
 				if (!formData.applicationDeadline) newErrors.applicationDeadline = "Application deadline is required";
 				if (!formData.startDate) newErrors.startDate = "Start date is required";
 
@@ -797,7 +797,7 @@ const CreateInternshipModal = ({
 
 							<FormInput
 								id="capacity"
-								label="Number of Positions"
+								label="Number of Positions to Fill"
 								name="capacity"
 								type="number"
 								min="1"
@@ -807,6 +807,7 @@ const CreateInternshipModal = ({
 								error={errors.capacity}
 								required
 								icon={<UsersIcon className="h-5 w-5" />}
+								tooltip="This is the number of people you plan to hire for this internship. Any number of people can apply, but you'll select the best candidates to fill these positions."
 							/>
 						</div>
 
@@ -1073,7 +1074,8 @@ const CreateInternshipModal = ({
 								<div>
 									<h5 className="font-semibold ym-text-primary">Schedule & Location</h5>
 									<p className="text-sm ym-text-muted">
-										{formData.duration} • {formData.capacity} positions • {formData.location.type}
+										{formData.duration} • {formData.capacity} positions to fill •{" "}
+										{formData.location.type}
 										{formData.location.city && ` in ${formData.location.city}`}
 									</p>
 								</div>

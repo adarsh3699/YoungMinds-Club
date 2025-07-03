@@ -290,15 +290,9 @@ exports.applyForInternship = async (req, res) => {
 			});
 		}
 
-		// Check if internship is at full capacity
-		if (internship.applicationCount >= internship.capacity) {
-			await session.abortTransaction();
-			session.endSession();
-			return res.status(400).json({
-				success: false,
-				message: "Internship has reached maximum applications",
-			});
-		}
+		// Note: We don't limit applications based on capacity.
+		// Capacity represents the number of positions to be filled, not the limit on applications.
+		// Organizers can review all applications and select the best candidates.
 
 		// Check if user has already applied
 		const existingApplication = await InternshipApplication.findOne({
