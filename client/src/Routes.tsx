@@ -29,6 +29,7 @@ const AdminProfile = lazy(() => import("@/pages/admin/AdminProfile"));
 const AdminUsersManagement = lazy(() => import("@/pages/admin/UserManagement"));
 const OrganizersManagement = lazy(() => import("@/pages/admin/OrganizersManagement"));
 const AdminEventsManagement = lazy(() => import("@/pages/admin/EventsManagement"));
+const AdminInternshipsManagement = lazy(() => import("@/pages/admin/InternshipManagement"));
 const AdminAnalytics = lazy(() => import("@/pages/admin/AnalyticsPage"));
 const AdminModeration = lazy(() => import("@/pages/admin/ModerationPage"));
 const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
@@ -166,6 +167,7 @@ const AppRoutes: React.FC = () => {
 											<Route path="/admin/users" element={<AdminUsersManagement />} />
 											<Route path="/admin/organizers" element={<OrganizersManagement />} />
 											<Route path="/admin/events" element={<AdminEventsManagement />} />
+											<Route path="/admin/internships" element={<AdminInternshipsManagement />} />
 											<Route path="/admin/analytics" element={<AdminAnalytics />} />
 											<Route path="/admin/moderation" element={<AdminModeration />} />
 											<Route path="/admin/announcements" element={<AdminAnnouncements />} />

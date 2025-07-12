@@ -22,7 +22,7 @@ export interface AdminConfirmationModalProps {
   flagReason?: string;
   onFlagReasonChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onConfirm: () => void;
-  context?: 'user' | 'event';
+  context?: 'user' | 'event' | 'internship';
 }
 
 export interface StatusOption {
@@ -412,6 +412,79 @@ export interface UpdateAnnouncementApiResponse {
 export interface AnnouncementsApiResponse {
   success: boolean;
   announcements: AdminAnnouncement[];
+  message?: string;
+}
+
+// Internships Management Types
+export interface AdminInternshipData {
+  _id: string;
+  title: string;
+  startDate: string;
+  endDate?: string;
+  applicationDeadline: string;
+  logo: string;
+  poster?: string;
+  organizer?: {
+    name: string;
+    organizerBrandLogo?: string;
+  };
+  organizerId?: {
+    _id: string;
+    name: string;
+    organizationName?: string;
+  };
+  category: string;
+  type: string;
+  status?: 'draft' | 'published' | 'closed' | 'completed';
+  location: {
+    type: 'remote' | 'on-site' | 'hybrid';
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+  compensation: {
+    type: 'Paid' | 'Unpaid';
+    amount: number;
+    currency: string;
+  };
+  applicationCount: number;
+  capacity: number;
+  isPublished: boolean;
+  isFeatured?: boolean;
+  isFlagged?: boolean;
+  flagReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown; // Allow additional properties for SearchAndFilter compatibility
+}
+
+export interface InternshipDeleteModalState {
+  isOpen: boolean;
+  internshipId: string | null;
+  internshipTitle: string;
+}
+
+export interface InternshipFlagModalState {
+  isOpen: boolean;
+  internshipId: string | null;
+  internshipTitle: string;
+  isFlagged: boolean;
+  flagReason: string;
+}
+
+export interface AdminInternshipsApiResponse {
+  success: boolean;
+  internships: AdminInternshipData[];
+  message?: string;
+}
+
+export interface InternshipDeleteResponse {
+  success: boolean;
+  message?: string;
+}
+
+export interface InternshipFlagResponse {
+  success: boolean;
   message?: string;
 }
 

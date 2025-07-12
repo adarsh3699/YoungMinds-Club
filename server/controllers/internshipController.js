@@ -2,6 +2,7 @@ const Internship = require("../models/Internship");
 const InternshipApplication = require("../models/InternshipApplication");
 const UserActivity = require("../models/UserActivity");
 const mongoose = require("mongoose");
+const { deleteImage } = require("../utils/cloudinary");
 
 // Get all internships with pagination and filters
 exports.getAllInternships = async (req, res) => {
@@ -499,6 +500,7 @@ exports.updateInternship = async (req, res) => {
 
 // Delete an internship (company/admin only)
 exports.deleteInternship = async (req, res) => {
+	let session;
 	try {
 		const internship = await Internship.findById(req.params.id);
 
@@ -517,12 +519,65 @@ exports.deleteInternship = async (req, res) => {
 			});
 		}
 
-		await Internship.findByIdAndDelete(req.params.id);
+		// Start transaction
+		session = await mongoose.startSession();
+		session.startTransaction();
 
-		res.status(200).json({
-			success: true,
-			message: "Internship deleted successfully",
-		});
+		try {
+			// Get all applications first to delete their attached files
+			const applications = await InternshipApplication.find({ internship: req.params.id }).session(session);
+
+			// Delete resume and portfolio files from Cloudinary if they exist
+			for (const application of applications) {
+				if (application.resume) {
+					try {
+						await deleteImage(application.resume);
+					} catch (error) {
+						console.error("Error deleting resume file:", error);
+					}
+				}
+				if (application.portfolio) {
+					try {
+						await deleteImage(application.portfolio);
+					} catch (error) {
+						console.error("Error deleting portfolio file:", error);
+					}
+				}
+			}
+
+			// Delete the internship poster if it exists
+			if (internship.poster) {
+				try {
+					await deleteImage(internship.poster);
+				} catch (error) {
+					console.error("Error deleting internship poster:", error);
+				}
+			}
+
+			// Delete the internship
+			await Internship.findByIdAndDelete(req.params.id).session(session);
+
+			// Delete all applications for this internship
+			await InternshipApplication.deleteMany({ internship: req.params.id }).session(session);
+
+			// Remove this internship from all users' saved internships lists
+			await UserActivity.updateMany(
+				{ savedInternships: req.params.id },
+				{ $pull: { savedInternships: req.params.id } }
+			).session(session);
+
+			// Commit the transaction
+			await session.commitTransaction();
+
+			res.status(200).json({
+				success: true,
+				message: "Internship and all related data deleted successfully",
+			});
+		} catch (error) {
+			// Rollback the transaction on error
+			await session.abortTransaction();
+			throw error;
+		}
 	} catch (error) {
 		console.error("Error deleting internship:", error);
 		res.status(500).json({
@@ -530,5 +585,10 @@ exports.deleteInternship = async (req, res) => {
 			message: "Failed to delete internship",
 			error: process.env.NODE_ENV === "development" ? error.message : undefined,
 		});
+	} finally {
+		// End session if it was started
+		if (session) {
+			session.endSession();
+		}
 	}
 };

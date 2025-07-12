@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useError } from '../../context/ErrorContext';
-import axios from 'axios';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useError } from "../../context/ErrorContext";
+import axios from "axios";
 import {
 	UserGroupIcon,
 	UserIcon,
@@ -10,7 +10,8 @@ import {
 	ShieldCheckIcon,
 	MegaphoneIcon,
 	SparklesIcon,
-} from '@heroicons/react/24/outline';
+	BriefcaseIcon,
+} from "@heroicons/react/24/outline";
 
 // Import dashboard components
 import {
@@ -20,7 +21,7 @@ import {
 	TopOrganizers,
 	ActiveUsers,
 	LoadingComponent,
-} from '../../components/admin/dashboard';
+} from "../../components/admin/dashboard";
 
 import {
 	AdminDashboardStats,
@@ -30,7 +31,7 @@ import {
 	UserCardData,
 	AdminSection,
 	StatsCardProps,
-} from '../../types';
+} from "../../types";
 
 // Constants
 const INITIAL_STATS: AdminDashboardStats = {
@@ -53,108 +54,116 @@ const AdminDashboard: React.FC = () => {
 	const adminSections = useMemo<AdminSection[]>(
 		() => [
 			{
-				title: 'Users',
-				description: 'Manage all users, change roles, and moderate accounts',
+				title: "Users",
+				description: "Manage all users, change roles, and moderate accounts",
 				icon: <UserIcon className="h-8 w-8 text-indigo" />,
-				link: '/admin/users',
+				link: "/admin/users",
 				count: stats.totalUsers - stats.totalOrganizers,
-				bg: 'bg-indigo-10',
-				text: 'text-indigo',
+				bg: "bg-indigo-10",
+				text: "text-indigo",
 			},
 			{
-				title: 'Organizers',
-				description: 'View and manage event organizers and their activities',
+				title: "Organizers",
+				description: "View and manage event organizers and their activities",
 				icon: <UserGroupIcon className="h-8 w-8 text-success" />,
-				link: '/admin/organizers',
+				link: "/admin/organizers",
 				count: stats.totalOrganizers,
-				bg: 'bg-success-10',
-				text: 'text-success',
+				bg: "bg-success-10",
+				text: "text-success",
 			},
 			{
-				title: 'Events',
-				description: 'Monitor all events, review content, and manage listings',
+				title: "Events",
+				description: "Monitor all events, review content, and manage listings",
 				icon: <CalendarIcon className="h-8 w-8 text-purple" />,
-				link: '/admin/events',
+				link: "/admin/events",
 				count: stats.totalEvents,
-				bg: 'bg-purple-10',
-				text: 'text-purple',
+				bg: "bg-purple-10",
+				text: "text-purple",
 			},
 			{
-				title: 'Registrations',
-				description: 'Track event registrations and attendee metrics',
+				title: "Internships",
+				description: "Monitor all internships, review applications, and manage listings",
+				icon: <BriefcaseIcon className="h-8 w-8 text-orange-500" />,
+				link: "/admin/internships",
+				bg: "bg-orange-10",
+				text: "text-orange-500",
+			},
+			{
+				title: "Registrations",
+				description: "Track event registrations and attendee metrics",
 				icon: <TicketIcon className="h-8 w-8 text-cyan" />,
-				link: '/admin/analytics',
+				link: "/admin/analytics",
 				count: stats.totalRegistrations,
-				bg: 'bg-cyan-10',
-				text: 'text-cyan',
+				bg: "bg-cyan-10",
+				text: "text-cyan",
 			},
 			{
-				title: 'Analytics',
-				description: 'View platform statistics and performance metrics',
+				title: "Analytics",
+				description: "View platform statistics and performance metrics",
 				icon: <ChartBarIcon className="h-8 w-8 text-teal" />,
-				link: '/admin/analytics',
-				bg: 'bg-teal-10',
-				text: 'text-teal',
+				link: "/admin/analytics",
+				bg: "bg-teal-10",
+				text: "text-teal",
 			},
 			{
-				title: 'Moderation',
-				description: 'Review flagged content and user reports',
+				title: "Moderation",
+				description: "Review flagged content and user reports",
 				icon: <ShieldCheckIcon className="h-8 w-8 text-destructive" />,
-				link: '/admin/moderation',
+				link: "/admin/moderation",
 				count: stats.flaggedItems,
-				bg: 'bg-destructive-10',
-				text: 'text-destructive',
+				bg: "bg-destructive-10",
+				text: "text-destructive",
 			},
 			{
-				title: 'Announcements',
-				description: 'Create and manage system-wide announcements',
+				title: "Announcements",
+				description: "Create and manage system-wide announcements",
 				icon: <MegaphoneIcon className="h-8 w-8 text-pink" />,
-				link: '/admin/announcements',
-				bg: 'bg-pink-10',
-				text: 'text-pink',
+				link: "/admin/announcements",
+				bg: "bg-pink-10",
+				text: "text-pink",
 			},
 		],
 		[stats]
 	);
 
 	// Memoized stats cards data
-	const statsCardsData = useMemo<Omit<StatsCardProps, 'key'>[]>(
+	const statsCardsData = useMemo<Omit<StatsCardProps, "key">[]>(
 		() => [
 			{
-				title: 'Total Users',
+				title: "Total Users",
 				value: stats.totalUsers,
-				description: 'Registered members',
+				description: "Registered members",
 				icon: <UserIcon className="h-6 w-6 text-primary" />,
-				bgClass: 'bg-gradient-primary-light',
-				borderClass: 'border-primary-20',
-				iconBgClass: 'bg-primary-5',
+				bgClass: "bg-gradient-primary-light",
+				borderClass: "border-primary-20",
+				iconBgClass: "bg-primary-5",
 			},
 			{
-				title: 'Organizers',
+				title: "Organizers",
 				value: stats.totalOrganizers,
-				description: 'Active organizers',
+				description: "Active organizers",
 				icon: <UserGroupIcon className="h-6 w-6 text-success" />,
-				bgClass: 'bg-gradient-success-light',
-				borderClass: 'border-success-20',
-				iconBgClass: 'bg-success-5',
+				bgClass: "bg-gradient-success-light",
+				borderClass: "border-success-20",
+				iconBgClass: "bg-success-5",
 			},
 			{
-				title: 'Total Events',
+				title: "Total Events",
 				value: stats.totalEvents,
-				description: 'Events created',
+				description: "Events created",
 				icon: <CalendarIcon className="h-6 w-6 text-brand-tertiary" />,
-				bgClass: 'bg-gradient-brand-tertiary-light',
-				borderClass: 'border-brand-tertiary-20',
-				iconBgClass: 'bg-brand-tertiary-5',
+				bgClass: "bg-gradient-brand-tertiary-light",
+				borderClass: "border-brand-tertiary-20",
+				iconBgClass: "bg-brand-tertiary-5",
 			},
 			{
-				title: 'Registrations',
+				title: "Registrations",
 				value: stats.totalRegistrations,
-				description: 'Total bookings',
+				description: "Total bookings",
 				icon: <TicketIcon className="h-6 w-6 text-brand-primary" />,
-				bgClass: 'bg-gradient-brand-primary-light',
-				borderClass: 'border-brand-primary-20',
-				iconBgClass: 'bg-brand-primary-5',
+				bgClass: "bg-gradient-brand-primary-light",
+				borderClass: "border-brand-primary-20",
+				iconBgClass: "bg-brand-primary-5",
 			},
 		],
 		[stats]
@@ -166,9 +175,9 @@ const AdminDashboard: React.FC = () => {
 			setLoading(true);
 
 			const [statsRes, organizersRes, usersRes] = await Promise.all([
-				axios.get<AdminStatsApiResponse>('/admin/dashboard/stats'),
-				axios.get<AdminTopOrganizersApiResponse>('/admin/top-organizers?limit=5'),
-				axios.get<AdminActiveUsersApiResponse>('/admin/active-users?limit=5'),
+				axios.get<AdminStatsApiResponse>("/admin/dashboard/stats"),
+				axios.get<AdminTopOrganizersApiResponse>("/admin/top-organizers?limit=5"),
+				axios.get<AdminActiveUsersApiResponse>("/admin/active-users?limit=5"),
 			]);
 
 			if (statsRes.data.success) {
@@ -183,8 +192,8 @@ const AdminDashboard: React.FC = () => {
 
 			setActiveUsers(usersRes.data.success && Array.isArray(usersRes.data.users) ? usersRes.data.users : []);
 		} catch (error) {
-			console.error('Error fetching dashboard data:', error);
-			showError('Failed to load dashboard data. Please try again later.');
+			console.error("Error fetching dashboard data:", error);
+			showError("Failed to load dashboard data. Please try again later.");
 		} finally {
 			setLoading(false);
 		}

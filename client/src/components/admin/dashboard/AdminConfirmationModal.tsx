@@ -14,17 +14,20 @@ const MODAL_TYPES = {
 type ModalType = (typeof MODAL_TYPES)[keyof typeof MODAL_TYPES];
 
 // Context-aware configuration factory
-const getModalConfigurations = (context: "user" | "event" = "user"): Record<ModalType, ModalConfiguration> => {
+const getModalConfigurations = (
+	context: "user" | "event" | "internship" = "user"
+): Record<ModalType, ModalConfiguration> => {
 	const isEvent = context === "event";
-	const entityType = isEvent ? "Event" : "User";
+	const isInternship = context === "internship";
+	const entityType = isEvent ? "Event" : isInternship ? "Internship" : "User";
 
 	return {
 		[MODAL_TYPES.DELETE]: {
 			title: `Delete ${entityType}`,
 			iconBg: "bg-destructive/10",
-			headerTitle: `Delete ${entityType}${isEvent ? "" : " Account"}`,
+			headerTitle: `Delete ${entityType}${isEvent || isInternship ? "" : " Account"}`,
 			baseMessage: `Are you sure you want to delete "${
-				isEvent ? "{userName}" : "{userName}"
+				isEvent || isInternship ? "{userName}" : "{userName}"
 			}"? This action cannot be undone.`,
 			confirmClass: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
 			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
@@ -38,17 +41,23 @@ const getModalConfigurations = (context: "user" | "event" = "user"): Record<Moda
 			getConfig: (isActivating: boolean) => ({
 				title: isActivating ? `Activate ${entityType}` : `Suspend ${entityType}`,
 				headerTitle: isActivating
-					? `Activate ${entityType}${isEvent ? "" : " Account"}`
-					: `Suspend ${entityType}${isEvent ? "" : " Account"}`,
+					? `Activate ${entityType}${isEvent || isInternship ? "" : " Account"}`
+					: `Suspend ${entityType}${isEvent || isInternship ? "" : " Account"}`,
 				message: isActivating
-					? `Are you sure you want to reactivate "${isEvent ? "{userName}" : "{userName}"}"? ${
+					? `Are you sure you want to reactivate "${
+							isEvent || isInternship ? "{userName}" : "{userName}"
+					  }"? ${
 							isEvent
 								? "The event will be visible to users again."
+								: isInternship
+								? "The internship will be visible to users again."
 								: "They will regain access to the platform."
 					  }`
-					: `Are you sure you want to suspend "${isEvent ? "{userName}" : "{userName}"}"? ${
+					: `Are you sure you want to suspend "${isEvent || isInternship ? "{userName}" : "{userName}"}"? ${
 							isEvent
 								? "The event will be hidden from users."
+								: isInternship
+								? "The internship will be hidden from users."
 								: "They will not be able to login until reactivated."
 					  }`,
 				confirmText: isActivating ? "Activate" : "Suspend",
@@ -65,8 +74,12 @@ const getModalConfigurations = (context: "user" | "event" = "user"): Record<Moda
 				title: isFlagged ? `Unflag ${entityType}` : `Flag ${entityType}`,
 				headerTitle: isFlagged ? "Remove Flag" : `Flag ${entityType}`,
 				message: isFlagged
-					? `Are you sure you want to remove the flag from "${isEvent ? "{userName}" : "{userName}"}"?`
-					: `Please specify a reason for flagging "${isEvent ? "{userName}" : "{userName}"}":`,
+					? `Are you sure you want to remove the flag from "${
+							isEvent || isInternship ? "{userName}" : "{userName}"
+					  }"?`
+					: `Please specify a reason for flagging "${
+							isEvent || isInternship ? "{userName}" : "{userName}"
+					  }":`,
 				confirmText: isFlagged ? "Remove Flag" : `Flag ${entityType}`,
 			}),
 		},
@@ -176,7 +189,7 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 			return `${BASE_BUTTON_CLASSES} ${config.confirmClass} ${ACTIVE_BUTTON_TRANSFORM}`;
 		}, [isDisabled, config.confirmClass]);
 
-		// Optimized content renderers - Update delete content for events
+		// Optimized content renderers - Update delete content for events and internships
 		const renderDeleteContent = useCallback(
 			() => (
 				<>
