@@ -14,6 +14,9 @@ import "@/styles/main.css";
 const HomePage = lazy(() => import("@/pages/home"));
 const AboutPage = lazy(() => import("@/pages/About"));
 const ContactPage = lazy(() => import("@/pages/Contact"));
+const TermsOfServicePage = lazy(() => import("@/pages/terms-of-service"));
+const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
+const GDPRPage = lazy(() => import("@/pages/gdpr"));
 const LoginPage = lazy(() => import("@/pages/login"));
 const RegisterPage = lazy(() => import("@/pages/register"));
 const UserDashboard = lazy(() => import("@/pages/user/dashboard"));
@@ -124,6 +127,9 @@ const AppRoutes: React.FC = () => {
 										<Route path="/" element={<HomePage />} />
 										<Route path="/about" element={<AboutPage />} />
 										<Route path="/contact" element={<ContactPage />} />
+										<Route path="/terms-of-service" element={<TermsOfServicePage />} />
+										<Route path="/privacy" element={<PrivacyPolicyPage />} />
+										<Route path="/gdpr" element={<GDPRPage />} />
 										<Route
 											path="/login"
 											element={
