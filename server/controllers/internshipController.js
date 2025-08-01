@@ -12,11 +12,16 @@ exports.getAllInternships = async (req, res) => {
 		const skip = (page - 1) * limit;
 
 		// Build filter object based on query params
+		const sevenDaysAgo = new Date();
+		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
 		const filter = {
 			// Only show published and non-flagged internships to public
 			isPublished: true,
 			isFlagged: false,
 			status: "published",
+			// Don't show internships with application deadlines older than 7 days
+			applicationDeadline: { $gte: sevenDaysAgo },
 		};
 
 		// Filter by category
@@ -97,10 +102,22 @@ exports.getAllInternships = async (req, res) => {
 			filter.skills = req.query.skill;
 		}
 
+		// Filter by featured status
+		if (req.query.featured === "true") {
+			filter.isFeatured = true;
+			// Only show internships with future application deadlines when filtering for featured, but respect the 7-day minimum
+			const now = new Date();
+			const finalDeadline = now > sevenDaysAgo ? now : sevenDaysAgo;
+			filter.applicationDeadline.$gte = finalDeadline;
+		}
+
 		// Sort options
 		let sortOptions = { createdAt: -1 }; // Default: newest first
 
-		if (req.query.sort) {
+		// For featured internships, prioritize by application deadline (soonest first)
+		if (req.query.featured === "true") {
+			sortOptions = { applicationDeadline: 1 };
+		} else if (req.query.sort) {
 			switch (req.query.sort) {
 				case "deadline":
 					sortOptions = { applicationDeadline: 1 };

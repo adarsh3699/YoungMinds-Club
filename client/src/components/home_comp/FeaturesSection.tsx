@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
 	MagnifyingGlassIcon,
 	UsersIcon,
@@ -6,47 +6,47 @@ import {
 	StarIcon,
 	ShieldCheckIcon,
 	BoltIcon,
-} from '@heroicons/react/24/outline';
-import { FeatureItem } from '@/types';
+} from "@heroicons/react/24/outline";
+import { FeatureItem } from "@/types";
 
 const FeaturesSection: React.FC = () => {
 	const features: FeatureItem[] = [
 		{
 			icon: MagnifyingGlassIcon,
-			title: 'Smart Event Discovery',
+			title: "Smart Event Discovery",
 			description:
-				'AI-powered recommendations help you find events perfectly matched to your interests and career goals.',
-			color: 'from-purple-500 to-purple-600',
+				"AI-powered recommendations help you find events perfectly matched to your interests and career goals.",
+			color: "from-purple-500 to-purple-600",
 		},
 		{
 			icon: UsersIcon,
-			title: 'Professional Networking',
-			description: 'Connect with like-minded professionals, mentors, and industry leaders in your field.',
-			color: 'from-blue-500 to-blue-600',
+			title: "Professional Networking",
+			description: "Connect with like-minded professionals, mentors, and industry leaders in your field.",
+			color: "from-blue-500 to-blue-600",
 		},
 		{
 			icon: MapPinIcon,
-			title: 'Local & Virtual Events',
-			description: 'Discover opportunities both in your city and online, expanding your reach globally.',
-			color: 'from-green-500 to-green-600',
+			title: "Local & Virtual Events",
+			description: "Discover opportunities both in your city and online, expanding your reach globally.",
+			color: "from-green-500 to-green-600",
 		},
 		{
 			icon: StarIcon,
-			title: 'Quality Assurance',
-			description: 'All events and internships are verified to ensure authentic, valuable experiences.',
-			color: 'from-yellow-500 to-yellow-600',
+			title: "Quality Assurance",
+			description: "All events and internships are verified to ensure authentic, valuable experiences.",
+			color: "from-yellow-500 to-yellow-600",
 		},
 		{
 			icon: ShieldCheckIcon,
-			title: 'Secure Platform',
-			description: 'Your data and privacy are protected with enterprise-grade security measures.',
-			color: 'from-red-500 to-red-600',
+			title: "Secure Platform",
+			description: "Your data and privacy are protected with enterprise-grade security measures.",
+			color: "from-red-500 to-red-600",
 		},
 		{
 			icon: BoltIcon,
-			title: 'Instant Applications',
-			description: 'One-click applications and seamless registration process for all opportunities.',
-			color: 'from-indigo-500 to-indigo-600',
+			title: "Instant Applications",
+			description: "One-click applications and seamless registration process for all opportunities.",
+			color: "from-indigo-500 to-indigo-600",
 		},
 	];
 
@@ -88,4 +88,4 @@ const FeaturesSection: React.FC = () => {
 	);
 };
 
-export default FeaturesSection; 
+export default FeaturesSection;
