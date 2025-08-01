@@ -176,7 +176,7 @@ const InternshipCard = ({ internship, isRecruiter = false, onManage, onEdit, onS
 		}
 
 		return { display, isToday, isRecent };
-	}, [internship.applicationDeadline]);
+	}, [internship]);
 
 	// Memoize the actively hiring status to prevent unnecessary recalculations
 	const isActivelyHiring = useMemo(() => {

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import axios, { AxiosResponse } from 'axios';
-import EventCard from '../../components/organizer/EventCard';
-import XPProgressBar from '../../components/user/XPProgressBar';
-import { Tabs, SearchAndFilter } from '../../components/common';
-import { UserDashboardProfile, Announcement, EventCardData, AnnouncementsApiResponse, AnnouncementType } from '@/types';
-import { EVENT_TYPES, EVENT_CATEGORIES } from '../../utils/eventConstants';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import axios, { AxiosResponse } from "axios";
+import EventCard from "../../components/organizer/EventCard";
+import XPProgressBar from "../../components/user/XPProgressBar";
+import { Tabs, SearchAndFilter } from "../../components/common";
+import { UserDashboardProfile, Announcement, EventCardData, AnnouncementsApiResponse, AnnouncementType } from "@/types";
+import type { DataItem } from "../../components/common/SearchAndFilter";
+import { EVENT_TYPES, EVENT_CATEGORIES } from "../../utils/eventConstants";
 
 const UserDashboard: React.FC = () => {
 	const { user } = useAuth();
@@ -17,14 +18,14 @@ const UserDashboard: React.FC = () => {
 	const [filteredRegisteredEvents, setFilteredRegisteredEvents] = useState<EventCardData[]>([]);
 	const [filteredSavedEvents, setFilteredSavedEvents] = useState<EventCardData[]>([]);
 	const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-	const [activeTab, setActiveTab] = useState<string>('registered');
+	const [activeTab, setActiveTab] = useState<string>("registered");
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleRegisteredEventsFilterChange = (filtered: any[]) => {
+	const handleRegisteredEventsFilterChange = (filtered: DataItem[]) => {
 		setFilteredRegisteredEvents(filtered as EventCardData[]);
 	};
 
-	const handleSavedEventsFilterChange = (filtered: any[]) => {
+	const handleSavedEventsFilterChange = (filtered: DataItem[]) => {
 		setFilteredSavedEvents(filtered as EventCardData[]);
 	};
 
@@ -35,7 +36,7 @@ const UserDashboard: React.FC = () => {
 			try {
 				// Get user profile with XP and badge
 				const profileResponse: AxiosResponse<{ profile: UserDashboardProfile }> = await axios.get(
-					'/user/dashboard'
+					"/user/dashboard"
 				);
 				setUserProfile(profileResponse.data.profile);
 
@@ -46,7 +47,7 @@ const UserDashboard: React.FC = () => {
 					badge: string;
 					savedEvents: EventCardData[];
 					events: EventCardData[];
-				}> = await axios.get('/user/events');
+				}> = await axios.get("/user/events");
 
 				if (userEventsResponse.data.success) {
 					const events = userEventsResponse.data.events || [];
@@ -59,14 +60,14 @@ const UserDashboard: React.FC = () => {
 
 				// Fetch active announcements
 				const announcementsResponse: AxiosResponse<AnnouncementsApiResponse> = await axios.get(
-					'/user/announcements'
+					"/user/announcements"
 				);
 				if (announcementsResponse.data.success) {
 					setAnnouncements(announcementsResponse.data.announcements);
 				}
 			} catch (error) {
-				console.error('Error fetching dashboard data:', error);
-				setError('Failed to load dashboard. Please try again.');
+				console.error("Error fetching dashboard data:", error);
+				setError("Failed to load dashboard. Please try again.");
 			} finally {
 				setLoading(false);
 			}
@@ -92,16 +93,16 @@ const UserDashboard: React.FC = () => {
 	// Announcement type styling
 	const getAnnouncementStyle = (type: AnnouncementType): string => {
 		switch (type) {
-			case 'info':
-				return 'ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700';
-			case 'warning':
-				return 'ym-bg-amber-100 border-l-amber-600 ym-text-yellow-700';
-			case 'success':
-				return 'ym-bg-success bg-opacity-10 border-l-green-400 ym-text-success';
-			case 'error':
-				return 'ym-bg-destructive bg-opacity-10 border-l-red-400 ym-text-destructive';
+			case "info":
+				return "ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700";
+			case "warning":
+				return "ym-bg-amber-100 border-l-amber-600 ym-text-yellow-700";
+			case "success":
+				return "ym-bg-success bg-opacity-10 border-l-green-400 ym-text-success";
+			case "error":
+				return "ym-bg-destructive bg-opacity-10 border-l-red-400 ym-text-destructive";
 			default:
-				return 'ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700';
+				return "ym-bg-amber-100 border-l-amber-400 ym-text-yellow-700";
 		}
 	};
 
@@ -219,9 +220,9 @@ const UserDashboard: React.FC = () => {
 					onTabChange={setActiveTab}
 					tabs={[
 						{
-							id: 'registered',
-							key: 'registered',
-							label: 'Registered Events',
+							id: "registered",
+							key: "registered",
+							label: "Registered Events",
 							content: (
 								<>
 									{/* Search and Filters Section */}
@@ -232,11 +233,11 @@ const UserDashboard: React.FC = () => {
 										disableAnimations={true}
 										searchPlaceholder="Search events by title, location, or tags..."
 										statusOptions={[
-											{ value: '', label: 'All Status' },
-											{ value: 'popular', label: 'Most Popular' },
-											{ value: 'upcoming', label: 'Upcoming' },
-											{ value: 'ongoing', label: 'Ongoing' },
-											{ value: 'completed', label: 'Completed' },
+											{ value: "", label: "All Status" },
+											{ value: "popular", label: "Most Popular" },
+											{ value: "upcoming", label: "Upcoming" },
+											{ value: "ongoing", label: "Ongoing" },
+											{ value: "completed", label: "Completed" },
 										]}
 										categoryOptions={EVENT_CATEGORIES}
 										eventTypeOptions={EVENT_TYPES}
@@ -273,12 +274,12 @@ const UserDashboard: React.FC = () => {
 												<p className="ym-text-secondary text-lg">
 													{registeredEvents.length === 0
 														? "You haven't registered for any events yet."
-														: 'No events match your search criteria.'}
+														: "No events match your search criteria."}
 												</p>
 												<p className="ym-text-muted text-sm mt-2">
 													{registeredEvents.length === 0
-														? 'Explore events and register to start earning XP!'
-														: 'Try adjusting your search or filters.'}
+														? "Explore events and register to start earning XP!"
+														: "Try adjusting your search or filters."}
 												</p>
 											</div>
 										) : (
@@ -300,9 +301,9 @@ const UserDashboard: React.FC = () => {
 							),
 						},
 						{
-							id: 'saved',
-							key: 'saved',
-							label: 'Saved Events',
+							id: "saved",
+							key: "saved",
+							label: "Saved Events",
 							content: (
 								<>
 									{/* Search and Filters Section for Saved Events */}
@@ -313,11 +314,11 @@ const UserDashboard: React.FC = () => {
 										disableAnimations={true}
 										searchPlaceholder="Search saved events by title, location, or tags..."
 										statusOptions={[
-											{ value: '', label: 'All Status' },
-											{ value: 'popular', label: 'Most Popular' },
-											{ value: 'upcoming', label: 'Upcoming' },
-											{ value: 'ongoing', label: 'Ongoing' },
-											{ value: 'completed', label: 'Completed' },
+											{ value: "", label: "All Status" },
+											{ value: "popular", label: "Most Popular" },
+											{ value: "upcoming", label: "Upcoming" },
+											{ value: "ongoing", label: "Ongoing" },
+											{ value: "completed", label: "Completed" },
 										]}
 										categoryOptions={EVENT_CATEGORIES}
 										eventTypeOptions={EVENT_TYPES}
@@ -352,12 +353,12 @@ const UserDashboard: React.FC = () => {
 												<p className="ym-text-secondary text-lg">
 													{savedEvents.length === 0
 														? "You haven't saved any events yet."
-														: 'No saved events match your search criteria.'}
+														: "No saved events match your search criteria."}
 												</p>
 												<p className="ym-text-muted text-sm mt-2">
 													{savedEvents.length === 0
 														? "Save events you're interested in to view them later!"
-														: 'Try adjusting your search or filters.'}
+														: "Try adjusting your search or filters."}
 												</p>
 											</div>
 										) : (

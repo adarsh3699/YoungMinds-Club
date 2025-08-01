@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useMemo } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 import {
 	MagnifyingGlassIcon,
 	ChevronDownIcon,
@@ -10,7 +10,7 @@ import { FormInput, SelectInput, Switch, DateTimePicker } from ".";
 import { SelectOption } from "@/types";
 
 // Generic data item interface
-interface DataItem {
+export interface DataItem {
 	id?: string;
 	_id?: string;
 	title?: string;

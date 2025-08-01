@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
-import { UserStatsCards, AdminTable, AdminConfirmationModal, AdminPageHeader } from '../../components/admin/dashboard';
-import { SearchAndFilter } from '../../components/common';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useAuth } from "../../context/AuthContext";
+import axios from "axios";
+import { UserStatsCards, AdminTable, AdminConfirmationModal, AdminPageHeader } from "../../components/admin/dashboard";
+import { SearchAndFilter } from "../../components/common";
 import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
@@ -11,13 +11,14 @@ import {
 	EyeSlashIcon,
 	EyeIcon,
 	FlagIcon,
-} from '@heroicons/react/24/outline';
-import { UserData } from '@/types';
+} from "@heroicons/react/24/outline";
+import { UserData } from "@/types";
+import type { DataItem } from "../../components/common/SearchAndFilter";
 
 // Simple modal state type
 type UserModalState = {
 	isOpen: boolean;
-	type: 'delete' | 'status' | 'flag' | null;
+	type: "delete" | "status" | "flag" | null;
 	userId: string | null;
 	userName: string;
 	deleteAllData: boolean;
@@ -26,17 +27,32 @@ type UserModalState = {
 	flagReason: string;
 };
 
+// Filter options
+const roleOptions = [
+	{ value: "all", label: "All Roles" },
+	{ value: "user", label: "Users" },
+	{ value: "organizer", label: "Organizers" },
+	{ value: "admin", label: "Admins" },
+];
+
+const statusOptions = [
+	{ value: "all", label: "All Status" },
+	{ value: "active", label: "Active" },
+	{ value: "suspended", label: "Suspended" },
+	{ value: "flagged", label: "Flagged" },
+];
+
 // Optimized helper functions
 const getStatusBadgeStyle = (status?: string) => {
-	const isActive = status === 'active' || !status;
+	const isActive = status === "active" || !status;
 	return {
 		className: `inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
 			isActive
-				? 'bg-success/10 text-success border border-success/20'
-				: 'bg-destructive/10 text-destructive border border-destructive/20'
+				? "bg-success/10 text-success border border-success/20"
+				: "bg-destructive/10 text-destructive border border-destructive/20"
 		}`,
 		icon: isActive ? <EyeIcon className="w-3 h-3 mr-1" /> : <EyeSlashIcon className="w-3 h-3 mr-1" />,
-		text: status || 'active',
+		text: status || "active",
 	};
 };
 
@@ -52,54 +68,39 @@ const UserManagement: React.FC = () => {
 		isOpen: false,
 		type: null,
 		userId: null,
-		userName: '',
+		userName: "",
 		deleteAllData: true,
-		currentStatus: '',
+		currentStatus: "",
 		isFlagged: false,
-		flagReason: '',
+		flagReason: "",
 	});
-
-	// Filter options
-	const roleOptions = [
-		{ value: 'all', label: 'All Roles' },
-		{ value: 'user', label: 'Users' },
-		{ value: 'organizer', label: 'Organizers' },
-		{ value: 'admin', label: 'Admins' },
-	];
-
-	const statusOptions = [
-		{ value: 'all', label: 'All Status' },
-		{ value: 'active', label: 'Active' },
-		{ value: 'suspended', label: 'Suspended' },
-		{ value: 'flagged', label: 'Flagged' },
-	];
 
 	// Table columns
 	const columns = [
-		{ key: 'user', label: 'User' },
-		{ key: 'email', label: 'Email' },
-		{ key: 'role', label: 'Role' },
-		{ key: 'status', label: 'Status' },
-		{ key: 'actions', label: 'Actions' },
+		{ key: "user", label: "User" },
+		{ key: "email", label: "Email" },
+		{ key: "role", label: "Role" },
+		{ key: "status", label: "Status" },
+		{ key: "actions", label: "Actions" },
 	];
 
 	// Empty state config
 	const emptyStateConfig = {
 		icon: <UserGroupIcon className="w-16 h-16 text-muted-foreground/50" />,
-		title: 'No users found',
-		description: 'Try adjusting your search or filters',
-		noFiltersDescription: 'No users have been registered yet',
+		title: "No users found",
+		description: "Try adjusting your search or filters",
+		noFiltersDescription: "No users have been registered yet",
 	};
 
 	// Optimized stats calculation
 	const userStats = useMemo(() => {
 		const total = users.length;
-		const active = users.filter((u) => (u.status || 'active') === 'active').length;
-		const suspended = users.filter((u) => u.status === 'suspended').length;
+		const active = users.filter((u) => (u.status || "active") === "active").length;
+		const suspended = users.filter((u) => u.status === "suspended").length;
 		const flagged = users.filter((u) => u.isFlagged).length;
-		const admins = users.filter((u) => u.role === 'admin').length;
-		const organizers = users.filter((u) => u.role === 'organizer').length;
-		const regularUsers = users.filter((u) => u.role === 'user').length;
+		const admins = users.filter((u) => u.role === "admin").length;
+		const organizers = users.filter((u) => u.role === "organizer").length;
+		const regularUsers = users.filter((u) => u.role === "user").length;
 
 		return {
 			total,
@@ -113,7 +114,7 @@ const UserManagement: React.FC = () => {
 	}, [users]);
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = (filtered: any[]) => {
+	const handleFilteredDataChange = (filtered: DataItem[]) => {
 		setFilteredUsers(filtered as UserData[]);
 	};
 
@@ -122,14 +123,14 @@ const UserManagement: React.FC = () => {
 		try {
 			setLoading(true);
 			setError(null);
-			const { data } = await axios.get('/admin/users');
+			const { data } = await axios.get("/admin/users");
 			if (data.success) {
 				setUsers(data.users);
 				setFilteredUsers(data.users);
 			}
 		} catch (error) {
-			console.error('Error fetching users:', error);
-			setError('Failed to load users. Please try again later.');
+			console.error("Error fetching users:", error);
+			setError("Failed to load users. Please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -140,12 +141,12 @@ const UserManagement: React.FC = () => {
 			const { data } = await axios.put(`/admin/users/${userId}/role`, { role: newRole });
 			if (data.success) {
 				setUsers((prev) =>
-					prev.map((u) => (u._id === userId ? { ...u, role: newRole as 'user' | 'organizer' | 'admin' } : u))
+					prev.map((u) => (u._id === userId ? { ...u, role: newRole as "user" | "organizer" | "admin" } : u))
 				);
 			}
 		} catch (error) {
-			console.error('Error updating user role:', error);
-			setError('Failed to update user role. Please try again.');
+			console.error("Error updating user role:", error);
+			setError("Failed to update user role. Please try again.");
 		}
 	}, []);
 
@@ -161,8 +162,8 @@ const UserManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error deleting user:', error);
-			setError('Failed to delete user. Please try again.');
+			console.error("Error deleting user:", error);
+			setError("Failed to delete user. Please try again.");
 		}
 	}, [modal.userId, modal.deleteAllData]);
 
@@ -170,19 +171,19 @@ const UserManagement: React.FC = () => {
 		if (!modal.userId) return;
 
 		try {
-			const newStatus = modal.currentStatus === 'active' ? 'suspended' : 'active';
+			const newStatus = modal.currentStatus === "active" ? "suspended" : "active";
 			const { data } = await axios.put(`/admin/users/${modal.userId}/status`, { status: newStatus });
 			if (data.success) {
 				setUsers((prev) =>
 					prev.map((u) =>
-						u._id === modal.userId ? { ...u, status: newStatus as 'active' | 'suspended' } : u
+						u._id === modal.userId ? { ...u, status: newStatus as "active" | "suspended" } : u
 					)
 				);
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error updating user status:', error);
-			setError('Failed to update user status. Please try again.');
+			console.error("Error updating user status:", error);
+			setError("Failed to update user status. Please try again.");
 		}
 	}, [modal.userId, modal.currentStatus]);
 
@@ -209,22 +210,22 @@ const UserManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error updating user flag status:', error);
-			setError('Failed to update user flag status. Please try again.');
+			console.error("Error updating user flag status:", error);
+			setError("Failed to update user flag status. Please try again.");
 		}
 	}, [modal.userId, modal.isFlagged, modal.flagReason]);
 
 	// Modal handlers
-	const openModal = useCallback((type: 'delete' | 'status' | 'flag', targetUser: UserData) => {
+	const openModal = useCallback((type: "delete" | "status" | "flag", targetUser: UserData) => {
 		setModal({
 			isOpen: true,
 			type,
 			userId: targetUser._id,
 			userName: targetUser.name,
 			deleteAllData: true,
-			currentStatus: targetUser.status || 'active',
+			currentStatus: targetUser.status || "active",
 			isFlagged: targetUser.isFlagged || false,
-			flagReason: targetUser.flagReason || '',
+			flagReason: targetUser.flagReason || "",
 		});
 	}, []);
 
@@ -233,11 +234,11 @@ const UserManagement: React.FC = () => {
 	}, []);
 
 	const handleConfirm = useCallback(() => {
-		if (modal.type === 'delete') {
+		if (modal.type === "delete") {
 			deleteUser();
-		} else if (modal.type === 'status') {
+		} else if (modal.type === "status") {
 			toggleUserStatus();
-		} else if (modal.type === 'flag') {
+		} else if (modal.type === "flag") {
 			toggleUserFlag();
 		}
 	}, [modal.type, deleteUser, toggleUserStatus, toggleUserFlag]);
@@ -246,14 +247,14 @@ const UserManagement: React.FC = () => {
 	const renderUserRow = useCallback(
 		(userData: UserData) => {
 			const statusStyle = getStatusBadgeStyle(userData.status);
-			const canModify = userData._id !== user?._id && userData.role !== 'admin';
-			const isProtected = userData._id === user?._id || userData.role === 'admin';
+			const canModify = userData._id !== user?._id && userData.role !== "admin";
+			const isProtected = userData._id === user?._id || userData.role === "admin";
 
 			return (
 				<tr
 					key={userData._id}
 					className={`hover:bg-muted/30 transition-colors ${
-						userData.isFlagged ? 'bg-destructive/5 border-l-4 border-l-destructive' : ''
+						userData.isFlagged ? "bg-destructive/5 border-l-4 border-l-destructive" : ""
 					}`}
 				>
 					{/* User Info */}
@@ -292,7 +293,7 @@ const UserManagement: React.FC = () => {
 									className="input-base text-sm py-2 px-3 pr-8 rounded-lg border-2 focus:border-primary transition-all appearance-none bg-card cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
 								>
 									{roleOptions
-										.filter((option) => option.value !== 'all')
+										.filter((option) => option.value !== "all")
 										.map((option) => (
 											<option key={option.value} value={option.value}>
 												{option.label}
@@ -303,7 +304,7 @@ const UserManagement: React.FC = () => {
 							</div>
 							{isProtected && (
 								<span className="text-xs text-muted-foreground italic">
-									{userData._id === user?._id ? 'Current User' : 'Protected'}
+									{userData._id === user?._id ? "Current User" : "Protected"}
 								</span>
 							)}
 						</div>
@@ -323,24 +324,24 @@ const UserManagement: React.FC = () => {
 							{canModify ? (
 								<>
 									<button
-										onClick={() => openModal('status', userData)}
+										onClick={() => openModal("status", userData)}
 										className={`px-3 py-2 text-xs font-medium rounded-lg transition-all flex items-center gap-1 ${
-											userData.status === 'suspended'
-												? 'bg-success hover:bg-success/80 text-white'
-												: 'bg-warning hover:bg-warning/80 text-white'
+											userData.status === "suspended"
+												? "bg-success hover:bg-success/80 text-white"
+												: "bg-warning hover:bg-warning/80 text-white"
 										}`}
 									>
-										{userData.status === 'suspended' ? 'Activate' : 'Suspend'}
+										{userData.status === "suspended" ? "Activate" : "Suspend"}
 									</button>
 									<button
-										onClick={() => openModal('flag', userData)}
+										onClick={() => openModal("flag", userData)}
 										className="px-3 py-2 text-xs font-medium rounded-lg transition-all bg-info hover:bg-info/80 text-white flex items-center gap-1"
 									>
 										<FlagIcon className="w-3 h-3" />
-										{userData.isFlagged ? 'Unflag' : 'Flag'}
+										{userData.isFlagged ? "Unflag" : "Flag"}
 									</button>
 									<button
-										onClick={() => openModal('delete', userData)}
+										onClick={() => openModal("delete", userData)}
 										className="px-3 py-2 text-xs font-medium rounded-lg transition-all bg-destructive hover:bg-destructive/80 text-white flex items-center gap-1"
 									>
 										<TrashIcon className="w-3 h-3" />
@@ -349,7 +350,7 @@ const UserManagement: React.FC = () => {
 								</>
 							) : (
 								<span className="text-xs text-muted-foreground italic">
-									{userData._id === user?._id ? 'Current User' : 'Admin Protected'}
+									{userData._id === user?._id ? "Current User" : "Admin Protected"}
 								</span>
 							)}
 						</div>
@@ -414,7 +415,7 @@ const UserManagement: React.FC = () => {
 
 				{/* Admin Confirmation Modal */}
 				<AdminConfirmationModal
-					modalType={modal.type || 'delete'}
+					modalType={modal.type || "delete"}
 					isOpen={modal.isOpen}
 					onClose={closeModal}
 					userName={modal.userName}

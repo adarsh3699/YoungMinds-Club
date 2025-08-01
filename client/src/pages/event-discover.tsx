@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import EventCard from '../components/organizer/EventCard';
-import { SearchAndFilter } from '../components/common';
-import EventCardSkeleton from '../components/organizer/EventCardSkeleton';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { EventDiscoverData, EventsApiResponse, SelectOption } from '@/types';
-import { EVENT_CATEGORIES, EVENT_TYPES } from '../utils/eventConstants';
+import React, { useState, useEffect } from "react";
+import axios, { AxiosResponse } from "axios";
+import EventCard from "../components/organizer/EventCard";
+import { SearchAndFilter } from "../components/common";
+import EventCardSkeleton from "../components/organizer/EventCardSkeleton";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { EventDiscoverData, EventsApiResponse, SelectOption } from "@/types";
+import type { DataItem } from "../components/common/SearchAndFilter";
+import { EVENT_CATEGORIES, EVENT_TYPES } from "../utils/eventConstants";
 
 // Sort options
 const SORT_OPTIONS: SelectOption[] = [
-	{ label: 'All Status', value: 'all' },
-	{ label: 'Most Popular', value: 'popular' },
-	{ label: 'Upcoming', value: 'upcoming' },
-	{ label: 'Ongoing', value: 'ongoing' },
-	{ label: 'Completed', value: 'completed' },
+	{ label: "All Status", value: "all" },
+	{ label: "Most Popular", value: "popular" },
+	{ label: "Upcoming", value: "upcoming" },
+	{ label: "Ongoing", value: "ongoing" },
+	{ label: "Completed", value: "completed" },
 ];
 
 const EventsPage: React.FC = () => {
@@ -32,20 +33,20 @@ const EventsPage: React.FC = () => {
 		const fetchEvents = async () => {
 			setLoading(true);
 			try {
-				const response: AxiosResponse<EventsApiResponse> = await axios.get('/events');
+				const response: AxiosResponse<EventsApiResponse> = await axios.get("/events");
 				if (response.data.success) {
 					const eventsData = response.data.events as EventDiscoverData[];
 					setEvents(eventsData);
 					setFilteredEvents(eventsData);
 				} else {
-					console.error('Error fetching events:', response.data.message);
-					setError('Failed to load events. Please try again later.');
+					console.error("Error fetching events:", response.data.message);
+					setError("Failed to load events. Please try again later.");
 					setEvents([]);
 					setFilteredEvents([]);
 				}
 			} catch (err) {
-				console.error('Error fetching events:', err);
-				setError('Failed to load events. Please try again later.');
+				console.error("Error fetching events:", err);
+				setError("Failed to load events. Please try again later.");
 				setEvents([]);
 				setFilteredEvents([]);
 			} finally {
@@ -57,7 +58,7 @@ const EventsPage: React.FC = () => {
 	}, []);
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = (filtered: any[]) => {
+	const handleFilteredDataChange = (filtered: DataItem[]) => {
 		setFilteredEvents(filtered as EventDiscoverData[]);
 	};
 
@@ -65,7 +66,7 @@ const EventsPage: React.FC = () => {
 	const handleSaveToggle = async (eventId: string): Promise<void> => {
 		if (!isAuthenticated) {
 			// Redirect to login if not authenticated
-			navigate('/login');
+			navigate("/login");
 			return;
 		}
 
@@ -73,7 +74,7 @@ const EventsPage: React.FC = () => {
 			// Always use POST method, as the server endpoint handles both save and unsave
 			await axios.post(`/events/${eventId}/save`);
 		} catch (error) {
-			console.error('Error toggling saved event:', error);
+			console.error("Error toggling saved event:", error);
 		}
 	};
 

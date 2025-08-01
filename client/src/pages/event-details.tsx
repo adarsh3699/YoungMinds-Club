@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import axios, { AxiosResponse } from 'axios';
-import { formatDate } from '../utils/formatDate';
-import { Tabs, MsgAlert } from '../components/common';
-import { EventDetailsData, EventRegistrationResponse, EventSaveResponse, UserEventsResponse } from '@/types';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios, { AxiosResponse, AxiosError } from "axios";
+import { formatDate } from "../utils/formatDate";
+
+// Helper interface for API error responses
+interface ApiErrorResponse {
+	message?: string;
+}
+
+// Helper function to safely handle axios errors
+const isAxiosError = (error: unknown): error is AxiosError<ApiErrorResponse> => {
+	return axios.isAxiosError(error);
+};
+import { Tabs, MsgAlert } from "../components/common";
+import { EventDetailsData, EventRegistrationResponse, EventSaveResponse, UserEventsResponse } from "@/types";
 
 const EventDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
@@ -19,18 +29,18 @@ const EventDetails: React.FC = () => {
 	const [isRegistered, setIsRegistered] = useState<boolean>(false);
 	const [registrationError, setRegistrationError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
-	const [activeTab, setActiveTab] = useState<string>('details');
+	const [activeTab, setActiveTab] = useState<string>("details");
 
 	// Check for registration success from URL query
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
-		if (queryParams.get('registered') === 'true') {
+		if (queryParams.get("registered") === "true") {
 			setSuccessMessage(
-				'You have successfully registered for this event. You earned 10 XP for registering. Keep it up!'
+				"You have successfully registered for this event. You earned 10 XP for registering. Keep it up!"
 			);
 			// Clear the URL parameter without refreshing the page
 			const newUrl = window.location.pathname;
-			window.history.replaceState({}, '', newUrl);
+			window.history.replaceState({}, "", newUrl);
 		}
 	}, [location.search]);
 
@@ -48,7 +58,7 @@ const EventDetails: React.FC = () => {
 
 				// If user is authenticated, check if they've saved or registered for this event
 				if (isAuthenticated) {
-					const userEventsResponse: AxiosResponse<UserEventsResponse> = await axios.get('/user/events');
+					const userEventsResponse: AxiosResponse<UserEventsResponse> = await axios.get("/user/events");
 
 					// Check if event is saved
 					const eventIsSaved = userEventsResponse.data.savedEvents?.some(
@@ -61,8 +71,8 @@ const EventDetails: React.FC = () => {
 					setIsRegistered(eventIsRegistered || false);
 				}
 			} catch (error) {
-				console.error('Error fetching event details:', error);
-				setError('Failed to load event details. Please try again.');
+				console.error("Error fetching event details:", error);
+				setError("Failed to load event details. Please try again.");
 			} finally {
 				setLoading(false);
 			}
@@ -74,7 +84,7 @@ const EventDetails: React.FC = () => {
 	// Handle saving/unsaving event
 	const handleSaveEvent = async () => {
 		if (!isAuthenticated) {
-			navigate('/login', { state: { from: `/event/${id}` } });
+			navigate("/login", { state: { from: `/event/${id}` } });
 			return;
 		}
 
@@ -84,15 +94,15 @@ const EventDetails: React.FC = () => {
 			const response: AxiosResponse<EventSaveResponse> = await axios.post(`/events/${id}/save`);
 			setIsSaved(response.data.isSaved);
 		} catch (error) {
-			console.error('Error saving event:', error);
-			setError('Failed to save event. Please try again.');
+			console.error("Error saving event:", error);
+			setError("Failed to save event. Please try again.");
 		}
 	};
 
 	// Handle registration
 	const handleRegister = async () => {
 		if (!isAuthenticated) {
-			navigate('/login', { state: { from: `/event/${id}` } });
+			navigate("/login", { state: { from: `/event/${id}` } });
 			return;
 		}
 
@@ -105,19 +115,23 @@ const EventDetails: React.FC = () => {
 			setIsRegistered(true);
 			setSuccessMessage(
 				`Registration successful! You have successfully registered for this event.${
-					response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ''
+					response.data.xp ? ` You earned ${response.data.xp} XP for registering. Keep it up!` : ""
 				}`
 			);
 			setRegistrationError(null);
-		} catch (error: any) {
-			console.error('Error registering for event:', error);
-			setRegistrationError(error.response?.data?.message || 'Failed to register. Please try again.');
+		} catch (error: unknown) {
+			console.error("Error registering for event:", error);
+			setRegistrationError(
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Failed to register. Please try again."
+			);
 		}
 	};
 
 	// Generate Google Calendar link
 	const generateGoogleCalendarLink = (): string => {
-		if (!event) return '#';
+		if (!event) return "#";
 
 		const startDate = new Date(event.date);
 		const endDate = new Date(startDate);
@@ -127,7 +141,7 @@ const EventDetails: React.FC = () => {
 
 		// Format dates for Google Calendar
 		const formatForCalendar = (date: Date): string => {
-			return date.toISOString().replace(/-|:|\.\d+/g, '');
+			return date.toISOString().replace(/-|:|\.\d+/g, "");
 		};
 
 		return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
@@ -139,7 +153,7 @@ const EventDetails: React.FC = () => {
 
 	// Generate WhatsApp share link
 	const generateWhatsAppLink = (): string => {
-		if (!event) return '#';
+		if (!event) return "#";
 
 		const eventDate = formatDate(event.date);
 		const shareText = `Check out this event: "${event.title}" on ${eventDate} at ${event.location.venue}, ${event.location.city}. Register here: ${window.location.href}`;
@@ -154,7 +168,7 @@ const EventDetails: React.FC = () => {
 				<div className="flex flex-col items-center justify-center h-64">
 					<div
 						className="w-12 h-12 border-t-4 border-solid rounded-full animate-spin mb-4"
-						style={{ borderTopColor: 'var(--ring)' }}
+						style={{ borderTopColor: "var(--ring)" }}
 					></div>
 					<h2 className="text-xl font-semibold ym-text-secondary">Loading event details...</h2>
 				</div>
@@ -168,9 +182,9 @@ const EventDetails: React.FC = () => {
 			<div className="container mx-auto px-4 py-12 mt-6">
 				<div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative">
 					<strong className="font-bold">Error!</strong>
-					<span className="block sm:inline"> {error || 'Event not found'}</span>
+					<span className="block sm:inline"> {error || "Event not found"}</span>
 					<button
-						onClick={() => navigate('/dashboard')}
+						onClick={() => navigate("/dashboard")}
 						className="mt-4 ml-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
 					>
 						Back to Dashboard
@@ -251,8 +265,8 @@ const EventDetails: React.FC = () => {
 								onClick={handleSaveEvent}
 								className={`w-full flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
 									isSaved
-										? 'ym-bg-amber-100 ym-text-yellow-700'
-										: 'ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card'
+										? "ym-bg-amber-100 ym-text-yellow-700"
+										: "ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card"
 								}`}
 							>
 								{isSaved ? (
@@ -357,8 +371,8 @@ const EventDetails: React.FC = () => {
 								onClick={handleSaveEvent}
 								className={`flex items-center py-2 px-6 rounded-lg font-medium transition-all duration-300 ${
 									isSaved
-										? 'ym-bg-amber-100 ym-text-yellow-700'
-										: 'ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card'
+										? "ym-bg-amber-100 ym-text-yellow-700"
+										: "ym-bg-card hover:ym-bg-card-hover ym-text-card border ym-border-card"
 								}`}
 							>
 								{isSaved ? (
@@ -403,8 +417,8 @@ const EventDetails: React.FC = () => {
 						<Tabs
 							tabs={[
 								{
-									id: 'details',
-									label: 'Event Details',
+									id: "details",
+									label: "Event Details",
 									content: (
 										<div className="space-y-6">
 											<div>
@@ -466,7 +480,7 @@ const EventDetails: React.FC = () => {
 														/>
 													</svg>
 													<div>
-														{event.location.type === 'online' ? (
+														{event.location.type === "online" ? (
 															<>
 																<p>Online Event</p>
 																{event.location.onlineUrl && (
@@ -521,8 +535,8 @@ const EventDetails: React.FC = () => {
 									),
 								},
 								{
-									id: 'organizer',
-									label: 'Organizer',
+									id: "organizer",
+									label: "Organizer",
 									content: (
 										<div className="space-y-6">
 											<div className="flex items-center mb-4">
@@ -548,7 +562,7 @@ const EventDetails: React.FC = () => {
 											</div>
 
 											<p className="ym-text-secondary">
-												{event.organizer.bio || 'No organizer information available.'}
+												{event.organizer.bio || "No organizer information available."}
 											</p>
 
 											<div className="ym-bg-card p-4 rounded-lg border ym-border-card">
@@ -568,8 +582,8 @@ const EventDetails: React.FC = () => {
 									),
 								},
 								{
-									id: 'share',
-									label: 'Share',
+									id: "share",
+									label: "Share",
 									content: (
 										<div className="space-y-6">
 											<p className="ym-text-secondary">
@@ -600,8 +614,8 @@ const EventDetails: React.FC = () => {
 														`I thought you might be interested in this event: ${
 															event.title
 														}.\n\nDate: ${formatDate(event.date)}\nLocation: ${
-															event.location.type === 'online'
-																? 'Online Event'
+															event.location.type === "online"
+																? "Online Event"
 																: `${event.location.venue}, ${event.location.city}`
 														}\n\nCheck it out here: ${window.location.href}`
 													)}`}
@@ -648,7 +662,7 @@ const EventDetails: React.FC = () => {
 												<button
 													onClick={() => {
 														navigator.clipboard.writeText(window.location.href);
-														alert('Link copied to clipboard!');
+														alert("Link copied to clipboard!");
 													}}
 													className="flex items-center ym-bg-card ym-text-card py-2 px-4 rounded-lg hover:ym-bg-card-hover transition-colors border ym-border-card"
 												>
@@ -685,14 +699,14 @@ const EventDetails: React.FC = () => {
 										<div
 											className={`h-2.5 w-2.5 rounded-full mr-2 ${
 												event.registrationCount >= event.capacity
-													? 'bg-red-500'
-													: 'ym-bg-success'
+													? "bg-red-500"
+													: "ym-bg-success"
 											}`}
 										></div>
 										<p className="text-sm ym-text-secondary">
 											{event.registrationCount >= event.capacity
-												? 'Sold Out'
-												: 'Open for Registration'}
+												? "Sold Out"
+												: "Open for Registration"}
 										</p>
 									</div>
 								</div>

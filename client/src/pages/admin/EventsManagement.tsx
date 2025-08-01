@@ -15,6 +15,7 @@ import {
 	PencilIcon,
 } from "@heroicons/react/24/outline";
 import { AdminEventData } from "@/types";
+import type { DataItem } from "../../components/common/SearchAndFilter";
 import CreateEventModal from "../../components/organizer/CreateEventModal";
 import { EVENT_CATEGORIES, EVENT_TYPES } from "../../utils/eventConstants";
 
@@ -56,12 +57,12 @@ const EventsManagement: React.FC = () => {
 
 	// Table columns
 	const columns = [
-		{ key: "event", label: "Event" },
-		{ key: "date", label: "Date & Time" },
-		{ key: "organizer", label: "Organizer" },
-		{ key: "category", label: "Category" },
-		{ key: "status", label: "Status" },
-		{ key: "actions", label: "Actions" },
+		{ key: "event", label: "Event", className: "w-1/4 min-w-[280px]" },
+		{ key: "date", label: "Date & Time", className: "w-1/6 min-w-[160px]" },
+		{ key: "organizer", label: "Organizer", className: "w-1/8 min-w-[120px]" },
+		{ key: "category", label: "Category", className: "w-1/12 min-w-[100px]" },
+		{ key: "status", label: "Status", className: "w-1/12 min-w-[100px]" },
+		{ key: "actions", label: "Actions", className: "w-1/6 min-w-[160px]" },
 	];
 
 	// Empty state config
@@ -138,7 +139,7 @@ const EventsManagement: React.FC = () => {
 	];
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = (filtered: any[]) => {
+	const handleFilteredDataChange = (filtered: DataItem[]) => {
 		setFilteredEvents(filtered as AdminEventData[]);
 	};
 
@@ -267,7 +268,7 @@ const EventsManagement: React.FC = () => {
 	}, [modal.type, deleteEvent, toggleFlag]);
 
 	const handleEditSuccess = useCallback(
-		(updatedEvent: any) => {
+		(updatedEvent: AdminEventData) => {
 			// Update the event in the local state
 			setEvents((prev) =>
 				prev.map((event) => (event._id === updatedEvent._id ? { ...event, ...updatedEvent } : event))
@@ -288,26 +289,27 @@ const EventsManagement: React.FC = () => {
 			>
 				{/* Event Details */}
 				<td className="py-4 px-6">
-					<div className="flex items-center space-x-4">
-						<div className="relative">
+					<div className="flex items-start space-x-3">
+						<div className="relative flex-shrink-0">
 							<img
 								src={event.poster}
 								alt={event.title}
-								className="w-16 h-16 object-cover rounded-lg shadow-md"
+								className="w-12 h-12 object-cover rounded-lg shadow-md"
 								onError={(e) => {
 									(e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=Event";
 								}}
 							/>
 							{event.isFeatured && (
-								<div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-primary rounded-full border-2 border-card" />
+								<div className="absolute -top-1 -right-1 w-3 h-3 bg-brand-primary rounded-full border-2 border-card" />
 							)}
 						</div>
 						<div className="min-w-0 flex-1">
 							<Link
 								to={`/event/${event._id}`}
-								className="text-brand-primary hover:text-brand-dark font-semibold text-sm block line-clamp-2 mb-1 transition-colors"
+								className="text-brand-primary hover:text-brand-dark font-semibold text-sm block mb-1 transition-colors leading-tight"
+								title={event.title}
 							>
-								{event.title}
+								<div className="line-clamp-2 break-words">{event.title}</div>
 							</Link>
 							{event.isFlagged && (
 								<span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-destructive-10 text-destructive rounded-full border border-destructive-20">
@@ -508,10 +510,10 @@ const EventsManagement: React.FC = () => {
 							<CreateEventModal
 								onClose={closeModal}
 								onSuccess={handleEditSuccess}
-								eventToEdit={modal.eventData as any}
+								eventToEdit={modal.eventData as any} // eslint-disable-line @typescript-eslint/no-explicit-any
 								isEditing={true}
 								apiEndpoint={
-									modal.eventData._id ? `/admin/events/${modal.eventData._id}` : (null as any)
+									modal.eventData?._id ? `/admin/events/${modal.eventData._id}` : (null as any) // eslint-disable-line @typescript-eslint/no-explicit-any
 								}
 							/>
 						</div>

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios, { AxiosResponse } from 'axios';
-import { format } from 'date-fns';
-import { QRCodeCanvas } from 'qrcode.react';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios, { AxiosResponse } from "axios";
+import { format } from "date-fns";
+import { QRCodeCanvas } from "qrcode.react";
 import {
 	ArrowLeftIcon,
 	PencilIcon,
@@ -11,10 +11,10 @@ import {
 	UsersIcon,
 	ChartBarIcon,
 	QrCodeIcon,
-} from '@heroicons/react/24/outline';
-import CreateEventModal from '../../components/organizer/CreateEventModal';
-import { Modal, Tabs } from '../../components/common';
-import { ManageEventData, AttendeeData, EventManageApiResponse, AttendeesApiResponse } from '@/types';
+} from "@heroicons/react/24/outline";
+import CreateEventModal from "../../components/organizer/CreateEventModal";
+import { Modal, Tabs } from "../../components/common";
+import { ManageEventData, AttendeeData, EventManageApiResponse, AttendeesApiResponse } from "@/types";
 
 // Custom tab item interface to allow JSX labels
 interface EventTabItem {
@@ -33,7 +33,7 @@ const EventManagePage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [showEditModal, setShowEditModal] = useState<boolean>(false);
 	const [showQrCode, setShowQrCode] = useState<boolean>(false);
-	const [activeTab, setActiveTab] = useState<string>('attendees');
+	const [activeTab, setActiveTab] = useState<string>("attendees");
 
 	// Fetch event and attendee data
 	useEffect(() => {
@@ -54,8 +54,8 @@ const EventManagePage: React.FC = () => {
 
 				setLoading(false);
 			} catch (error) {
-				console.error('Error fetching event data:', error);
-				setError('Failed to load event data. Please try again.');
+				console.error("Error fetching event data:", error);
+				setError("Failed to load event data. Please try again.");
 				setLoading(false);
 			}
 		};
@@ -65,9 +65,9 @@ const EventManagePage: React.FC = () => {
 
 	const formatDate = (dateString: string): string => {
 		try {
-			return format(new Date(dateString), 'MMMM d, yyyy h:mm a');
-		} catch (error) {
-			return 'Invalid date';
+			return format(new Date(dateString), "MMMM d, yyyy h:mm a");
+		} catch {
+			return "Invalid date";
 		}
 	};
 
@@ -81,15 +81,15 @@ const EventManagePage: React.FC = () => {
 
 		const eventToDuplicate = { ...event };
 		// Remove specific fields
-		delete (eventToDuplicate as any)._id;
-		delete (eventToDuplicate as any).createdAt;
-		delete (eventToDuplicate as any).updatedAt;
+		delete (eventToDuplicate as Partial<ManageEventData>)._id;
+		delete (eventToDuplicate as Partial<ManageEventData>).createdAt;
+		delete (eventToDuplicate as Partial<ManageEventData>).updatedAt;
 
 		// Set a default title to indicate it's a duplicate
 		eventToDuplicate.title = `Copy of ${eventToDuplicate.title}`;
 
-		localStorage.setItem('duplicateEvent', JSON.stringify(eventToDuplicate));
-		navigate('/organizer/events/create');
+		localStorage.setItem("duplicateEvent", JSON.stringify(eventToDuplicate));
+		navigate("/organizer/events/create");
 	};
 
 	const downloadCSV = (): void => {
@@ -98,24 +98,24 @@ const EventManagePage: React.FC = () => {
 		// Format attendees data for CSV
 		const csvContent = [
 			// CSV Header
-			['Name', 'Email', 'Registration Date', 'Status'].join(','),
+			["Name", "Email", "Registration Date", "Status"].join(","),
 			// CSV Data Rows
 			...attendees.map((attendee) =>
 				[
 					attendee.name,
 					attendee.email,
-					format(new Date(attendee.registrationDate), 'yyyy-MM-dd'),
+					format(new Date(attendee.registrationDate), "yyyy-MM-dd"),
 					attendee.status,
-				].join(',')
+				].join(",")
 			),
-		].join('\n');
+		].join("\n");
 
 		// Create and trigger download
-		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.setAttribute('href', url);
-		link.setAttribute('download', `${event.title.replace(/\s+/g, '_')}_attendees.csv`);
+		const link = document.createElement("a");
+		link.setAttribute("href", url);
+		link.setAttribute("download", `${event.title.replace(/\s+/g, "_")}_attendees.csv`);
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
@@ -124,11 +124,11 @@ const EventManagePage: React.FC = () => {
 	const downloadQRCode = (): void => {
 		if (!event) return;
 
-		const canvas = document.getElementById('event-qrcode') as HTMLCanvasElement;
+		const canvas = document.getElementById("event-qrcode") as HTMLCanvasElement;
 		if (canvas) {
-			const link = document.createElement('a');
-			link.download = `${event.title.replace(/\s+/g, '_')}_qrcode.png`;
-			link.href = canvas.toDataURL('image/png');
+			const link = document.createElement("a");
+			link.download = `${event.title.replace(/\s+/g, "_")}_qrcode.png`;
+			link.href = canvas.toDataURL("image/png");
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
@@ -148,7 +148,7 @@ const EventManagePage: React.FC = () => {
 			<div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900 text-gray-200">
 				<div className="text-red-400 mb-4">{error}</div>
 				<button
-					onClick={() => navigate('/organizer/dashboard')}
+					onClick={() => navigate("/organizer/dashboard")}
 					className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
 				>
 					Return to Dashboard
@@ -162,7 +162,7 @@ const EventManagePage: React.FC = () => {
 			<div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900 text-gray-200">
 				<div className="text-red-400 mb-4">Event not found or you do not have permission.</div>
 				<button
-					onClick={() => navigate('/organizer/dashboard')}
+					onClick={() => navigate("/organizer/dashboard")}
 					className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
 				>
 					Return to Dashboard
@@ -256,18 +256,18 @@ const EventManagePage: React.FC = () => {
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<div className="text-sm text-gray-300">
-											{format(new Date(attendee.registrationDate), 'MMM d, yyyy')}
+											{format(new Date(attendee.registrationDate), "MMM d, yyyy")}
 										</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
 										<span
 											className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-												attendee.status === 'attended'
-													? 'bg-green-900 text-green-200'
-													: 'bg-blue-900 text-blue-200'
+												attendee.status === "attended"
+													? "bg-green-900 text-green-200"
+													: "bg-blue-900 text-blue-200"
 											}`}
 										>
-											{attendee.status === 'attended' ? 'Attended' : 'Registered'}
+											{attendee.status === "attended" ? "Attended" : "Registered"}
 										</span>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap">
@@ -325,8 +325,8 @@ const EventManagePage: React.FC = () => {
 
 	const tabs: EventTabItem[] = [
 		{
-			id: 'attendees',
-			key: 'attendees',
+			id: "attendees",
+			key: "attendees",
 			label: (
 				<span className="flex items-center">
 					<UsersIcon className="h-5 w-5 mr-2" />
@@ -336,8 +336,8 @@ const EventManagePage: React.FC = () => {
 			content: attendeesTabContent,
 		},
 		{
-			id: 'analytics',
-			key: 'analytics',
+			id: "analytics",
+			key: "analytics",
 			label: (
 				<span className="flex items-center">
 					<ChartBarIcon className="h-5 w-5 mr-2" />
@@ -353,7 +353,7 @@ const EventManagePage: React.FC = () => {
 			{/* Back Button and Event Title */}
 			<div className="mb-6">
 				<button
-					onClick={() => navigate('/dashboard')}
+					onClick={() => navigate("/dashboard")}
 					className="flex items-center text-blue-400 hover:text-blue-300 mb-2"
 				>
 					<ArrowLeftIcon className="h-4 w-4 mr-1" />
@@ -418,7 +418,7 @@ const EventManagePage: React.FC = () => {
 
 								<div>
 									<h3 className="text-sm font-semibold text-gray-200">Location</h3>
-									{event.location.type === 'online' ? (
+									{event.location.type === "online" ? (
 										<div>
 											<p className="text-gray-300">Online Event</p>
 											<a
@@ -505,7 +505,7 @@ const EventManagePage: React.FC = () => {
 					<CreateEventModal
 						onClose={() => setShowEditModal(false)}
 						onSuccess={handleEditSuccess}
-						eventToEdit={event as any}
+						eventToEdit={event as any} // eslint-disable-line @typescript-eslint/no-explicit-any
 						isEditing={true}
 					/>
 				)}

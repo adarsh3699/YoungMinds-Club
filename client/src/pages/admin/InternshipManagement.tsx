@@ -17,6 +17,7 @@ import {
 	CurrencyDollarIcon,
 } from "@heroicons/react/24/outline";
 import { AdminInternshipData } from "@/types";
+import type { DataItem } from "../../components/common/SearchAndFilter";
 import CreateInternshipModal from "../../components/organizer/CreateInternshipModal";
 import { INTERNSHIP_CATEGORIES } from "../../utils/internshipConstants";
 
@@ -59,14 +60,14 @@ const InternshipManagement: React.FC = () => {
 
 	// Table columns
 	const columns = [
-		{ key: "internship", label: "Internship" },
-		{ key: "deadline", label: "Application Deadline" },
-		{ key: "organizer", label: "Organizer" },
-		{ key: "category", label: "Category" },
-		{ key: "compensation", label: "Compensation" },
-		{ key: "location", label: "Location" },
-		{ key: "status", label: "Status" },
-		{ key: "actions", label: "Actions" },
+		{ key: "internship", label: "Internship", className: "w-1/4 min-w-[280px]" },
+		{ key: "deadline", label: "Application Deadline", className: "w-1/8 min-w-[140px]" },
+		{ key: "organizer", label: "Organizer", className: "w-1/8 min-w-[120px]" },
+		{ key: "category", label: "Category", className: "w-1/12 min-w-[100px]" },
+		{ key: "compensation", label: "Compensation", className: "w-1/12 min-w-[100px]" },
+		{ key: "location", label: "Location", className: "w-1/12 min-w-[100px]" },
+		{ key: "status", label: "Status", className: "w-1/12 min-w-[100px]" },
+		{ key: "actions", label: "Actions", className: "w-1/6 min-w-[160px]" },
 	];
 
 	// Empty state config
@@ -159,7 +160,7 @@ const InternshipManagement: React.FC = () => {
 
 	// Handle filtered data changes from SearchAndFilter component
 	const handleFilteredDataChange = useCallback(
-		(filtered: any[]) => {
+		(filtered: DataItem[]) => {
 			// Map back to original internships using _id
 			const filteredIds = filtered.map((item) => item._id);
 			const originalFiltered = internships.filter((internship) => filteredIds.includes(internship._id));
@@ -296,7 +297,7 @@ const InternshipManagement: React.FC = () => {
 	}, [modal.type, deleteInternship, toggleFlag]);
 
 	const handleEditSuccess = useCallback(
-		(updatedInternship: any) => {
+		(updatedInternship: AdminInternshipData) => {
 			// Update the internship in the local state
 			setInternships((prev) =>
 				prev.map((internship) =>
@@ -319,8 +320,8 @@ const InternshipManagement: React.FC = () => {
 			>
 				{/* Internship Details */}
 				<td className="py-4 px-6">
-					<div className="flex items-center space-x-4">
-						<div className="relative">
+					<div className="flex items-start space-x-3">
+						<div className="relative flex-shrink-0">
 							<img
 								src={
 									internship.organizer?.organizerBrandLogo ||
@@ -329,22 +330,23 @@ const InternshipManagement: React.FC = () => {
 									"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA1MEg3MFY2MEgzMFY1MFoiIGZpbGw9IiM2QjcyODAiLz4KPHA+YXRoIGQ9Ik0zNSA0MEg2NVY0N0gzNVY0MFoiIGZpbGw9IiM2QjcyODAiLz4KPHA+YXRoIGQ9Ik0zNSA2NUg1NVY3MEgzNVY2NVoiIGZpbGw9IiM2QjcyODAiLz4KPC9zdmc+"
 								}
 								alt={internship.title}
-								className="w-16 h-16 object-cover rounded-lg shadow-md"
+								className="w-12 h-12 object-cover rounded-lg shadow-md"
 								onError={(e) => {
 									(e.target as HTMLImageElement).src =
 										"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCA1MEg3MFY2MEgzMFY1MFoiIGZpbGw9IiM2QjcyODAiLz4KPHA+YXRoIGQ9Ik0zNSA0MEg2NVY0N0gzNVY0MFoiIGZpbGw9IiM2QjcyODAiLz4KPHA+YXRoIGQ9Ik0zNSA2NUg1NVY3MEgzNVY2NVoiIGZpbGw9IiM2QjcyODAiLz4KPC9zdmc+";
 								}}
 							/>
 							{internship.isFeatured && (
-								<div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-primary rounded-full border-2 border-card" />
+								<div className="absolute -top-1 -right-1 w-3 h-3 bg-brand-primary rounded-full border-2 border-card" />
 							)}
 						</div>
 						<div className="min-w-0 flex-1">
 							<Link
 								to={`/internship/${internship._id}`}
-								className="text-brand-primary hover:text-brand-dark font-semibold text-sm block line-clamp-2 mb-1 transition-colors"
+								className="text-brand-primary hover:text-brand-dark font-semibold text-sm block mb-1 transition-colors leading-tight"
+								title={internship.title}
 							>
-								{internship.title}
+								<div className="line-clamp-2 break-words">{internship.title}</div>
 							</Link>
 							<p className="text-xs text-muted-foreground">
 								{internship.capacity} position{internship.capacity > 1 ? "s" : ""} •{" "}
@@ -583,12 +585,12 @@ const InternshipManagement: React.FC = () => {
 							<CreateInternshipModal
 								onClose={closeModal}
 								onSuccess={handleEditSuccess}
-								internshipToEdit={modal.internshipData as any}
+								internshipToEdit={modal.internshipData as any} // eslint-disable-line @typescript-eslint/no-explicit-any
 								isEditing={true}
 								apiEndpoint={
-									modal.internshipData._id
+									modal.internshipData?._id
 										? `/admin/internships/${modal.internshipData._id}`
-										: (null as any)
+										: (null as any) // eslint-disable-line @typescript-eslint/no-explicit-any
 								}
 							/>
 						</div>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import axios from 'axios';
-import { StatsCard, AdminTable, AdminConfirmationModal, AdminPageHeader } from '../../components/admin/dashboard';
-import { SearchAndFilter } from '../../components/common';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import axios from "axios";
+import { StatsCard, AdminTable, AdminConfirmationModal, AdminPageHeader } from "../../components/admin/dashboard";
+import { SearchAndFilter } from "../../components/common";
 import {
 	ExclamationTriangleIcon,
 	UserGroupIcon,
@@ -11,13 +11,14 @@ import {
 	UserIcon,
 	NoSymbolIcon,
 	ArrowDownIcon,
-} from '@heroicons/react/24/outline';
-import { OrganizerData } from '@/types';
+} from "@heroicons/react/24/outline";
+import { OrganizerData } from "@/types";
+import type { DataItem } from "../../components/common/SearchAndFilter";
 
 // Simple modal state type
 type OrganizerModalState = {
 	isOpen: boolean;
-	type: 'status' | 'flag' | 'demote' | null;
+	type: "status" | "flag" | "demote" | null;
 	organizerId: string | null;
 	organizerName: string;
 	currentStatus: string;
@@ -35,43 +36,43 @@ const OrganizersManagement: React.FC = () => {
 		isOpen: false,
 		type: null,
 		organizerId: null,
-		organizerName: '',
-		currentStatus: '',
+		organizerName: "",
+		currentStatus: "",
 		isFlagged: false,
-		flagReason: '',
+		flagReason: "",
 	});
 
 	// Filter options
 	const statusOptions = [
-		{ value: 'all', label: 'All Status' },
-		{ value: 'active', label: 'Active' },
-		{ value: 'suspended', label: 'Suspended' },
-		{ value: 'flagged', label: 'Flagged' },
+		{ value: "all", label: "All Status" },
+		{ value: "active", label: "Active" },
+		{ value: "suspended", label: "Suspended" },
+		{ value: "flagged", label: "Flagged" },
 	];
 
 	// Table columns
 	const columns = [
-		{ key: 'organizer', label: 'Organizer' },
-		{ key: 'email', label: 'Email' },
-		{ key: 'organization', label: 'Organization' },
-		{ key: 'events', label: 'Events' },
-		{ key: 'status', label: 'Status' },
-		{ key: 'actions', label: 'Actions' },
+		{ key: "organizer", label: "Organizer" },
+		{ key: "email", label: "Email" },
+		{ key: "organization", label: "Organization" },
+		{ key: "events", label: "Events" },
+		{ key: "status", label: "Status" },
+		{ key: "actions", label: "Actions" },
 	];
 
 	// Empty state config
 	const emptyStateConfig = {
 		icon: <UserGroupIcon className="w-16 h-16 text-muted-foreground/50" />,
-		title: 'No organizers found',
-		description: 'Try adjusting your search or filters',
-		noFiltersDescription: 'No organizers have been registered yet',
+		title: "No organizers found",
+		description: "Try adjusting your search or filters",
+		noFiltersDescription: "No organizers have been registered yet",
 	};
 
 	// Optimized stats calculation
 	const organizerStats = useMemo(() => {
 		const total = organizers.length;
-		const active = organizers.filter((org) => org.status === 'active' || !org.status).length;
-		const suspended = organizers.filter((org) => org.status === 'suspended').length;
+		const active = organizers.filter((org) => org.status === "active" || !org.status).length;
+		const suspended = organizers.filter((org) => org.status === "suspended").length;
 		const flagged = organizers.filter((org) => org.isFlagged).length;
 		const totalEvents = organizers.reduce((sum, org) => sum + (org.eventCount || 0), 0);
 
@@ -87,54 +88,54 @@ const OrganizersManagement: React.FC = () => {
 	// Stats cards data
 	const statsCards = [
 		{
-			title: 'Total Organizers',
+			title: "Total Organizers",
 			value: organizerStats.total,
-			description: 'All registered organizers',
+			description: "All registered organizers",
 			icon: <UserGroupIcon className="h-6 w-6 text-primary" />,
-			bgClass: 'bg-gradient-primary-light',
-			borderClass: 'border-primary/20',
-			iconBgClass: 'bg-primary-5',
+			bgClass: "bg-gradient-primary-light",
+			borderClass: "border-primary/20",
+			iconBgClass: "bg-primary-5",
 		},
 		{
-			title: 'Active',
+			title: "Active",
 			value: organizerStats.active,
-			description: 'Currently active',
+			description: "Currently active",
 			icon: <ShieldCheckIcon className="h-6 w-6 text-success" />,
-			bgClass: 'bg-gradient-success-light',
-			borderClass: 'border-success/20',
-			iconBgClass: 'bg-success-5',
+			bgClass: "bg-gradient-success-light",
+			borderClass: "border-success/20",
+			iconBgClass: "bg-success-5",
 		},
 		{
-			title: 'Suspended',
+			title: "Suspended",
 			value: organizerStats.suspended,
-			description: 'Temporarily suspended',
+			description: "Temporarily suspended",
 			icon: <NoSymbolIcon className="h-6 w-6 text-warning" />,
-			bgClass: 'bg-gradient-brand-tertiary-light',
-			borderClass: 'border-warning/20',
-			iconBgClass: 'bg-destructive-10',
+			bgClass: "bg-gradient-brand-tertiary-light",
+			borderClass: "border-warning/20",
+			iconBgClass: "bg-destructive-10",
 		},
 		{
-			title: 'Flagged',
+			title: "Flagged",
 			value: organizerStats.flagged,
-			description: 'Requiring attention',
+			description: "Requiring attention",
 			icon: <FlagIcon className="h-6 w-6 text-destructive" />,
-			bgClass: 'bg-gradient-brand-primary-light',
-			borderClass: 'border-destructive/20',
-			iconBgClass: 'bg-warning-10',
+			bgClass: "bg-gradient-brand-primary-light",
+			borderClass: "border-destructive/20",
+			iconBgClass: "bg-warning-10",
 		},
 		{
-			title: 'Total Events',
+			title: "Total Events",
 			value: organizerStats.totalEvents,
-			description: 'Events organized',
+			description: "Events organized",
 			icon: <CalendarIcon className="h-6 w-6 text-indigo" />,
-			bgClass: 'bg-gradient-indigo-light',
-			borderClass: 'border-indigo/20',
-			iconBgClass: 'bg-indigo-10',
+			bgClass: "bg-gradient-indigo-light",
+			borderClass: "border-indigo/20",
+			iconBgClass: "bg-indigo-10",
 		},
 	];
 
 	// Handle filtered data changes from SearchAndFilter component
-	const handleFilteredDataChange = (filtered: any[]) => {
+	const handleFilteredDataChange = (filtered: DataItem[]) => {
 		setFilteredOrganizers(filtered as OrganizerData[]);
 	};
 
@@ -143,14 +144,14 @@ const OrganizersManagement: React.FC = () => {
 		try {
 			setLoading(true);
 			setError(null);
-			const { data } = await axios.get('/admin/organizers');
+			const { data } = await axios.get("/admin/organizers");
 			if (data.success) {
 				setOrganizers(data.organizers);
 				setFilteredOrganizers(data.organizers);
 			}
 		} catch (error) {
-			console.error('Error fetching organizers:', error);
-			setError('Failed to load organizers. Please try again later.');
+			console.error("Error fetching organizers:", error);
+			setError("Failed to load organizers. Please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -160,7 +161,7 @@ const OrganizersManagement: React.FC = () => {
 		if (!modal.organizerId) return;
 
 		try {
-			const newStatus = modal.currentStatus === 'active' ? 'suspended' : 'active';
+			const newStatus = modal.currentStatus === "active" ? "suspended" : "active";
 			const { data } = await axios.put(`/admin/users/${modal.organizerId}/status`, {
 				status: newStatus,
 			});
@@ -173,8 +174,8 @@ const OrganizersManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error updating organizer status:', error);
-			setError('Failed to update organizer status. Please try again.');
+			console.error("Error updating organizer status:", error);
+			setError("Failed to update organizer status. Please try again.");
 		}
 	}, [modal.organizerId, modal.currentStatus]);
 
@@ -201,8 +202,8 @@ const OrganizersManagement: React.FC = () => {
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error updating organizer flag status:', error);
-			setError('Failed to update organizer flag status. Please try again.');
+			console.error("Error updating organizer flag status:", error);
+			setError("Failed to update organizer flag status. Please try again.");
 		}
 	}, [modal.organizerId, modal.isFlagged, modal.flagReason]);
 
@@ -211,28 +212,28 @@ const OrganizersManagement: React.FC = () => {
 
 		try {
 			const { data } = await axios.put(`/admin/users/${modal.organizerId}/role`, {
-				role: 'user',
+				role: "user",
 			});
 			if (data.success) {
 				setOrganizers((prev) => prev.filter((org) => org._id !== modal.organizerId));
 				setModal((prev) => ({ ...prev, isOpen: false }));
 			}
 		} catch (error) {
-			console.error('Error demoting organizer:', error);
-			setError('Failed to demote organizer. Please try again.');
+			console.error("Error demoting organizer:", error);
+			setError("Failed to demote organizer. Please try again.");
 		}
 	}, [modal.organizerId]);
 
 	// Modal handlers
-	const openModal = useCallback((type: 'status' | 'flag' | 'demote', organizer: OrganizerData) => {
+	const openModal = useCallback((type: "status" | "flag" | "demote", organizer: OrganizerData) => {
 		setModal({
 			isOpen: true,
 			type,
 			organizerId: organizer._id,
 			organizerName: organizer.name,
-			currentStatus: organizer.status || 'active',
+			currentStatus: organizer.status || "active",
 			isFlagged: organizer.isFlagged || false,
-			flagReason: organizer.flagReason || '',
+			flagReason: organizer.flagReason || "",
 		});
 	}, []);
 
@@ -241,11 +242,11 @@ const OrganizersManagement: React.FC = () => {
 	}, []);
 
 	const handleConfirm = useCallback(() => {
-		if (modal.type === 'status') {
+		if (modal.type === "status") {
 			toggleOrganizerStatus();
-		} else if (modal.type === 'flag') {
+		} else if (modal.type === "flag") {
 			toggleOrganizerFlag();
-		} else if (modal.type === 'demote') {
+		} else if (modal.type === "demote") {
 			demoteOrganizer();
 		}
 	}, [modal.type, toggleOrganizerStatus, toggleOrganizerFlag, demoteOrganizer]);
@@ -253,14 +254,14 @@ const OrganizersManagement: React.FC = () => {
 	// Optimized render function
 	const renderOrganizerRow = useCallback(
 		(organizer: OrganizerData) => {
-			const isActive = organizer.status === 'active' || !organizer.status;
-			const isSuspended = organizer.status === 'suspended';
+			const isActive = organizer.status === "active" || !organizer.status;
+			const isSuspended = organizer.status === "suspended";
 
 			return (
 				<tr
 					key={organizer._id}
 					className={`hover:bg-surface-secondary/50 transition-colors ${
-						organizer.isFlagged ? 'bg-destructive/5' : ''
+						organizer.isFlagged ? "bg-destructive/5" : ""
 					}`}
 				>
 					{/* Organizer Info */}
@@ -294,7 +295,7 @@ const OrganizersManagement: React.FC = () => {
 					{/* Organization */}
 					<td className="px-6 py-4">
 						<div className="text-sm text-card-foreground">
-							{organizer.organizationName || 'Not specified'}
+							{organizer.organizationName || "Not specified"}
 						</div>
 					</td>
 
@@ -310,7 +311,7 @@ const OrganizersManagement: React.FC = () => {
 					<td className="px-6 py-4">
 						<span
 							className={`inline-flex items-center px-2.5 py-1 text-xs rounded-full ${
-								isActive ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+								isActive ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
 							}`}
 						>
 							{isActive ? (
@@ -318,7 +319,7 @@ const OrganizersManagement: React.FC = () => {
 							) : (
 								<NoSymbolIcon className="h-3 w-3 mr-1" />
 							)}
-							{organizer.status || 'active'}
+							{organizer.status || "active"}
 						</span>
 					</td>
 
@@ -326,30 +327,30 @@ const OrganizersManagement: React.FC = () => {
 					<td className="px-6 py-4">
 						<div className="flex items-center space-x-2">
 							<button
-								onClick={() => openModal('status', organizer)}
+								onClick={() => openModal("status", organizer)}
 								className={`inline-flex items-center px-3 py-1.5 text-xs rounded-lg transition-all ${
 									isSuspended
-										? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
-										: 'bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20'
+										? "bg-success/10 text-success border border-success/20 hover:bg-success/20"
+										: "bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
 								}`}
 							>
-								{isSuspended ? 'Activate' : 'Suspend'}
+								{isSuspended ? "Activate" : "Suspend"}
 							</button>
 
 							<button
-								onClick={() => openModal('flag', organizer)}
+								onClick={() => openModal("flag", organizer)}
 								className={`inline-flex items-center px-3 py-1.5 text-xs rounded-lg transition-all ${
 									organizer.isFlagged
-										? 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20'
-										: 'bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20'
+										? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+										: "bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20"
 								}`}
 							>
 								<FlagIcon className="h-3 w-3 mr-1" />
-								{organizer.isFlagged ? 'Unflag' : 'Flag'}
+								{organizer.isFlagged ? "Unflag" : "Flag"}
 							</button>
 
 							<button
-								onClick={() => openModal('demote', organizer)}
+								onClick={() => openModal("demote", organizer)}
 								className="inline-flex items-center px-3 py-1.5 text-xs bg-purple/10 text-purple border border-purple/20 rounded-lg hover:bg-purple/20 transition-all"
 							>
 								<ArrowDownIcon className="h-3 w-3 mr-1" />
@@ -426,7 +427,7 @@ const OrganizersManagement: React.FC = () => {
 
 				{/* Admin Confirmation Modal */}
 				<AdminConfirmationModal
-					modalType={modal.type || 'status'}
+					modalType={modal.type || "status"}
 					isOpen={modal.isOpen}
 					onClose={closeModal}
 					userName={modal.organizerName}

@@ -16,7 +16,8 @@ import {
 	ChatBubbleLeftRightIcon,
 	CameraIcon as InstagramIcon,
 } from "@heroicons/react/24/outline";
-import { FormInput, TextareaField, SearchableSelect, getErrorMessage } from "../../components/common";
+import { FormInput, TextareaField, SearchableSelect } from "../../components/common";
+import { getErrorMessage } from "../../utils/errorUtils";
 import {
 	OrganizerProfileData,
 	OrganizerFormValues,

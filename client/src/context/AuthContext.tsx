@@ -1,13 +1,25 @@
-import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { jwtDecode } from 'jwt-decode';
-import { User, AuthContextType, ApiResponse, RegisterData, LoginData } from '@/types';
-import SuspendedAccountModal from '@/components/common/SuspendedAccountModal';
+import { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import axios, { AxiosResponse, AxiosError } from "axios";
+import { jwtDecode } from "jwt-decode";
+import { User, AuthContextType, ApiResponse, RegisterData, LoginData } from "@/types";
+import SuspendedAccountModal from "@/components/common/SuspendedAccountModal";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+// Helper interface for API error responses
+interface ApiErrorResponse {
+	message?: string;
+	errors?: Array<{ msg: string }>;
+	isSuspended?: boolean;
+}
+
+// Helper function to safely handle axios errors
+const isAxiosError = (error: unknown): error is AxiosError<ApiErrorResponse> => {
+	return axios.isAxiosError(error);
+};
 
 interface AuthProviderProps {
 	children: ReactNode;
@@ -21,7 +33,7 @@ interface JWTPayload {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [user, setUser] = useState<User | null>(null);
-	const [token, setToken] = useState<string | null>(localStorage.getItem('token') || null);
+	const [token, setToken] = useState<string | null>(localStorage.getItem("token") || null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [showSuspendedModal, setShowSuspendedModal] = useState<boolean>(false);
@@ -33,15 +45,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	// Add token to axios defaults if it exists
 	useEffect(() => {
 		if (token) {
-			axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+			axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 		} else {
-			delete axios.defaults.headers.common['Authorization'];
+			delete axios.defaults.headers.common["Authorization"];
 		}
 	}, [token]);
 
 	// Handle suspended user - clear session and show modal
 	const handleSuspendedUser = () => {
-		localStorage.removeItem('token');
+		localStorage.removeItem("token");
 		setToken(null);
 		setUser(null);
 		setShowSuspendedModal(true);
@@ -51,7 +63,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const closeSuspendedModal = () => {
 		setShowSuspendedModal(false);
 		// Optional: redirect to home page
-		window.location.href = '/';
+		window.location.href = "/";
 	};
 
 	// Check if token is valid and get user data
@@ -66,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				// Check if token is expired
 				const decodedToken = jwtDecode<JWTPayload>(token);
 				if (decodedToken.exp * 1000 < Date.now()) {
-					localStorage.removeItem('token');
+					localStorage.removeItem("token");
 					setToken(null);
 					setUser(null);
 					setLoading(false);
@@ -74,26 +86,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				}
 
 				// Verify token with backend
-				const response: AxiosResponse<ApiResponse<User>> = await axios.get('/auth/me');
+				const response: AxiosResponse<ApiResponse<User>> = await axios.get("/auth/me");
 
 				if (response.data.success && response.data.user) {
 					// Check if user is suspended
-					if (response.data.user.status === 'suspended') {
+					if (response.data.user.status === "suspended") {
 						handleSuspendedUser();
 						setLoading(false);
 						return;
 					}
 					setUser(response.data.user);
 				} else {
-					localStorage.removeItem('token');
+					localStorage.removeItem("token");
 					setToken(null);
 					setUser(null);
 				}
-			} catch (error: any) {
-				console.error('Token verification error:', error);
+			} catch (error: unknown) {
+				console.error("Token verification error:", error);
 
 				// Handle suspended user specifically
-				if (error.response?.data?.isSuspended) {
+				if (isAxiosError(error) && error.response?.data?.isSuspended) {
 					handleSuspendedUser();
 					setLoading(false);
 					return;
@@ -101,8 +113,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 				// Don't immediately remove token on network errors
 				// This prevents logout on temporary server issues or connectivity problems
-				if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-					localStorage.removeItem('token');
+				if (
+					isAxiosError(error) &&
+					error.response &&
+					(error.response.status === 401 || error.response.status === 403)
+				) {
+					localStorage.removeItem("token");
 					setToken(null);
 					setUser(null);
 				}
@@ -120,20 +136,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		setError(null);
 
 		try {
-			const response: AxiosResponse<ApiResponse> = await axios.post('/auth/signup', userData);
+			const response: AxiosResponse<ApiResponse> = await axios.post("/auth/signup", userData);
 
 			if (response.data.success && response.data.token && response.data.user) {
-				localStorage.setItem('token', response.data.token);
+				localStorage.setItem("token", response.data.token);
 				setToken(response.data.token);
 				setUser(response.data.user);
 			}
 
 			return response.data;
-		} catch (error: any) {
-			const errorMessage =
-				error.response?.data?.message ||
-				error.response?.data?.errors?.[0]?.msg ||
-				'Registration failed. Please try again.';
+		} catch (error: unknown) {
+			const errorMessage = isAxiosError(error)
+				? error.response?.data?.message ||
+				  error.response?.data?.errors?.[0]?.msg ||
+				  "Registration failed. Please try again."
+				: "Registration failed. Please try again.";
 			setError(errorMessage);
 			throw error;
 		} finally {
@@ -147,34 +164,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		setError(null);
 
 		try {
-			const response: AxiosResponse<ApiResponse> = await axios.post('/auth/login', userData);
+			const response: AxiosResponse<ApiResponse> = await axios.post("/auth/login", userData);
 
 			if (response.data.success && response.data.token && response.data.user) {
 				// Check if user is suspended
-				if (response.data.user.status === 'suspended') {
+				if (response.data.user.status === "suspended") {
 					handleSuspendedUser();
 					setLoading(false);
-					throw new Error('Account suspended');
+					throw new Error("Account suspended");
 				}
 
-				localStorage.setItem('token', response.data.token);
+				localStorage.setItem("token", response.data.token);
 				setToken(response.data.token);
 				setUser(response.data.user);
 			}
 
 			return response.data;
-		} catch (error: any) {
+		} catch (error: unknown) {
 			// Handle suspended user specifically
-			if (error.response?.data?.isSuspended) {
+			if (isAxiosError(error) && error.response?.data?.isSuspended) {
 				handleSuspendedUser();
 				setLoading(false);
 				throw error;
 			}
 
-			const errorMessage =
-				error.response?.data?.message ||
-				error.response?.data?.errors?.[0]?.msg ||
-				'Login failed. Please check your credentials.';
+			const errorMessage = isAxiosError(error)
+				? error.response?.data?.message ||
+				  error.response?.data?.errors?.[0]?.msg ||
+				  "Login failed. Please check your credentials."
+				: "Login failed. Please check your credentials.";
 			setError(errorMessage);
 			throw error;
 		} finally {
@@ -185,11 +203,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 	// Logout user
 	const logout = async (): Promise<void> => {
 		try {
-			await axios.get('/auth/logout');
+			await axios.get("/auth/logout");
 		} catch (error) {
-			console.error('Logout error:', error);
+			console.error("Logout error:", error);
 		} finally {
-			localStorage.removeItem('token');
+			localStorage.removeItem("token");
 			setToken(null);
 			setUser(null);
 		}
@@ -207,8 +225,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		setToken,
 		setUser,
 		isAuthenticated: !!user,
-		isAdmin: user?.role === 'admin',
-		isOrganizer: user?.role === 'organizer',
+		isAdmin: user?.role === "admin",
+		isOrganizer: user?.role === "organizer",
 	};
 
 	return (
@@ -220,11 +238,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 // Custom hook to use the auth context
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
 	const context = useContext(AuthContext);
 
 	if (!context) {
-		throw new Error('useAuth must be used within an AuthProvider');
+		throw new Error("useAuth must be used within an AuthProvider");
 	}
 
 	return context;
