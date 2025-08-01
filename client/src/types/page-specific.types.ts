@@ -119,7 +119,7 @@ export type HeroSectionProps = Record<string, never>;
 
 export type FeaturesSectionProps = Record<string, never>;
 
-export type EventsSectionProps = Record<string, never>;
+export type FeaturesEventsProps = Record<string, never>;
 
 export type FAQSectionProps = Record<string, never>;
 

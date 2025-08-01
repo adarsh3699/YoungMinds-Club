@@ -70,7 +70,7 @@ const FeaturesSection: React.FC = () => {
 						return (
 							<div
 								key={index}
-								className="animate-on-scroll ym-bg-card rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border ym-border-card p-6"
+								className="animate-on-scroll smooth-hover-card ym-bg-card rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 border ym-border-card p-6"
 							>
 								<div
 									className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { CalendarIcon, UsersIcon, StarIcon } from '@heroicons/react/24/outline';
-import { StatItem } from '@/types';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { CalendarIcon, UsersIcon, StarIcon } from "@heroicons/react/24/outline";
+import { StatItem } from "@/types";
 
 const HeroSection: React.FC = () => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -13,18 +13,18 @@ const HeroSection: React.FC = () => {
 	const stats: StatItem[] = [
 		{
 			icon: CalendarIcon,
-			value: '500+',
-			label: 'Events Listed',
+			value: "500+",
+			label: "Events Listed",
 		},
 		{
 			icon: UsersIcon,
-			value: '10K+',
-			label: 'Active Members',
+			value: "10K+",
+			label: "Active Members",
 		},
 		{
 			icon: StarIcon,
-			value: '4.9/5',
-			label: 'User Rating',
+			value: "4.9/5",
+			label: "User Rating",
 		},
 	];
 
@@ -35,7 +35,7 @@ const HeroSection: React.FC = () => {
 					{/* Badge */}
 					<div
 						className={`inline-flex items-center px-4 py-2 mb-6 ym-bg-yellow-100 ym-text-yellow-700 border border-yellow-200 dark:border-yellow-800 rounded-full text-sm font-medium transform transition-all duration-500 ${
-							isVisible ? 'scale-100 opacity-100' : 'scale-75 opacity-0'
+							isVisible ? "scale-100 opacity-100" : "scale-75 opacity-0"
 						}`}
 					>
 						🎉 Join 10,000+ Young Professionals
@@ -44,7 +44,7 @@ const HeroSection: React.FC = () => {
 					{/* Main Heading */}
 					<h1
 						className={`text-4xl md:text-6xl lg:text-7xl font-bold ym-text-primary mb-6 transform transition-all duration-700 delay-200 ${
-							isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+							isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
 						}`}
 					>
 						Connect. Learn. <span className="gradient-text">Grow.</span>
@@ -53,7 +53,7 @@ const HeroSection: React.FC = () => {
 					{/* Subheading */}
 					<p
 						className={`text-xl md:text-2xl ym-text-secondary mb-8 max-w-3xl mx-auto transform transition-all duration-700 delay-300 ${
-							isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+							isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
 						}`}
 					>
 						The premier platform connecting event organizers with ambitious young minds seeking meaningful
@@ -63,7 +63,7 @@ const HeroSection: React.FC = () => {
 					{/* CTA Buttons */}
 					<div
 						className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 transform transition-all duration-700 delay-400 ${
-							isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+							isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
 						}`}
 					>
 						<Link
@@ -85,7 +85,7 @@ const HeroSection: React.FC = () => {
 					{/* Stats */}
 					<div
 						className={`flex flex-wrap justify-center gap-8 text-center transform transition-all duration-700 delay-500 ${
-							isVisible ? 'opacity-100' : 'opacity-0'
+							isVisible ? "opacity-100" : "opacity-0"
 						}`}
 					>
 						{stats.map((stat, index) => {
@@ -108,7 +108,7 @@ const HeroSection: React.FC = () => {
 				{/* Hero Image/Illustration */}
 				<div
 					className={`mt-16 relative transform transition-all duration-1000 delay-600 ${
-						isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+						isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
 					}`}
 				>
 					<div className="relative max-w-4xl mx-auto">

@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import {
 	HeroSection,
 	FeaturesSection,
-	EventsSection,
-	InternshipsSection,
+	FeaturesEvents,
+	FeaturedInternships,
 	FAQSection,
 	CTASection,
 } from "../components/home_comp";
@@ -51,8 +51,8 @@ const HomePage: React.FC = () => {
 		<div className="min-h-screen bg-white dark:bg-gray-900">
 			<HeroSection />
 			<FeaturesSection />
-			<EventsSection />
-			<InternshipsSection />
+			<FeaturesEvents />
+			<FeaturedInternships />
 			<FAQSection />
 			<CTASection />
 		</div>

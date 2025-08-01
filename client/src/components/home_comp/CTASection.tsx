@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const CTASection: React.FC = () => {
 	const { isAuthenticated } = useAuth();
@@ -30,4 +30,4 @@ const CTASection: React.FC = () => {
 	);
 };
 
-export default CTASection; 
+export default CTASection;

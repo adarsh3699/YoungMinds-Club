@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { CalendarIcon, ClockIcon, MapPinIcon, UsersIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { AdminEventData } from "@/types";
 
-const EventsSection: React.FC = () => {
+const FeaturesEvents: React.FC = () => {
 	const [events, setEvents] = useState<AdminEventData[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -84,7 +84,7 @@ const EventsSection: React.FC = () => {
 					{events.slice(0, 3).map((event) => (
 						<div
 							key={event._id}
-							className="animate-on-scroll ym-bg-card rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border ym-border-card h-full flex flex-col"
+							className="animate-on-scroll smooth-hover-card ym-bg-card rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-2 overflow-hidden border ym-border-card h-full flex flex-col"
 						>
 							<div
 								className={`aspect-video bg-gradient-to-br ${getGradientForCategory(
@@ -156,4 +156,4 @@ const EventsSection: React.FC = () => {
 	);
 };
 
-export default EventsSection;
+export default FeaturesEvents;

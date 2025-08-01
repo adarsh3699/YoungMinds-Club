@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { InternshipCardData } from "@/types";
 
-const InternshipsSection: React.FC = () => {
+const FeaturedInternships: React.FC = () => {
 	const [internships, setInternships] = useState<InternshipCardData[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -130,7 +130,7 @@ const InternshipsSection: React.FC = () => {
 					{internships.slice(0, 3).map((internship) => (
 						<div
 							key={internship._id || internship.id}
-							className="animate-on-scroll ym-bg-card rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border ym-border-card h-full flex flex-col"
+							className="animate-on-scroll smooth-hover-card ym-bg-card rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-2 overflow-hidden border ym-border-card h-full flex flex-col"
 						>
 							<div
 								className={`aspect-video bg-gradient-to-br ${getGradientForCategory(
@@ -219,4 +219,4 @@ const InternshipsSection: React.FC = () => {
 	);
 };
 
-export default InternshipsSection;
+export default FeaturedInternships;
