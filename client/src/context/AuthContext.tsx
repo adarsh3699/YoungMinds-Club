@@ -213,6 +213,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
+	// Forgot password
+	const forgotPassword = async (email: string): Promise<ApiResponse> => {
+		setLoading(true);
+		setError(null);
+
+		try {
+			const response: AxiosResponse<ApiResponse> = await axios.post("/auth/forgot-password", { email });
+			return response.data;
+		} catch (error: unknown) {
+			const errorMessage = isAxiosError(error)
+				? error.response?.data?.message ||
+				  error.response?.data?.errors?.[0]?.msg ||
+				  "Failed to send password reset email. Please try again."
+				: "Failed to send password reset email. Please try again.";
+			setError(errorMessage);
+			throw error;
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	// Reset password
+	const resetPassword = async (data: { token: string; password: string }): Promise<ApiResponse> => {
+		setLoading(true);
+		setError(null);
+
+		try {
+			const response: AxiosResponse<ApiResponse> = await axios.post("/auth/reset-password", data);
+
+			if (response.data.success && response.data.token && response.data.user) {
+				localStorage.setItem("token", response.data.token);
+				setToken(response.data.token);
+				setUser(response.data.user);
+			}
+
+			return response.data;
+		} catch (error: unknown) {
+			const errorMessage = isAxiosError(error)
+				? error.response?.data?.message ||
+				  error.response?.data?.errors?.[0]?.msg ||
+				  "Failed to reset password. Please try again."
+				: "Failed to reset password. Please try again.";
+			setError(errorMessage);
+			throw error;
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	// Value to be provided to consuming components
 	const value: AuthContextType = {
 		user,
@@ -222,6 +271,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		register,
 		login,
 		logout,
+		forgotPassword,
+		resetPassword,
 		setToken,
 		setUser,
 		isAuthenticated: !!user,

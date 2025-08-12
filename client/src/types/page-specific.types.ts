@@ -45,6 +45,15 @@ export interface RegisterFormData {
 	role: "user" | "organizer";
 }
 
+export interface ForgotPasswordFormData {
+	email: string;
+}
+
+export interface ResetPasswordFormData {
+	password: string;
+	confirmPassword: string;
+}
+
 export interface AuthFormErrors {
 	[key: string]: string;
 }

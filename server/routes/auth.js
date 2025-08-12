@@ -18,11 +18,22 @@ const validateLogin = [
 	body("password").notEmpty().withMessage("Password is required"),
 ];
 
+const validateForgotPassword = [body("email").trim().isEmail().withMessage("Please enter a valid email")];
+
+const validateResetPassword = [
+	body("token").notEmpty().withMessage("Reset token is required"),
+	body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
+];
+
 // Auth routes
 router.post("/signup", validateSignup, authController.signup);
 router.post("/login", validateLogin, authController.login);
 router.get("/me", isAuthenticated, authController.getCurrentUser);
 router.get("/logout", authController.logout);
+
+// Password reset routes
+router.post("/forgot-password", validateForgotPassword, authController.forgotPassword);
+router.post("/reset-password", validateResetPassword, authController.resetPassword);
 
 // Google OAuth routes
 router.get("/google", (req, res) => {

@@ -76,6 +76,8 @@ export interface AuthContextType {
 	register: (userData: RegisterData) => Promise<ApiResponse>;
 	login: (userData: LoginData) => Promise<ApiResponse>;
 	logout: () => Promise<void>;
+	forgotPassword: (email: string) => Promise<ApiResponse>;
+	resetPassword: (data: { token: string; password: string }) => Promise<ApiResponse>;
 	setToken: (token: string | null) => void;
 	setUser: (user: User | null) => void;
 	updateUserInfo?: (userInfo: { name: string; email: string }) => void;

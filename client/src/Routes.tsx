@@ -19,6 +19,8 @@ const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
 const GDPRPage = lazy(() => import("@/pages/gdpr"));
 const LoginPage = lazy(() => import("@/pages/login"));
 const RegisterPage = lazy(() => import("@/pages/register"));
+const ForgotPasswordPage = lazy(() => import("@/pages/forgot-password"));
+const ResetPasswordPage = lazy(() => import("@/pages/reset-password"));
 const UserDashboard = lazy(() => import("@/pages/user/dashboard"));
 const UserProfile = lazy(() => import("@/pages/user/profile"));
 const UserEventFeedback = lazy(() => import("@/pages/user/event-feedback"));
@@ -143,6 +145,22 @@ const AppRoutes: React.FC = () => {
 											element={
 												<AuthRouteGuard>
 													<RegisterPage />
+												</AuthRouteGuard>
+											}
+										/>
+										<Route
+											path="/forgot-password"
+											element={
+												<AuthRouteGuard>
+													<ForgotPasswordPage />
+												</AuthRouteGuard>
+											}
+										/>
+										<Route
+											path="/reset-password"
+											element={
+												<AuthRouteGuard>
+													<ResetPasswordPage />
 												</AuthRouteGuard>
 											}
 										/>

@@ -1,6 +1,6 @@
-import React from 'react';
-import LoginForm from '../components/auth/LoginForm';
-import { AcademicCapIcon, UsersIcon, CalendarIcon, HandRaisedIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import LoginForm from "../components/auth/LoginForm";
+import { AcademicCapIcon, UsersIcon, CalendarIcon, HandRaisedIcon } from "@heroicons/react/24/outline";
 
 const LoginPage: React.FC = () => {
 	return (
@@ -72,7 +72,7 @@ const LoginPage: React.FC = () => {
 			</div>
 
 			{/* Right side - Login Form */}
-			<div className="flex-1 flex items-center justify-center p-6 ym-features-bg relative">
+			<div className="flex-1 flex items-start justify-center p-6 ym-features-bg relative">
 				{/* Background pattern */}
 				<div className="absolute inset-0 auth-pattern-bg opacity-30"></div>
 
@@ -82,9 +82,6 @@ const LoginPage: React.FC = () => {
 							<HandRaisedIcon className="w-8 h-8 text-white" />
 						</div>
 						<h2 className="text-3xl font-bold ym-text-primary mb-2">Welcome back</h2>
-						<p className="ym-text-secondary leading-relaxed">
-							Log in to continue your journey with YoungMinds Club and access exclusive content
-						</p>
 					</div>
 
 					<div className="ym-bg-card rounded-2xl auth-card-shadow backdrop-blur-sm border ym-border-card overflow-hidden">
