@@ -3,6 +3,7 @@ const { generateToken } = require("../utils/jwt");
 const { validationResult } = require("express-validator");
 const { setupGoogleAuth } = require("../config/google");
 const { sendPasswordResetEmail, sendPasswordChangeConfirmation } = require("../services/emailService");
+const crypto = require("crypto");
 
 // Register new user
 exports.signup = async (req, res) => {
@@ -176,8 +177,7 @@ exports.googleCallback = async (req, res) => {
 		});
 
 		// Get the client URL properly - handle comma-separated URLs
-		const clientURLs = (process.env.CLIENT_URL || "http://localhost:5173").split(",");
-		const clientURL = clientURLs[0].trim();
+		const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
 
 		// Redirect to frontend with token
 		res.redirect(`${clientURL}/auth/success?token=${token}`);
@@ -185,8 +185,7 @@ exports.googleCallback = async (req, res) => {
 		console.error("Google OAuth error:", error);
 
 		// Get the client URL properly - handle comma-separated URLs
-		const clientURLs = (process.env.CLIENT_URL || "http://localhost:5173").split(",");
-		const clientURL = clientURLs[0].trim();
+		const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
 
 		// For suspended users, redirect to auth success with suspended parameter
 		if (error.isSuspended) {
@@ -281,7 +280,9 @@ exports.forgotPassword = async (req, res) => {
 		const isGoogleOnlyAccount = user.googleId && !user.password;
 
 		// Generate password reset token
-		const resetToken = user.createPasswordResetToken();
+		const resetToken = crypto.randomBytes(32).toString("hex");
+		user.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+		user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 		await user.save({ validateBeforeSave: false });
 
 		try {
@@ -332,13 +333,16 @@ exports.resetPassword = async (req, res) => {
 
 		const { token, password } = req.body;
 
-		// Find user with valid reset token
+		// Hash the provided token to compare with stored hash
+		const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+		// Find user with matching reset token that hasn't expired
 		const user = await User.findOne({
-			passwordResetToken: { $exists: true },
+			passwordResetToken: hashedToken,
 			passwordResetExpires: { $gt: Date.now() },
 		});
 
-		if (!user || !user.isPasswordResetTokenValid(token)) {
+		if (!user) {
 			return res.status(400).json({
 				success: false,
 				message: "Password reset token is invalid or has expired.",

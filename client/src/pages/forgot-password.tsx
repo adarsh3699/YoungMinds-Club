@@ -96,7 +96,7 @@ const ForgotPasswordPage: React.FC = () => {
 			</div>
 
 			{/* Right side - Forgot Password Form */}
-			<div className="flex-1 flex items-center justify-center p-6 ym-features-bg relative">
+			<div className="flex-1 flex items-start justify-center p-6 ym-features-bg relative">
 				{/* Background pattern */}
 				<div className="absolute inset-0 auth-pattern-bg opacity-30"></div>
 
@@ -106,9 +106,6 @@ const ForgotPasswordPage: React.FC = () => {
 							<KeyIcon className="w-8 h-8 text-white" />
 						</div>
 						<h2 className="text-3xl font-bold ym-text-primary mb-2">Reset Password</h2>
-						<p className="ym-text-secondary leading-relaxed">
-							Enter your email address and we'll send you a link to reset your password
-						</p>
 					</div>
 
 					<div className="ym-bg-card rounded-2xl auth-card-shadow backdrop-blur-sm border ym-border-card overflow-hidden">

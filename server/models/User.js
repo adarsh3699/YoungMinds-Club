@@ -165,25 +165,6 @@ userSchema.methods.isActive = function () {
 	return this.status === "active";
 };
 
-// Method to generate password reset token
-userSchema.methods.createPasswordResetToken = function () {
-	const resetToken = crypto.randomBytes(32).toString("hex");
-
-	this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-	// Token expires in 10 minutes
-	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-	return resetToken;
-};
-
-// Method to check if password reset token is valid
-userSchema.methods.isPasswordResetTokenValid = function (token) {
-	const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
-	return this.passwordResetToken === hashedToken && this.passwordResetExpires > Date.now();
-};
-
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

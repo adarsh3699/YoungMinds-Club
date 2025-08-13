@@ -19,8 +19,7 @@ const sendPasswordResetEmail = async (userEmail, userName, resetToken, isGoogleU
 		const transporter = createTransporter();
 
 		// Get the client URL properly - handle comma-separated URLs
-		const clientURLs = (process.env.CLIENT_URL || "http://localhost:5173").split(",");
-		const clientURL = clientURLs[0].trim();
+		const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
 		const resetURL = `${clientURL}/reset-password?token=${resetToken}`;
 
 		const emailSubject = isGoogleUser
@@ -163,6 +162,8 @@ const sendPasswordChangeConfirmation = async (userEmail, userName) => {
 						
 						<p style="font-size: 14px; color: #666;">
 							If you did not make this change, please contact our support team immediately.
+							<br>
+							<a href="mailto:clubyoungminds@gmail.com">clubyoungminds@gmail.com</a>
 						</p>
 						
 						<p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">

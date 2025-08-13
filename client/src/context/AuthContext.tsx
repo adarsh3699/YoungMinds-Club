@@ -132,7 +132,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	// Register user
 	const register = async (userData: RegisterData): Promise<ApiResponse> => {
-		setLoading(true);
 		setError(null);
 
 		try {
@@ -153,14 +152,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				: "Registration failed. Please try again.";
 			setError(errorMessage);
 			throw error;
-		} finally {
-			setLoading(false);
 		}
 	};
 
 	// Login user
 	const login = async (userData: LoginData): Promise<ApiResponse> => {
-		setLoading(true);
 		setError(null);
 
 		try {
@@ -170,7 +166,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				// Check if user is suspended
 				if (response.data.user.status === "suspended") {
 					handleSuspendedUser();
-					setLoading(false);
 					throw new Error("Account suspended");
 				}
 
@@ -184,7 +179,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 			// Handle suspended user specifically
 			if (isAxiosError(error) && error.response?.data?.isSuspended) {
 				handleSuspendedUser();
-				setLoading(false);
 				throw error;
 			}
 
@@ -195,8 +189,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				: "Login failed. Please check your credentials.";
 			setError(errorMessage);
 			throw error;
-		} finally {
-			setLoading(false);
 		}
 	};
 
@@ -215,7 +207,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	// Forgot password
 	const forgotPassword = async (email: string): Promise<ApiResponse> => {
-		setLoading(true);
 		setError(null);
 
 		try {
@@ -229,14 +220,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				: "Failed to send password reset email. Please try again.";
 			setError(errorMessage);
 			throw error;
-		} finally {
-			setLoading(false);
 		}
 	};
 
 	// Reset password
 	const resetPassword = async (data: { token: string; password: string }): Promise<ApiResponse> => {
-		setLoading(true);
 		setError(null);
 
 		try {
@@ -257,8 +245,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				: "Failed to reset password. Please try again.";
 			setError(errorMessage);
 			throw error;
-		} finally {
-			setLoading(false);
 		}
 	};
 
