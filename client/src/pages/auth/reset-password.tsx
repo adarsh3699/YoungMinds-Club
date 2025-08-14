@@ -1,8 +1,8 @@
 import React from "react";
-import LoginForm from "../components/auth/LoginForm";
-import { AcademicCapIcon, UsersIcon, CalendarIcon, HandRaisedIcon } from "@heroicons/react/24/outline";
+import { ResetPasswordForm } from "../../components/auth";
+import { AcademicCapIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 
-const LoginPage: React.FC = () => {
+const ResetPasswordPage: React.FC = () => {
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row">
 			{/* Left side - Image/Brand */}
@@ -25,43 +25,67 @@ const LoginPage: React.FC = () => {
 						</div>
 					</div>
 					<p className="text-xl contrast-text-white leading-relaxed">
-						Where young thinkers connect, learn, and grow together through meaningful experiences.
+						You're almost there! Create a new, secure password for your account.
 					</p>
 				</div>
 
 				<div className="space-y-8 relative z-10">
 					<div className="flex items-start space-x-4 group">
 						<div className="bg-white bg-opacity-20 backdrop-blur-sm p-3 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-							<AcademicCapIcon className="w-6 h-6 text-amber-600" />
+							<ShieldCheckIcon className="w-6 h-6 text-amber-600" />
 						</div>
 						<div>
-							<h3 className="font-bold text-lg contrast-text-white-bold">Learn and Develop</h3>
+							<h3 className="font-bold text-lg contrast-text-white-bold">Strong Security</h3>
 							<p className="contrast-text-white leading-relaxed">
-								Access educational resources and workshops tailored for young minds to excel
+								Choose a strong password to keep your account secure
 							</p>
 						</div>
 					</div>
 
 					<div className="flex items-start space-x-4 group">
 						<div className="bg-white bg-opacity-20 backdrop-blur-sm p-3 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-							<UsersIcon className="w-6 h-6 text-amber-600" />
+							<svg
+								className="w-6 h-6 text-amber-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+								></path>
+							</svg>
 						</div>
 						<div>
-							<h3 className="font-bold text-lg contrast-text-white-bold">Connect with Peers</h3>
+							<h3 className="font-bold text-lg contrast-text-white-bold">Instant Access</h3>
 							<p className="contrast-text-white leading-relaxed">
-								Build lasting friendships with like-minded young people from around the world
+								You'll be automatically logged in after resetting your password
 							</p>
 						</div>
 					</div>
 
 					<div className="flex items-start space-x-4 group">
 						<div className="bg-white bg-opacity-20 backdrop-blur-sm p-3 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-							<CalendarIcon className="w-6 h-6 text-amber-600" />
+							<svg
+								className="w-6 h-6 text-amber-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2"
+									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+								></path>
+							</svg>
 						</div>
 						<div>
-							<h3 className="font-bold text-lg contrast-text-white-bold">Join Activities</h3>
+							<h3 className="font-bold text-lg contrast-text-white-bold">All Set</h3>
 							<p className="contrast-text-white leading-relaxed">
-								Participate in engaging workshops, competitions, and networking events
+								Continue your journey with YoungMinds Club seamlessly
 							</p>
 						</div>
 					</div>
@@ -71,23 +95,23 @@ const LoginPage: React.FC = () => {
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 to-transparent"></div>
 			</div>
 
-			{/* Right side - Login Form */}
-			<div className="flex-1 flex items-start justify-center p-6 ym-features-bg relative">
+			{/* Right side - Reset Password Form */}
+			<div className="flex-1 flex items-center justify-center p-6 ym-features-bg relative">
 				{/* Background pattern */}
 				<div className="absolute inset-0 auth-pattern-bg opacity-30"></div>
 
 				<div className="w-full max-w-md relative z-10">
 					<div className="text-center mb-10">
 						<div className="inline-flex items-center justify-center w-16 h-16 ym-bg-amber-400 rounded-xl mb-4 shadow-lg">
-							<HandRaisedIcon className="w-8 h-8 text-white" />
+							<ShieldCheckIcon className="w-8 h-8 text-white" />
 						</div>
-						<h2 className="text-3xl font-bold ym-text-primary mb-2">Welcome back</h2>
+						<h2 className="text-3xl font-bold ym-text-primary mb-2">Create New Password</h2>
 					</div>
 
 					<div className="ym-bg-card rounded-2xl auth-card-shadow backdrop-blur-sm border ym-border-card overflow-hidden">
 						{/* Card header with gradient */}
 						<div className="h-2 gradient-bg"></div>
-						<LoginForm />
+						<ResetPasswordForm />
 					</div>
 
 					{/* Mobile brand info */}
@@ -106,4 +130,4 @@ const LoginPage: React.FC = () => {
 	);
 };
 
-export default LoginPage;
+export default ResetPasswordPage;

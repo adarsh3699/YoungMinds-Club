@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { InternshipDiscoverData, InternshipsApiResponse } from "@/types";
 import { INTERNSHIP_TYPES } from "../utils/internshipConstants";
+import { BriefcaseIcon } from "@heroicons/react/24/outline";
 
 const InternshipDiscoverPage: React.FC = () => {
 	const { isAuthenticated } = useAuth();
@@ -116,20 +117,7 @@ const InternshipDiscoverPage: React.FC = () => {
 						</div>
 					) : filteredInternships.length === 0 ? (
 						<div className="ym-bg-card rounded-lg p-8 text-center border ym-border-card shadow-md">
-							<svg
-								className="mx-auto h-12 w-12 ym-text-muted"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								aria-hidden="true"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M8 6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V8a2 2 0 00-2-2"
-								/>
-							</svg>
+							<BriefcaseIcon className="mx-auto h-12 w-12 ym-text-muted" aria-hidden="true" />
 							<h3 className="mt-2 text-lg font-medium ym-text-primary">No internships found</h3>
 							<p className="mt-1 text-sm ym-text-secondary">
 								Try adjusting your search or filter criteria to find internships.
