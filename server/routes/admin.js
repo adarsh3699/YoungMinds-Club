@@ -57,6 +57,15 @@ router.delete("/users/:id", adminController.deleteUser);
 router.get("/organizers", adminController.getAllOrganizers);
 router.get("/top-organizers", adminController.getTopOrganizers);
 
+// Organizer application management routes
+router.get("/organizer-applications", adminController.getOrganizerApplications);
+router.put("/organizer-applications/:id/approve", adminController.approveOrganizerApplication);
+router.put(
+	"/organizer-applications/:id/reject",
+	[body("rejectionReason").optional().isString().withMessage("Rejection reason must be a string")],
+	adminController.rejectOrganizerApplication
+);
+
 // Event management routes
 router.get("/events", adminController.getAllEvents);
 router.put("/events/:id", upload.single("poster"), handleMulterError, adminController.updateEvent);

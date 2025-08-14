@@ -5,6 +5,19 @@ export interface User {
 	name: string;
 	role: "user" | "organizer" | "admin";
 	status?: "active" | "suspended";
+	organizerStatus?: "none" | "pending" | "approved" | "rejected";
+	organizerApplication?: {
+		organizationName?: string;
+		reason?: string;
+		experience?: string;
+		socialLinks?: string;
+		appliedAt?: string;
+		reviewedAt?: string;
+		reviewedBy?: string;
+		rejectionReason?: string;
+		reapplicationCount?: number;
+		lastRejectedAt?: string;
+	};
 	profileImage?: string;
 	phoneNumber?: string;
 	dateOfBirth?: string;

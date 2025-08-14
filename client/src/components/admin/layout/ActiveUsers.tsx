@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { UserIcon } from '@heroicons/react/24/outline';
-import UserCard from './UserCard';
-import { ActiveUsersProps } from '@/types';
+import React from "react";
+import { Link } from "react-router-dom";
+import { UserIcon } from "@heroicons/react/24/outline";
+import UserCard from "../cards/UserCard";
+import { ActiveUsersProps } from "@/types";
 
 const ActiveUsers: React.FC<ActiveUsersProps> = ({ users = [] }) => {
 	return (
@@ -43,4 +43,4 @@ const ActiveUsers: React.FC<ActiveUsersProps> = ({ users = [] }) => {
 	);
 };
 
-export default ActiveUsers; 
+export default ActiveUsers;

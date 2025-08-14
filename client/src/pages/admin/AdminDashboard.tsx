@@ -21,7 +21,7 @@ import {
 	TopOrganizers,
 	ActiveUsers,
 	LoadingComponent,
-} from "../../components/admin/dashboard";
+} from "../../components/admin";
 
 import {
 	AdminDashboardStats,

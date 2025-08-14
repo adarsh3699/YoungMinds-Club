@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ExclamationTriangleIcon, UserIcon, CalendarIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/common/Button";
 import Tabs from "@/components/common/Tabs";
-import { AdminConfirmationModal, AdminPageHeader } from "@/components/admin/dashboard";
+import { AdminConfirmationModal, AdminPageHeader } from "@/components/admin";
 import { FlaggedItems, ModerationApiResponse, FlaggedUser, FlaggedEvent } from "@/types";
 
 // Unified modal state management

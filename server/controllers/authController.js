@@ -52,12 +52,14 @@ exports.signup = async (req, res) => {
 			message: "User registered successfully",
 			token,
 			user: {
-				id: user._id,
+				_id: user._id,
 				name: user.name,
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
 				status: user.status,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
 		});
 	} catch (error) {
@@ -135,12 +137,14 @@ exports.login = async (req, res) => {
 			message: "Login successful",
 			token,
 			user: {
-				id: user._id,
+				_id: user._id,
 				name: user.name,
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
 				status: user.status,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
 		});
 	} catch (error) {
@@ -213,12 +217,14 @@ exports.getCurrentUser = async (req, res) => {
 		res.status(200).json({
 			success: true,
 			user: {
-				id: user._id,
+				_id: user._id,
 				name: user.name,
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
 				status: user.status,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
 		});
 	} catch (error) {
@@ -393,12 +399,14 @@ exports.resetPassword = async (req, res) => {
 			message: successMessage,
 			token: jwtToken,
 			user: {
-				id: user._id,
+				_id: user._id,
 				name: user.name,
 				email: user.email,
 				role: user.role,
 				profilePicture: user.profilePicture,
 				status: user.status,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
 		});
 	} catch (error) {

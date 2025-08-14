@@ -1,11 +1,17 @@
-export { default as StatsCard } from './StatsCard';
-export { default as UserCard } from './UserCard';
-export { default as AdminSectionCard } from './AdminSectionCard';
-export { default as AnnouncementForm } from './AnnouncementForm';
-export { default as TopOrganizers } from './TopOrganizers';
-export { default as ActiveUsers } from './ActiveUsers';
-export { default as LoadingComponent } from './LoadingComponent';
-export { default as UserStatsCards } from './UserStatsCards';
-export { default as AdminTable, UsersTable } from './AdminTable';
-export { default as AdminConfirmationModal } from './AdminConfirmationModal';
-export { default as AdminPageHeader } from './AdminPageHeader'; 
+// Legacy exports for backwards compatibility
+// These re-export from the new organized structure
+
+// Modals
+export { AdminApplicationModal, AdminConfirmationModal } from "../modals";
+
+// Tables
+export { AdminTable, UsersTable } from "../tables";
+
+// Cards
+export { StatsCard, UserCard, AdminSectionCard, UserStatsCards } from "../cards";
+
+// Forms
+export { AnnouncementForm } from "../forms";
+
+// Layout
+export { AdminPageHeader, LoadingComponent, TopOrganizers, ActiveUsers } from "../layout";

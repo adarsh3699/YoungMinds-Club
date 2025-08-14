@@ -41,6 +41,52 @@ const userSchema = new mongoose.Schema(
 			enum: ["active", "suspended"],
 			default: "active",
 		},
+		// Organizer approval status
+		organizerStatus: {
+			type: String,
+			enum: ["none", "pending", "approved", "rejected"],
+			default: "none",
+		},
+		// Organizer application data
+		organizerApplication: {
+			organizationName: {
+				type: String,
+				trim: true,
+			},
+			reason: {
+				type: String,
+				trim: true,
+			},
+			experience: {
+				type: String,
+				trim: true,
+			},
+			socialLinks: {
+				type: String,
+				trim: true,
+			},
+			appliedAt: {
+				type: Date,
+			},
+			reviewedAt: {
+				type: Date,
+			},
+			reviewedBy: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+			rejectionReason: {
+				type: String,
+				trim: true,
+			},
+			reapplicationCount: {
+				type: Number,
+				default: 0,
+			},
+			lastRejectedAt: {
+				type: Date,
+			},
+		},
 		college: {
 			type: String,
 			trim: true,
@@ -158,6 +204,12 @@ userSchema.methods.isAdmin = function () {
 // Method to check if user is organizer
 userSchema.methods.isOrganizer = function () {
 	return this.role === "organizer" || this.role === "admin";
+};
+
+// Method to check if user is approved organizer (can create events/internships)
+userSchema.methods.isApprovedOrganizer = function () {
+	if (this.role === "admin") return true;
+	return this.role === "organizer" && this.organizerStatus === "approved";
 };
 
 // Method to check if user account is active

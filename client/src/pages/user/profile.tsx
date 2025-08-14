@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import axios, { AxiosResponse } from 'axios';
-import { ProfileHeader, XPSection, BadgeCollection, OrganizerApplication } from '../../components/user/profile';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import axios, { AxiosResponse } from "axios";
+import { ProfileHeader, XPSection, BadgeCollection, OrganizerApplication } from "../../components/user/profile";
 import {
 	UserProfile,
 	XPHistoryEntry,
@@ -10,11 +10,11 @@ import {
 	OrganizerApplicationData,
 	DashboardBadgeInfo,
 	BadgeType,
-	ApiResponse
-} from '@/types';
+	ApiResponse,
+} from "@/types";
 
 const Profile: React.FC = () => {
-	const { user, updateUserInfo } = useAuth();
+	const { user } = useAuth();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [saving, setSaving] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -23,45 +23,57 @@ const Profile: React.FC = () => {
 	const [badges, setBadges] = useState<BadgeItem[]>([]);
 	const [editMode, setEditMode] = useState<boolean>(false);
 	const [formValues, setFormValues] = useState<ProfileFormValues>({
-		name: '',
-		email: '',
-		college: '',
+		name: "",
+		email: "",
+		college: "",
 	});
 	const [applyingForOrganizer, setApplyingForOrganizer] = useState<boolean>(false);
 	const [organizerApplication, setOrganizerApplication] = useState<OrganizerApplicationData>({
-		organizationName: '',
-		reason: '',
-		experience: '',
-		socialLinks: '',
+		organizationName: "",
+		reason: "",
+		experience: "",
+		socialLinks: "",
 	});
+	const [organizerStatus, setOrganizerStatus] = useState<"none" | "pending" | "approved" | "rejected">("none");
+	const [organizerApplicationData, setOrganizerApplicationData] = useState<
+		UserProfile["organizerApplication"] | null
+	>(null);
 
 	useEffect(() => {
 		const fetchProfileData = async (): Promise<void> => {
-				setLoading(true);
+			setLoading(true);
 			try {
 				// Get user profile data
-				const profileResponse: AxiosResponse<{ success: boolean; profile: UserProfile }> = await axios.get('/user/profile');
+				const profileResponse: AxiosResponse<{ success: boolean; profile: UserProfile }> = await axios.get(
+					"/user/profile"
+				);
 				if (profileResponse?.data?.success) {
 					const profileData = profileResponse.data.profile || {};
 					setUserProfile(profileData);
 					setFormValues({
-						name: profileData?.name || '',
-						email: profileData?.email || '',
-						college: profileData?.college || '',
+						name: profileData?.name || "",
+						email: profileData?.email || "",
+						college: profileData?.college || "",
 					});
+
+					// Extract organizer data from profile
+					setOrganizerStatus(profileData?.organizerStatus || "none");
+					setOrganizerApplicationData(profileData?.organizerApplication || null);
 				} else {
 					// Create default profile if response is not successful
-					const defaultProfile: UserProfile = { name: user?.name || '', email: user?.email || '' };
+					const defaultProfile: UserProfile = { name: user?.name || "", email: user?.email || "" };
 					setUserProfile(defaultProfile);
-				setFormValues({
+					setFormValues({
 						name: defaultProfile.name,
 						email: defaultProfile.email,
-						college: '',
+						college: "",
 					});
 				}
 
 				// Get XP history
-				const xpResponse: AxiosResponse<{ success: boolean; xpHistory: XPHistoryEntry[] }> = await axios.get('/user/xp-history');
+				const xpResponse: AxiosResponse<{ success: boolean; xpHistory: XPHistoryEntry[] }> = await axios.get(
+					"/user/xp-history"
+				);
 				if (xpResponse?.data?.success) {
 					setXPHistory(xpResponse.data.xpHistory || []);
 				} else {
@@ -69,23 +81,25 @@ const Profile: React.FC = () => {
 				}
 
 				// Get badges collection
-				const badgesResponse: AxiosResponse<{ success: boolean; badges: BadgeItem[] }> = await axios.get('/user/badges');
+				const badgesResponse: AxiosResponse<{ success: boolean; badges: BadgeItem[] }> = await axios.get(
+					"/user/badges"
+				);
 				if (badgesResponse?.data?.success) {
 					setBadges(badgesResponse.data.badges || []);
 				} else {
 					setBadges([]);
 				}
 			} catch (error) {
-				console.error('Error fetching profile data:', error);
-				setError('Failed to load profile data. Please try again.');
+				console.error("Error fetching profile data:", error);
+				setError("Failed to load profile data. Please try again.");
 
 				// Set defaults in case of error
-				const defaultProfile: UserProfile = { name: user?.name || '', email: user?.email || '' };
+				const defaultProfile: UserProfile = { name: user?.name || "", email: user?.email || "" };
 				setUserProfile(defaultProfile);
 				setFormValues({
 					name: defaultProfile.name,
 					email: defaultProfile.email,
-					college: '',
+					college: "",
 				});
 				setXPHistory([]);
 				setBadges([]);
@@ -101,9 +115,9 @@ const Profile: React.FC = () => {
 		if (editMode) {
 			// Reset form values when canceling edit
 			setFormValues({
-				name: userProfile?.name || '',
-				email: userProfile?.email || '',
-				college: userProfile?.college || '',
+				name: userProfile?.name || "",
+				email: userProfile?.email || "",
+				college: userProfile?.college || "",
 			});
 		}
 		setEditMode(!editMode);
@@ -129,25 +143,20 @@ const Profile: React.FC = () => {
 		e.preventDefault();
 		setSaving(true);
 		try {
-			const response: AxiosResponse<ApiResponse> = await axios.put('/user/profile', formValues);
+			const response: AxiosResponse<ApiResponse> = await axios.put("/user/profile", formValues);
 
 			if (response.data.success) {
 				setUserProfile({
 					...userProfile!,
 					...formValues,
 				});
-				// Update auth context if available
-				if (updateUserInfo) {
-					updateUserInfo({
-						name: formValues.name,
-						email: formValues.email,
-					});
-				}
+				// Update user profile data
+				await fetchUserProfile();
 				setEditMode(false);
 			}
 		} catch (error) {
-			console.error('Error updating profile:', error);
-			setError('Failed to update profile. Please try again.');
+			console.error("Error updating profile:", error);
+			setError("Failed to update profile. Please try again.");
 		} finally {
 			setSaving(false);
 		}
@@ -157,17 +166,97 @@ const Profile: React.FC = () => {
 		e.preventDefault();
 		setSaving(true);
 		try {
-			const response: AxiosResponse<ApiResponse> = await axios.post('/user/apply-organizer', organizerApplication);
+			const response: AxiosResponse<ApiResponse> = await axios.post(
+				"/user/apply-organizer",
+				organizerApplication
+			);
 
 			if (response.data.success) {
 				setApplyingForOrganizer(false);
-				// Show success message or notification
+				// Refresh user data to get updated organizer status
+				await fetchUserProfile();
 			}
 		} catch (error) {
-			console.error('Error submitting application:', error);
-			setError('Failed to submit organizer application. Please try again.');
+			console.error("Error submitting application:", error);
+			setError("Failed to submit organizer application. Please try again.");
 		} finally {
 			setSaving(false);
+		}
+	};
+
+	const updateOrganizerApplication = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+		e.preventDefault();
+		setSaving(true);
+		try {
+			const response: AxiosResponse<ApiResponse> = await axios.put(
+				"/user/organizer-application",
+				organizerApplication
+			);
+
+			if (response.data.success) {
+				setApplyingForOrganizer(false);
+				// Refresh user data to get updated application
+				await fetchUserProfile();
+			}
+		} catch (error) {
+			console.error("Error updating application:", error);
+			setError("Failed to update organizer application. Please try again.");
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const cancelOrganizerApplication = async (): Promise<void> => {
+		if (!window.confirm("Are you sure you want to cancel your organizer application?")) {
+			return;
+		}
+
+		setSaving(true);
+		try {
+			const response: AxiosResponse<ApiResponse> = await axios.delete("/user/organizer-application");
+
+			if (response.data.success) {
+				setApplyingForOrganizer(false);
+				// Refresh user data to reset organizer status
+				await fetchUserProfile();
+			}
+		} catch (error) {
+			console.error("Error cancelling application:", error);
+			setError("Failed to cancel organizer application. Please try again.");
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const editOrganizerApplication = (): void => {
+		// Pre-fill form with existing application data
+		if (organizerApplicationData) {
+			setOrganizerApplication({
+				organizationName: organizerApplicationData.organizationName || "",
+				reason: organizerApplicationData.reason || "",
+				experience: organizerApplicationData.experience || "",
+				socialLinks: organizerApplicationData.socialLinks || "",
+			});
+		}
+		setApplyingForOrganizer(true);
+	};
+
+	const fetchUserProfile = async (): Promise<void> => {
+		try {
+			// Re-fetch profile data to get updated organizer information
+			const profileResponse: AxiosResponse<{ success: boolean; profile: UserProfile }> = await axios.get(
+				"/user/profile"
+			);
+			if (profileResponse?.data?.success) {
+				const profileData = profileResponse.data.profile || {};
+				setUserProfile(profileData);
+
+				// Update organizer data
+				setOrganizerStatus(profileData?.organizerStatus || "none");
+				setOrganizerApplicationData(profileData?.organizerApplication || null);
+			}
+		} catch (error) {
+			console.error("Error fetching user profile:", error);
 		}
 	};
 
@@ -176,15 +265,19 @@ const Profile: React.FC = () => {
 		if (!file) return;
 
 		const formData = new FormData();
-		formData.append('profilePicture', file);
+		formData.append("profilePicture", file);
 
 		setSaving(true);
 		try {
-			const response: AxiosResponse<{ success: boolean; profilePicture: string }> = await axios.post('/user/profile/picture', formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
+			const response: AxiosResponse<{ success: boolean; profilePicture: string }> = await axios.post(
+				"/user/profile/picture",
+				formData,
+				{
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+				}
+			);
 
 			if (response.data.success) {
 				setUserProfile({
@@ -193,8 +286,8 @@ const Profile: React.FC = () => {
 				});
 			}
 		} catch (error) {
-			console.error('Error uploading profile picture:', error);
-			setError('Failed to upload profile picture. Please try again.');
+			console.error("Error uploading profile picture:", error);
+			setError("Failed to upload profile picture. Please try again.");
 		} finally {
 			setSaving(false);
 		}
@@ -203,18 +296,18 @@ const Profile: React.FC = () => {
 	// Badge styling helper
 	const getBadgeInfo = (badgeName: string): DashboardBadgeInfo => {
 		switch (badgeName as BadgeType) {
-			case 'Newbie':
-				return { color: 'ym-bg-amber-100 ym-text-yellow-700', icon: '🌱' };
-			case 'Regular':
-				return { color: 'ym-bg-success bg-opacity-10 ym-text-success', icon: '🌟' };
-			case 'Champ':
-				return { color: 'ym-bg-orange-400 text-white', icon: '🏆' };
-			case 'Veteran':
-				return { color: 'ym-bg-amber-400 text-white', icon: '🔥' };
-			case 'Master':
-				return { color: 'gradient-bg text-white', icon: '👑' };
+			case "Newbie":
+				return { color: "ym-bg-amber-100 ym-text-yellow-700", icon: "🌱" };
+			case "Regular":
+				return { color: "ym-bg-success bg-opacity-10 ym-text-success", icon: "🌟" };
+			case "Champ":
+				return { color: "ym-bg-orange-400 text-white", icon: "🏆" };
+			case "Veteran":
+				return { color: "ym-bg-amber-400 text-white", icon: "🔥" };
+			case "Master":
+				return { color: "gradient-bg text-white", icon: "👑" };
 			default:
-				return { color: 'ym-bg-card ym-text-card border ym-border-card', icon: '❓' };
+				return { color: "ym-bg-card ym-text-card border ym-border-card", icon: "❓" };
 		}
 	};
 
@@ -225,7 +318,7 @@ const Profile: React.FC = () => {
 					<div className="flex justify-center items-center h-64">
 						<div
 							className="w-12 h-12 border-t-4 border-solid rounded-full animate-spin mb-4"
-							style={{ borderTopColor: 'var(--ring)' }}
+							style={{ borderTopColor: "var(--ring)" }}
 						></div>
 						<h2 className="text-xl font-semibold ym-text-secondary ml-4">Loading profile...</h2>
 					</div>
@@ -287,9 +380,15 @@ const Profile: React.FC = () => {
 						applyingForOrganizer={applyingForOrganizer}
 						organizerApplication={organizerApplication}
 						saving={saving}
+						organizerStatus={organizerStatus}
+						reapplicationCount={organizerApplicationData?.reapplicationCount || 0}
+						maxReapplications={3}
 						onApplicationChange={handleApplicationChange}
 						onSubmitApplication={submitOrganizerApplication}
 						onToggleApplication={() => setApplyingForOrganizer(!applyingForOrganizer)}
+						onEditApplication={editOrganizerApplication}
+						onCancelApplication={cancelOrganizerApplication}
+						onUpdateApplication={updateOrganizerApplication}
 					/>
 				</div>
 			</div>

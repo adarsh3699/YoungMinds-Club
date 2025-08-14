@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
-import { AdminPageHeader, AdminTable, AdminConfirmationModal, StatsCard } from "../../components/admin/dashboard";
+import { AdminPageHeader, AdminTable, AdminConfirmationModal, StatsCard } from "../../components/admin";
 import { SearchAndFilter } from "../../components/common";
 import {
 	ExclamationTriangleIcon,

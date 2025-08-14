@@ -10,12 +10,16 @@ const { deleteImage, replaceImage } = require("../utils/cloudinary");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const { filterEventUpdateFields } = require("../utils/eventHelpers");
+const { sendOrganizerApprovalEmail, sendOrganizerRejectionEmail } = require("../services/emailService");
 
 // Get admin dashboard stats
 exports.getDashboardStats = async (req, res) => {
 	try {
 		const totalUsers = await User.countDocuments();
-		const totalOrganizers = await User.countDocuments({ role: "organizer" });
+		const totalOrganizers = await User.countDocuments({
+			role: "organizer",
+			organizerStatus: "approved",
+		});
 		const totalEvents = await Event.countDocuments();
 		const totalRegistrations = await EventRegistration.countDocuments();
 
@@ -61,7 +65,10 @@ exports.getAllUsers = async (req, res) => {
 // Get all organizers with event counts
 exports.getAllOrganizers = async (req, res) => {
 	try {
-		const organizers = await User.find({ role: "organizer" }).select("-password");
+		const organizers = await User.find({
+			role: "organizer",
+			organizerStatus: "approved",
+		}).select("-password");
 
 		// Get event counts for each organizer
 		const organizerIds = organizers.map((org) => org._id);
@@ -103,8 +110,11 @@ exports.getTopOrganizers = async (req, res) => {
 	try {
 		const limit = parseInt(req.query.limit) || 5;
 
-		// Get all organizers
-		const organizers = await User.find({ role: "organizer" }).select("-password");
+		// Get all approved organizers
+		const organizers = await User.find({
+			role: "organizer",
+			organizerStatus: "approved",
+		}).select("-password");
 		const organizerIds = organizers.map((org) => org._id);
 
 		// Aggregate event counts and registration counts for each organizer
@@ -924,7 +934,10 @@ exports.getAdminProfile = async (req, res) => {
 
 		// Get additional stats that might be useful for admin profile
 		const totalUsers = await User.countDocuments();
-		const totalOrganizers = await User.countDocuments({ role: "organizer" });
+		const totalOrganizers = await User.countDocuments({
+			role: "organizer",
+			organizerStatus: "approved",
+		});
 		const totalEvents = await Event.countDocuments();
 
 		// Format the response in a simpler structure
@@ -1410,7 +1423,6 @@ exports.deleteInternship = async (req, res) => {
 	}
 };
 
-
 // Update internship (Admin only)
 exports.updateInternship = async (req, res) => {
 	try {
@@ -1547,6 +1559,137 @@ exports.updateInternship = async (req, res) => {
 		res.status(500).json({
 			success: false,
 			message: "Failed to update internship",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
+		});
+	}
+};
+
+// Get all organizer applications
+exports.getOrganizerApplications = async (req, res) => {
+	try {
+		const applications = await User.find({
+			organizerStatus: { $in: ["pending", "rejected"] },
+		})
+			.select("-password")
+			.populate("organizerApplication.reviewedBy", "name email")
+			.sort({ "organizerApplication.appliedAt": -1 });
+
+		res.status(200).json({
+			success: true,
+			count: applications.length,
+			applications,
+		});
+	} catch (error) {
+		console.error("Get organizer applications error:", error);
+		res.status(500).json({
+			success: false,
+			message: "Failed to fetch organizer applications",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
+		});
+	}
+};
+
+// Approve organizer application
+exports.approveOrganizerApplication = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const adminId = req.user._id;
+
+		const user = await User.findById(id);
+		if (!user) {
+			return res.status(404).json({
+				success: false,
+				message: "User not found",
+			});
+		}
+
+		if (user.organizerStatus !== "pending") {
+			return res.status(400).json({
+				success: false,
+				message: "Only pending applications can be approved",
+			});
+		}
+
+		// Update user status to approved and promote role to organizer
+		await User.findByIdAndUpdate(id, {
+			role: "organizer", // Promote user to organizer role
+			organizerStatus: "approved",
+			"organizerApplication.reviewedAt": new Date(),
+			"organizerApplication.reviewedBy": adminId,
+		});
+
+		res.status(200).json({
+			success: true,
+			message: "Organizer application approved successfully",
+		});
+
+		// Send approval email notification
+		try {
+			await sendOrganizerApprovalEmail(user.email, user.name);
+		} catch (emailError) {
+			console.error("Failed to send approval email:", emailError);
+			// Don't fail the request if email fails
+		}
+	} catch (error) {
+		console.error("Approve organizer application error:", error);
+		res.status(500).json({
+			success: false,
+			message: "Failed to approve organizer application",
+			error: process.env.NODE_ENV === "development" ? error.message : null,
+		});
+	}
+};
+
+// Reject organizer application
+exports.rejectOrganizerApplication = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { rejectionReason } = req.body;
+		const adminId = req.user._id;
+
+		const user = await User.findById(id);
+		if (!user) {
+			return res.status(404).json({
+				success: false,
+				message: "User not found",
+			});
+		}
+
+		if (user.organizerStatus !== "pending") {
+			return res.status(400).json({
+				success: false,
+				message: "Only pending applications can be rejected",
+			});
+		}
+
+		// Update user status to rejected and increment reapplication count
+		await User.findByIdAndUpdate(id, {
+			organizerStatus: "rejected",
+			role: "user", // Revert role back to user
+			"organizerApplication.reviewedAt": new Date(),
+			"organizerApplication.reviewedBy": adminId,
+			"organizerApplication.rejectionReason": rejectionReason || "Application did not meet requirements",
+			"organizerApplication.lastRejectedAt": new Date(),
+			$inc: { "organizerApplication.reapplicationCount": 1 },
+		});
+
+		res.status(200).json({
+			success: true,
+			message: "Organizer application rejected successfully",
+		});
+
+		// Send rejection email notification
+		try {
+			await sendOrganizerRejectionEmail(user.email, user.name, rejectionReason);
+		} catch (emailError) {
+			console.error("Failed to send rejection email:", emailError);
+			// Don't fail the request if email fails
+		}
+	} catch (error) {
+		console.error("Reject organizer application error:", error);
+		res.status(500).json({
+			success: false,
+			message: "Failed to reject organizer application",
 			error: process.env.NODE_ENV === "development" ? error.message : null,
 		});
 	}

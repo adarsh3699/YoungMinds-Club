@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { UserGroupIcon } from '@heroicons/react/24/outline';
-import UserCard from './UserCard';
-import { TopOrganizersProps } from '@/types';
+import React from "react";
+import { Link } from "react-router-dom";
+import { UserGroupIcon } from "@heroicons/react/24/outline";
+import UserCard from "../cards/UserCard";
+import { TopOrganizersProps } from "@/types";
 
 const TopOrganizers: React.FC<TopOrganizersProps> = ({ organizers = [] }) => {
 	return (
@@ -43,4 +43,4 @@ const TopOrganizers: React.FC<TopOrganizersProps> = ({ organizers = [] }) => {
 	);
 };
 
-export default TopOrganizers; 
+export default TopOrganizers;

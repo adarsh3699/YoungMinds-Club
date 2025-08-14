@@ -27,4 +27,9 @@ router.get("/badges", userActivityController.getUserBadges);
 router.get("/announcements", announcementController.getActiveAnnouncements);
 router.get("/notifications", announcementController.getUserNotifications);
 
+// Organizer application routes
+router.post("/apply-organizer", userController.applyForOrganizer);
+router.put("/organizer-application", userController.updateOrganizerApplication);
+router.delete("/organizer-application", userController.cancelOrganizerApplication);
+
 module.exports = router;

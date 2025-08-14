@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import { UserStatsCards, AdminTable, AdminConfirmationModal, AdminPageHeader } from "../../components/admin/dashboard";
+import { UserStatsCards, AdminTable, AdminConfirmationModal, AdminPageHeader } from "../../components/admin";
 import { SearchAndFilter } from "../../components/common";
 import {
 	ExclamationTriangleIcon,

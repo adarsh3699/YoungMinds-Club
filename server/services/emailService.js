@@ -199,7 +199,150 @@ YoungMinds Club Team
 	}
 };
 
+// Send organizer application approval email
+const sendOrganizerApprovalEmail = async (userEmail, userName) => {
+	try {
+		const transporter = createTransporter();
+
+		const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
+		const dashboardURL = `${clientURL}/organizer/dashboard`;
+
+		const mailOptions = {
+			from: `"YoungMinds Club" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+			to: userEmail,
+			subject: "Organizer Application Approved - YoungMinds Club",
+			html: `
+				<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+					<div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+						<h1 style="color: white; margin: 0; font-size: 28px;">YoungMinds Club</h1>
+						<p style="color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;">Application Approved!</p>
+					</div>
+					
+					<div style="background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px;">
+						<h2 style="color: #1f2937; margin-top: 0;">Congratulations, ${userName}!</h2>
+						
+						<p style="color: #4b5563; font-size: 16px; margin: 20px 0;">
+							Great news! Your organizer application has been approved. You can now create and manage events and internships on YoungMinds Club.
+						</p>
+						
+						<div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981; margin: 20px 0;">
+							<h3 style="color: #059669; margin: 0 0 10px 0;">What you can do now:</h3>
+							<ul style="color: #4b5563; margin: 0; padding-left: 20px;">
+								<li>Create and publish events</li>
+								<li>Post internship opportunities</li>
+								<li>Manage attendees and applications</li>
+								<li>Access organizer analytics and insights</li>
+							</ul>
+						</div>
+						
+						<div style="text-align: center; margin: 30px 0;">
+							<a href="${dashboardURL}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+								Go to Organizer Dashboard
+							</a>
+						</div>
+						
+						<p style="color: #6b7280; font-size: 14px; margin: 20px 0;">
+							Welcome to the YoungMinds Club organizer community! We're excited to see the amazing events and opportunities you'll create.
+						</p>
+						
+						<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+						
+						<p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
+							This email was sent by YoungMinds Club. If you have any questions, please contact our support team.
+						</p>
+					</div>
+				</div>
+			`,
+		};
+
+		const info = await transporter.sendMail(mailOptions);
+		console.log("Organizer approval email sent:", info.messageId);
+		return { success: true, messageId: info.messageId };
+	} catch (error) {
+		console.error("Error sending organizer approval email:", error);
+		return { success: false, error: error.message };
+	}
+};
+
+// Send organizer application rejection email
+const sendOrganizerRejectionEmail = async (userEmail, userName, rejectionReason) => {
+	try {
+		const transporter = createTransporter();
+
+		const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
+		const profileURL = `${clientURL}/profile`;
+
+		const mailOptions = {
+			from: `"YoungMinds Club" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+			to: userEmail,
+			subject: "Organizer Application Update - YoungMinds Club",
+			html: `
+				<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+					<div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+						<h1 style="color: white; margin: 0; font-size: 28px;">YoungMinds Club</h1>
+						<p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Application Update</p>
+					</div>
+					
+					<div style="background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px;">
+						<h2 style="color: #1f2937; margin-top: 0;">Hello ${userName},</h2>
+						
+						<p style="color: #4b5563; font-size: 16px; margin: 20px 0;">
+							Thank you for your interest in becoming an organizer with YoungMinds Club. After careful review, we're unable to approve your application at this time.
+						</p>
+						
+						${
+							rejectionReason
+								? `
+						<div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #f59e0b; margin: 20px 0;">
+							<h3 style="color: #d97706; margin: 0 0 10px 0;">Feedback:</h3>
+							<p style="color: #4b5563; margin: 0;">${rejectionReason}</p>
+						</div>
+						`
+								: ""
+						}
+						
+						<div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 20px 0;">
+							<h3 style="color: #1d4ed8; margin: 0 0 10px 0;">What's next?</h3>
+							<ul style="color: #4b5563; margin: 0; padding-left: 20px;">
+								<li>You can reapply for organizer status in the future</li>
+								<li>Continue participating in events as an attendee</li>
+								<li>Contact our support team if you have questions</li>
+								<li>Build more experience organizing events and try again</li>
+							</ul>
+						</div>
+						
+						<div style="text-align: center; margin: 30px 0;">
+							<a href="${profileURL}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+								Visit Your Profile
+							</a>
+						</div>
+						
+						<p style="color: #6b7280; font-size: 14px; margin: 20px 0;">
+							We appreciate your enthusiasm for organizing events and encourage you to stay engaged with our community. There may be opportunities to apply again in the future.
+						</p>
+						
+						<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+						
+						<p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
+							This email was sent by YoungMinds Club. If you have any questions, please contact our support team.
+						</p>
+					</div>
+				</div>
+			`,
+		};
+
+		const info = await transporter.sendMail(mailOptions);
+		console.log("Organizer rejection email sent:", info.messageId);
+		return { success: true, messageId: info.messageId };
+	} catch (error) {
+		console.error("Error sending organizer rejection email:", error);
+		return { success: false, error: error.message };
+	}
+};
+
 module.exports = {
 	sendPasswordResetEmail,
 	sendPasswordChangeConfirmation,
+	sendOrganizerApprovalEmail,
+	sendOrganizerRejectionEmail,
 };
