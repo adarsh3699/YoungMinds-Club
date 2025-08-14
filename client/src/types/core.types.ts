@@ -113,6 +113,11 @@ export interface RegisterData {
 	password: string;
 	confirmPassword?: string;
 	role?: "user" | "organizer";
+	// Organizer application fields
+	organizationName?: string;
+	socialLinks?: string;
+	reason?: string;
+	experience?: string;
 }
 
 export interface LoginData {

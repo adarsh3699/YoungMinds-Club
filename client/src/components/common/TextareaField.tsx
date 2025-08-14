@@ -7,6 +7,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 	value,
 	onChange,
 	label,
+	disabled = false,
 	error,
 	placeholder = "",
 	required = false,
@@ -109,6 +110,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
 				name={name}
 				value={value}
 				onChange={handleChange}
+				disabled={disabled}
 				onInput={handleInput}
 				rows={expandable ? minRows : rows}
 				maxLength={maxLength}

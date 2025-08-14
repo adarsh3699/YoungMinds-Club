@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { FormInput, Button, SelectInput } from "../common";
+import { FormInput, Button, SelectInput, TextareaField } from "../common";
 import { SocialLogin } from "./";
-import { RegisterFormData, AuthFormErrors, RoleOption } from "@/types";
+import { RegisterFormData, AuthFormErrors, RoleOption, RegisterData } from "@/types";
 
 const RegisterForm: React.FC = () => {
 	const [formData, setFormData] = useState<RegisterFormData>({
@@ -12,6 +12,10 @@ const RegisterForm: React.FC = () => {
 		password: "",
 		confirmPassword: "",
 		role: "user",
+		organizationName: "",
+		socialLinks: "",
+		reason: "",
+		experience: "",
 	});
 	const [formErrors, setFormErrors] = useState<AuthFormErrors>({});
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -51,6 +55,19 @@ const RegisterForm: React.FC = () => {
 			errors.confirmPassword = "Passwords do not match";
 		}
 
+		// Validate organizer fields if role is organizer
+		if (data.role === "organizer") {
+			if (!data.organizationName?.trim()) {
+				errors.organizationName = "Organization name is required";
+			}
+			if (!data.reason?.trim()) {
+				errors.reason = "Reason for becoming an organizer is required";
+			}
+			if (!data.experience?.trim()) {
+				errors.experience = "Previous experience is required";
+			}
+		}
+
 		return errors;
 	};
 
@@ -67,12 +84,23 @@ const RegisterForm: React.FC = () => {
 
 			setIsSubmitting(true);
 			try {
-				await register({
+				// Prepare registration data
+				const registrationData: RegisterData = {
 					name: registerData.name,
 					email: registerData.email,
 					password: registerData.password,
 					role: registerData.role,
-				});
+				};
+
+				// Add organizer application fields if role is organizer
+				if (registerData.role === "organizer") {
+					registrationData.organizationName = registerData.organizationName;
+					registrationData.socialLinks = registerData.socialLinks;
+					registrationData.reason = registerData.reason;
+					registrationData.experience = registerData.experience;
+				}
+
+				await register(registrationData);
 				navigate("/dashboard");
 			} catch (error) {
 				console.error("Registration error:", error);
@@ -84,7 +112,7 @@ const RegisterForm: React.FC = () => {
 
 	const roleOptions: RoleOption[] = [
 		{ value: "user", label: "Attendee" },
-		{ value: "organizer", label: "Event Organizer" },
+		{ value: "organizer", label: "Register as an Event Organiser" },
 	];
 
 	return (
@@ -158,6 +186,56 @@ const RegisterForm: React.FC = () => {
 					options={roleOptions}
 					disabled={isSubmitting}
 				/>
+
+				{/* Organizer Application Fields - Only shown when role is "organizer" */}
+				{formData.role === "organizer" && (
+					<>
+						<FormInput
+							type="text"
+							id="organizationName"
+							name="organizationName"
+							value={formData.organizationName || ""}
+							onChange={handleChange}
+							label="Organization Name"
+							error={formErrors.organizationName}
+							placeholder="Your organization or company name"
+							disabled={isSubmitting}
+						/>
+						<FormInput
+							type="text"
+							id="socialLinks"
+							name="socialLinks"
+							value={formData.socialLinks || ""}
+							onChange={handleChange}
+							label="Social Links or Portfolio (Optional)"
+							error={formErrors.socialLinks}
+							placeholder="LinkedIn, website, or portfolio links"
+							disabled={isSubmitting}
+						/>
+						<TextareaField
+							id="reason"
+							name="reason"
+							value={formData.reason || ""}
+							onChange={handleChange}
+							label="Why do you want to become an organiser?"
+							error={formErrors.reason}
+							placeholder="Tell us about your motivation and goals..."
+							disabled={isSubmitting}
+							rows={3}
+						/>
+						<TextareaField
+							id="experience"
+							name="experience"
+							value={formData.experience || ""}
+							onChange={handleChange}
+							label="Previous event organisation experience"
+							error={formErrors.experience}
+							placeholder="Describe your previous experience organizing events..."
+							disabled={isSubmitting}
+							rows={3}
+						/>
+					</>
+				)}
 
 				<Button type="submit" className="w-full py-3 text-base font-medium mt-8" disabled={isSubmitting}>
 					{isSubmitting ? (

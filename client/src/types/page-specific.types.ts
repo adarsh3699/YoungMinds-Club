@@ -43,6 +43,11 @@ export interface RegisterFormData {
 	password: string;
 	confirmPassword: string;
 	role: "user" | "organizer";
+	// Organizer application fields (shown when role is "organizer")
+	organizationName?: string;
+	socialLinks?: string;
+	reason?: string;
+	experience?: string;
 }
 
 export interface ForgotPasswordFormData {

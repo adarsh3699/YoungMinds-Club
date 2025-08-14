@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
 			});
 		}
 
-		const { name, email, password, role } = req.body;
+		const { name, email, password, role, organizationName, socialLinks, reason, experience } = req.body;
 
 		// Check if user already exists
 		const existingUser = await User.findOne({ email });
@@ -28,13 +28,28 @@ exports.signup = async (req, res) => {
 			});
 		}
 
-		// Create new user
-		const user = await User.create({
+		// Prepare user data
+		const userData = {
 			name,
 			email,
 			password,
-			role: role && ["user", "organizer"].includes(role) ? role : "user", // Only allow user and organizer roles
-		});
+			role: "user", // Always start as user, even if applying for organizer
+		};
+
+		// If user selected organizer role, set up organizer application
+		if (role === "organizer") {
+			userData.organizerStatus = "pending";
+			userData.organizerApplication = {
+				organizationName: organizationName || "",
+				socialLinks: socialLinks || "",
+				reason: reason || "",
+				experience: experience || "",
+				appliedAt: new Date(),
+			};
+		}
+
+		// Create new user
+		const user = await User.create(userData);
 
 		// Generate JWT token
 		const token = generateToken(user._id, user.role);
@@ -46,10 +61,16 @@ exports.signup = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 		});
 
+		// Prepare success message
+		const successMessage =
+			role === "organizer"
+				? "Registration successful! Your organizer application has been submitted for admin review."
+				: "User registered successfully";
+
 		// Send response
 		res.status(201).json({
 			success: true,
-			message: "User registered successfully",
+			message: successMessage,
 			token,
 			user: {
 				_id: user._id,

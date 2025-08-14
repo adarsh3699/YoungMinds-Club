@@ -767,7 +767,9 @@ const OrganizersManagement: React.FC = () => {
 											<p className="text-gray-900">{selectedApplication.email}</p>
 										</div>
 										<div>
-											<label className="text-sm font-medium text-gray-500">Current Status</label>
+											<label className="text-sm font-medium text-gray-500 mr-2">
+												Current Status
+											</label>
 											<span
 												className={`inline-flex items-center px-2.5 py-1 text-xs rounded-full ${
 													selectedApplication.organizerStatus === "pending"
@@ -840,19 +842,34 @@ const OrganizersManagement: React.FC = () => {
 									</div>
 								</div>
 
-								{/* Review Information (if reviewed) */}
-								{selectedApplication.organizerApplication?.reviewedAt && (
+								{/* Review Information (only if reviewed by admin) */}
+								{selectedApplication.organizerApplication?.reviewedBy && (
 									<div className="bg-purple-50 rounded-lg p-4">
 										<h4 className="text-lg font-semibold text-gray-900 mb-3">Review Information</h4>
 										<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+											<div>
+												<label className="text-sm font-medium text-gray-500">Review by</label>
+												<p className="text-gray-900">
+													{typeof selectedApplication.organizerApplication.reviewedBy ===
+													"string"
+														? selectedApplication.organizerApplication.reviewedBy
+														: (
+																selectedApplication.organizerApplication.reviewedBy as {
+																	email?: string;
+																	name?: string;
+																}
+														  )?.email || "Unknown Admin"}
+												</p>
+											</div>
 											<div>
 												<label className="text-sm font-medium text-gray-500">
 													Reviewed Date
 												</label>
 												<p className="text-gray-900">
-													{new Date(
-														selectedApplication.organizerApplication.reviewedAt
-													).toLocaleDateString()}
+													{selectedApplication.organizerApplication.reviewedAt &&
+														new Date(
+															selectedApplication.organizerApplication.reviewedAt
+														).toLocaleDateString()}
 												</p>
 											</div>
 											{selectedApplication.organizerApplication.rejectionReason && (
