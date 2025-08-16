@@ -1,4 +1,6 @@
 const UserActivity = require("../models/UserActivity");
+const EventRegistration = require("../models/EventRegistration");
+const InternshipApplication = require("../models/InternshipApplication");
 const Event = require("../models/Event");
 
 // Get user's profile with XP and badge
@@ -54,32 +56,29 @@ exports.getRegisteredEvents = async (req, res) => {
 	try {
 		const userId = req.user.id;
 
-		const userActivity = await UserActivity.findOne({ user: userId }).populate({
-			path: "registeredEvents.event",
-			populate: {
-				path: "organizer",
-				select: "name",
-			},
-		});
-
-		if (!userActivity) {
-			return res.status(200).json({
-				success: true,
-				registeredEvents: [],
-			});
-		}
+		const eventRegistrations = await EventRegistration.find({ user: userId })
+			.populate({
+				path: "event",
+				populate: {
+					path: "organizer",
+					select: "name",
+				},
+			})
+			.sort({ registrationDate: -1 });
 
 		// Extract and format registered events
-		const registeredEvents = userActivity.registeredEvents
-			.filter((item) => item.event) // Filter out any null references
-			.map((item) => ({
-				...item.event.toObject(),
-				registeredAt: item.registeredAt,
-				attended: item.attended,
+		const registeredEvents = eventRegistrations
+			.filter((registration) => registration.event) // Filter out any null references
+			.map((registration) => ({
+				...registration.event.toObject(),
+				registrationId: registration._id,
+				registeredAt: registration.registrationDate,
+				status: registration.status,
+				attended: registration.checkIn.checkedIn,
 				feedback: {
-					given: item.feedback.given,
-					rating: item.feedback.rating,
-					comment: item.feedback.comment,
+					given: registration.feedback.submitted,
+					rating: registration.feedback.rating,
+					comment: registration.feedback.comment,
 				},
 			}));
 
@@ -137,34 +136,28 @@ exports.getLeaderboard = async (req, res) => {
 	}
 };
 
-// Get XP history for the current user
+// Get user's events and activity data
 exports.getUserEvents = async (req, res) => {
 	try {
 		const userId = req.user.id;
 
-		const userActivity = await UserActivity.findOne({ user: userId });
-
-		if (!userActivity) {
-			return res.status(200).json({
-				success: true,
-				xp: 0,
-				badge: "Newbie",
-				savedEvents: [],
-				events: [],
-			});
-		}
-
-		// Get user's saved events
-		await userActivity.populate({
+		// Get user activity for XP and badge info
+		let userActivity = await UserActivity.findOne({ user: userId }).populate({
 			path: "savedEvents.event",
 			select: "title shortDescription poster date location type",
 		});
 
-		// Get user's registered events
-		await userActivity.populate({
-			path: "registeredEvents.event",
-			select: "title shortDescription poster date location type",
-		});
+		if (!userActivity) {
+			userActivity = await UserActivity.create({ user: userId });
+		}
+
+		// Get user's registered events from EventRegistration model
+		const eventRegistrations = await EventRegistration.find({ user: userId })
+			.populate({
+				path: "event",
+				select: "title shortDescription poster date location type",
+			})
+			.sort({ registrationDate: -1 });
 
 		// Format saved events
 		const savedEvents = userActivity.savedEvents
@@ -182,20 +175,25 @@ exports.getUserEvents = async (req, res) => {
 			}));
 
 		// Format registered events
-		const registeredEvents = userActivity.registeredEvents
-			.filter((item) => item.event)
-			.map((item) => ({
-				id: item.event._id,
-				_id: item.event._id,
-				title: item.event.title,
-				shortDescription: item.event.shortDescription,
-				poster: item.event.poster,
-				date: item.event.date,
-				location: item.event.location,
-				type: item.event.type,
-				registeredAt: item.registeredAt,
-				attended: item.attended,
-				feedback: item.feedback,
+		const registeredEvents = eventRegistrations
+			.filter((registration) => registration.event)
+			.map((registration) => ({
+				id: registration.event._id,
+				_id: registration.event._id,
+				title: registration.event.title,
+				shortDescription: registration.event.shortDescription,
+				poster: registration.event.poster,
+				date: registration.event.date,
+				location: registration.event.location,
+				type: registration.event.type,
+				registeredAt: registration.registrationDate,
+				attended: registration.checkIn.checkedIn,
+				feedback: {
+					given: registration.feedback.submitted,
+					rating: registration.feedback.rating,
+					comment: registration.feedback.comment,
+					givenAt: registration.feedback.submittedAt,
+				},
 			}));
 
 		res.status(200).json({
@@ -222,8 +220,8 @@ exports.getXPHistory = async (req, res) => {
 		const userId = req.user.id;
 
 		const userActivity = await UserActivity.findOne({ user: userId }).populate({
-			path: "registeredEvents.event",
-			select: "title date",
+			path: "xpHistory.referenceId",
+			refPath: "xpHistory.referenceModel",
 		});
 
 		if (!userActivity) {
@@ -233,49 +231,16 @@ exports.getXPHistory = async (req, res) => {
 			});
 		}
 
-		// Generate XP history entries from registered events
-		const eventXPHistory = userActivity.registeredEvents
-			.filter((item) => item.event)
-			.map((item) => ({
-				_id: item._id,
-				date: item.registeredAt,
-				description: item.attended
-					? `Attended event: ${item.event.title || "Event"}`
-					: `Registered for event: ${item.event.title || "Event"}`,
-				amount: 10, // Standard XP for registering for events
-			}));
-
-		// Add streak bonus entries if available
-		const streakXPHistory = [];
-		if (userActivity.streakCount > 0) {
-			// Calculate how many streak bonuses the user has received (every 3 streaks)
-			const bonusCount = Math.floor(userActivity.streakCount / 3);
-
-			// Add an entry for each streak bonus
-			for (let i = 1; i <= bonusCount; i++) {
-				streakXPHistory.push({
-					_id: `streak-${i}`,
-					date: userActivity.lastEventDate || new Date(),
-					description: `Weekend streak bonus (${i * 3} weeks)`,
-					amount: 15, // Bonus XP for streaks
-				});
-			}
-		}
-
-		// Add feedback XP entries
-		const feedbackXPHistory = userActivity.registeredEvents
-			.filter((item) => item.feedback && item.feedback.given)
-			.map((item) => ({
-				_id: `feedback-${item._id}`,
-				date: item.feedback.givenAt || item.registeredAt,
-				description: `Provided feedback for an event`,
-				amount: 5, // XP for giving feedback
-			}));
-
-		// Combine all XP history entries and sort by date (newest first)
-		const xpHistory = [...eventXPHistory, ...streakXPHistory, ...feedbackXPHistory].sort(
-			(a, b) => new Date(b.date) - new Date(a.date)
-		);
+		// Format XP history from the new xpHistory field
+		const xpHistory = userActivity.xpHistory
+			.map((entry) => ({
+				_id: entry._id,
+				date: entry.earnedAt,
+				description: entry.description,
+				amount: entry.amount,
+				type: entry.type,
+			}))
+			.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 		res.status(200).json({
 			success: true,

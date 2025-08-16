@@ -344,42 +344,26 @@ exports.applyForInternship = async (req, res) => {
 		// Award XP for applying
 		const xpAwarded = 15; // XP for applying to internship
 
-		// Get or create user activity record
+		// Get or create user activity record for XP tracking
 		let userActivity = await UserActivity.findOne({ user: userId }).session(session);
 
 		if (!userActivity) {
-			userActivity = await UserActivity.create(
-				[
-					{
-						user: userId,
-						totalXP: xpAwarded,
-						internshipApplications: [
-							{
-								internship: internshipId,
-								appliedAt: new Date(),
-								xpEarned: xpAwarded,
-							},
-						],
-					},
-				],
-				{ session }
-			);
-		} else {
-			// Update existing activity
-			userActivity.totalXP += xpAwarded;
-
-			// Initialize internshipApplications if it doesn't exist
-			if (!userActivity.internshipApplications) {
-				userActivity.internshipApplications = [];
-			}
-
-			userActivity.internshipApplications.push({
-				internship: internshipId,
-				appliedAt: new Date(),
-				xpEarned: xpAwarded,
+			userActivity = new UserActivity({
+				user: userId,
 			});
-			await userActivity.save({ session });
 		}
+
+		// Get internship details for description
+		const internshipForDescription = await Internship.findById(internshipId).session(session);
+
+		// Add XP for application with proper tracking
+		await userActivity.addXP(
+			xpAwarded,
+			"internship_application",
+			`Applied for internship: ${internshipForDescription?.title || "Internship"}`,
+			application[0]._id,
+			"InternshipApplication"
+		);
 
 		// Update application with XP awarded
 		application[0].xpAwarded = xpAwarded;

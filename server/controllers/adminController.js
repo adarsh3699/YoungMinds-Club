@@ -832,17 +832,25 @@ exports.getActiveUsers = async (req, res) => {
 			.limit(limit)
 			.populate("user", "name email profilePicture");
 
-		const activeUsers = userActivities.map((activity) => ({
-			_id: activity.user._id,
-			name: activity.user.name,
-			email: activity.user.email,
-			profilePicture: activity.user.profilePicture,
-			xp: activity.xp,
-			badge: activity.badge,
-			streakCount: activity.streakCount,
-			registeredEvents: activity.registeredEvents?.length || 0,
-			attendedEvents: activity.registeredEvents?.filter((reg) => reg.attended).length || 0,
-		}));
+		// Get event registration counts for each user
+		const activeUsers = await Promise.all(
+			userActivities.map(async (activity) => {
+				const eventRegistrations = await EventRegistration.find({ user: activity.user._id });
+				const attendedEvents = eventRegistrations.filter((reg) => reg.checkIn.checkedIn).length;
+
+				return {
+					_id: activity.user._id,
+					name: activity.user.name,
+					email: activity.user.email,
+					profilePicture: activity.user.profilePicture,
+					xp: activity.xp,
+					badge: activity.badge,
+					streakCount: activity.streakCount,
+					registeredEvents: eventRegistrations.length,
+					attendedEvents: attendedEvents,
+				};
+			})
+		);
 
 		res.status(200).json({
 			success: true,

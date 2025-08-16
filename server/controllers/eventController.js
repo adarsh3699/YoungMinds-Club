@@ -1,4 +1,5 @@
 const Event = require("../models/Event");
+const EventRegistration = require("../models/EventRegistration");
 const UserActivity = require("../models/UserActivity");
 const User = require("../models/User");
 const mongoose = require("mongoose");
@@ -241,19 +242,13 @@ exports.registerForEvent = async (req, res) => {
 			});
 		}
 
-		// Get or create user activity record
-		let userActivity = await UserActivity.findOne({ user: userId }).session(session);
+		// Check if user is already registered using EventRegistration model
+		const existingRegistration = await EventRegistration.findOne({
+			event: eventId,
+			user: userId,
+		}).session(session);
 
-		if (!userActivity) {
-			userActivity = new UserActivity({
-				user: userId,
-			});
-		}
-
-		// Check if user is already registered
-		const alreadyRegistered = userActivity.registeredEvents.some((reg) => reg.event.toString() === eventId);
-
-		if (alreadyRegistered) {
+		if (existingRegistration) {
 			await session.abortTransaction();
 			session.endSession();
 			return res.status(400).json({
@@ -262,14 +257,35 @@ exports.registerForEvent = async (req, res) => {
 			});
 		}
 
-		// Add event to registered events
-		userActivity.registeredEvents.push({
-			event: eventId,
-			registeredAt: new Date(),
-		});
+		// Create event registration
+		const eventRegistration = await EventRegistration.create(
+			[
+				{
+					event: eventId,
+					user: userId,
+					status: "registered",
+				},
+			],
+			{ session }
+		);
 
-		// Add XP for registration
-		await userActivity.addXP(10);
+		// Get or create user activity record for XP tracking
+		let userActivity = await UserActivity.findOne({ user: userId }).session(session);
+
+		if (!userActivity) {
+			userActivity = new UserActivity({
+				user: userId,
+			});
+		}
+
+		// Add XP for registration with proper tracking
+		await userActivity.addXP(
+			10,
+			"event_registration",
+			`Registered for event: ${event.title}`,
+			eventRegistration[0]._id,
+			"EventRegistration"
+		);
 
 		// Increment event registration count
 		event.registrationCount += 1;
@@ -397,20 +413,13 @@ exports.submitFeedback = async (req, res) => {
 			});
 		}
 
-		// Get user activity record
-		const userActivity = await UserActivity.findOne({ user: userId });
+		// Find the event registration
+		const eventRegistration = await EventRegistration.findOne({
+			event: eventId,
+			user: userId,
+		});
 
-		if (!userActivity) {
-			return res.status(400).json({
-				success: false,
-				message: "User has no activity record",
-			});
-		}
-
-		// Find the registered event
-		const registeredEventIndex = userActivity.registeredEvents.findIndex((reg) => reg.event.toString() === eventId);
-
-		if (registeredEventIndex === -1) {
+		if (!eventRegistration) {
 			return res.status(400).json({
 				success: false,
 				message: "You must be registered for this event to submit feedback",
@@ -418,23 +427,43 @@ exports.submitFeedback = async (req, res) => {
 		}
 
 		// Check if feedback already given
-		if (userActivity.registeredEvents[registeredEventIndex].feedback.given) {
+		if (eventRegistration.feedback.submitted) {
 			return res.status(400).json({
 				success: false,
 				message: "You have already submitted feedback for this event",
 			});
 		}
 
-		// Update the feedback
-		userActivity.registeredEvents[registeredEventIndex].feedback = {
-			given: true,
+		// Update the feedback in EventRegistration
+		eventRegistration.feedback = {
+			submitted: true,
 			rating,
 			comment,
-			givenAt: new Date(),
+			submittedAt: new Date(),
 		};
 
-		// Add XP for giving feedback
-		await userActivity.addXP(5);
+		await eventRegistration.save();
+
+		// Get or create user activity record for XP tracking
+		let userActivity = await UserActivity.findOne({ user: userId });
+
+		if (!userActivity) {
+			userActivity = new UserActivity({
+				user: userId,
+			});
+		}
+
+		// Get event details for description
+		const event = await Event.findById(eventId);
+
+		// Add XP for giving feedback with proper tracking
+		await userActivity.addXP(
+			5,
+			"event_feedback",
+			`Submitted feedback for event: ${event?.title || "Event"}`,
+			eventRegistration._id,
+			"EventRegistration"
+		);
 
 		res.status(200).json({
 			success: true,
@@ -457,8 +486,8 @@ exports.getRecommendedEvents = async (req, res) => {
 	try {
 		const userId = req.user.id;
 
-		// Get user activity to analyze interests (for a real recommender, we'd use more sophisticated logic)
-		const userActivity = await UserActivity.findOne({ user: userId }).populate("registeredEvents.event");
+		// Get user's event registrations to analyze interests
+		const userRegistrations = await EventRegistration.find({ user: userId }).populate("event");
 
 		// For now, we'll use a simplified approach (random events as placeholder)
 		// In a real system, you'd use tags, categories, and past registrations to find similar events
@@ -476,10 +505,10 @@ exports.getRecommendedEvents = async (req, res) => {
 			.limit(6)
 			.populate("organizer", "name");
 
-		// If user has activity, we can do slightly better recommendations
-		if (userActivity && userActivity.registeredEvents.length > 0) {
+		// If user has registrations, we can do slightly better recommendations
+		if (userRegistrations && userRegistrations.length > 0) {
 			// Extract categories and tags from user's registered events
-			const userEvents = userActivity.registeredEvents.map((reg) => reg.event).filter(Boolean); // Filter out null/undefined events
+			const userEvents = userRegistrations.map((reg) => reg.event).filter(Boolean); // Filter out null/undefined events
 			const userCategories = [...new Set(userEvents.map((event) => event.category).filter(Boolean))];
 			const userTags = [...new Set(userEvents.flatMap((event) => event.tags || []))];
 
@@ -487,6 +516,8 @@ exports.getRecommendedEvents = async (req, res) => {
 			if (userCategories.length > 0 || userTags.length > 0) {
 				const filter = {
 					date: { $gte: new Date() },
+					isPublished: true,
+					isFlagged: false,
 				};
 
 				if (userCategories.length > 0) {
@@ -497,8 +528,8 @@ exports.getRecommendedEvents = async (req, res) => {
 					filter.tags = { $in: userTags };
 				}
 
-				// Exclude events user is already registered for (only include valid events)
-				const registeredEventIds = userActivity.registeredEvents
+				// Exclude events user is already registered for
+				const registeredEventIds = userRegistrations
 					.filter((reg) => reg.event && reg.event._id) // Filter out null events
 					.map((reg) => reg.event._id.toString());
 
