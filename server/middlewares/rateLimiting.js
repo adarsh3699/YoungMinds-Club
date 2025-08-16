@@ -12,9 +12,11 @@ const passwordResetLimiter = rateLimit({
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 	// Custom key generator to combine IP and email for more targeted limiting
-	keyGenerator: (req) => {
+	keyGenerator: (req, res) => {
 		const email = req.body.email || "unknown";
-		return `${req.ip}-${email}`;
+		// Use the built-in IP key generator to properly handle IPv6 addresses
+		const ipKey = rateLimit.ipKeyGenerator(req, res);
+		return `${ipKey}-${email}`;
 	},
 	// Skip successful requests from counting against the limit
 	skipSuccessfulRequests: false,

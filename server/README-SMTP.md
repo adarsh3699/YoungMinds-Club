@@ -141,6 +141,10 @@ SMTP_FROM=noreply@yourdomain.com
 -   **Dual Authentication**: Users can log in with both Google and email/password after setup
 -   **Rate Limiting**: Prevents abuse with smart rate limiting (3 requests per 15 minutes per IP+email)
 -   **User-friendly Feedback**: Clear messaging with remaining time when rate limited
+-   **📊 Email Monitoring**: Comprehensive email delivery tracking and analytics
+-   **🚫 Email Suppression**: Automatic suppression of problematic email addresses
+-   **📈 Performance Metrics**: Health scoring and delivery rate monitoring
+-   **⚠️ Smart Alerts**: Real-time notifications for email delivery issues
 
 ## API Endpoints
 
@@ -235,3 +239,46 @@ The system includes comprehensive rate limiting:
 -   Disabled form during rate limit period
 -   Clear messaging with remaining time from server
 -   Clock icon to indicate waiting period
+
+## 📊 Email Monitoring & Analytics
+
+The system now includes comprehensive email monitoring capabilities:
+
+### Real-time Tracking
+
+-   **All emails logged** with unique message IDs
+-   **Delivery status tracking** (sent → delivered/bounced/complained)
+-   **Performance metrics** calculated automatically
+-   **Health scoring** (0-100) based on email performance
+
+### Admin Dashboard Endpoints
+
+-   `GET /email-monitoring/dashboard` - Complete monitoring overview
+-   `GET /email-monitoring/stats` - Delivery statistics
+-   `GET /email-monitoring/stats/by-type` - Stats by email type
+-   `GET /email-monitoring/problematic-emails` - High-risk addresses
+
+### Automatic Email Suppression
+
+Emails are automatically suppressed for addresses that:
+
+-   Have received complaints (marked as spam)
+-   Have multiple hard bounces (invalid addresses)
+-   Show consistently poor delivery rates
+
+### Future-Ready Email Types
+
+Ready for implementation when you add event/internship emails:
+
+-   `event_registration` - Event registration confirmations
+-   `event_reminder` - Event reminders
+-   `internship_application` - Internship application confirmations
+-   `internship_status_update` - Application status updates
+
+### Performance Benchmarks
+
+-   **Excellent**: >98% delivery, <2% bounce, <0.1% complaint
+-   **Good**: 95-98% delivery, 2-5% bounce, 0.1-0.2% complaint
+-   **Needs Attention**: <95% delivery, >5% bounce, >0.2% complaint
+
+See `EMAIL-MONITORING.md` for detailed documentation.

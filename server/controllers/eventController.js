@@ -1,6 +1,8 @@
 const Event = require("../models/Event");
 const UserActivity = require("../models/UserActivity");
+const User = require("../models/User");
 const mongoose = require("mongoose");
+const { sendEventRegistrationEmail } = require("../services/emailService");
 
 // Get all events with pagination and filters
 exports.getAllEvents = async (req, res) => {
@@ -275,6 +277,27 @@ exports.registerForEvent = async (req, res) => {
 
 		await session.commitTransaction();
 		session.endSession();
+
+		// Send event registration confirmation email (non-blocking)
+		try {
+			const user = await User.findById(userId);
+			if (user) {
+				// Format event details for email
+				const eventDetails = {
+					id: event._id,
+					title: event.title,
+					date: event.date ? new Date(event.date).toLocaleDateString() : "TBD",
+					time: event.time || "TBD",
+					location: event.location?.address || event.location?.name || "Online/TBD",
+				};
+
+				await sendEventRegistrationEmail(user.email, user.name, eventDetails, user._id);
+				console.log(`Event registration email sent to ${user.email} for event: ${event.title}`);
+			}
+		} catch (emailError) {
+			console.error("Event registration email failed:", emailError);
+			// Don't fail registration if email fails
+		}
 
 		res.status(200).json({
 			success: true,

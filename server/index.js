@@ -14,6 +14,7 @@ const userRoutes = require("./routes/user");
 const eventRoutes = require("./routes/event");
 const internshipRoutes = require("./routes/internship");
 const filtersRoutes = require("./routes/filters");
+const emailMonitoringRoutes = require("./routes/emailMonitoring");
 
 // Create Express app
 const app = express();
@@ -48,6 +49,7 @@ app.use("/user", userRoutes);
 app.use("/events", eventRoutes);
 app.use("/internships", internshipRoutes);
 app.use("/filters", filtersRoutes);
+app.use("/email-monitoring", emailMonitoringRoutes);
 
 // Additional public routes
 app.get("/leaderboard", require("./controllers/userActivityController").getLeaderboard);

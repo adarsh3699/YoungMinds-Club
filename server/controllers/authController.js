@@ -2,7 +2,11 @@ const User = require("../models/User");
 const { generateToken } = require("../utils/jwt");
 const { validationResult } = require("express-validator");
 const { setupGoogleAuth } = require("../config/google");
-const { sendPasswordResetEmail, sendPasswordChangeConfirmation } = require("../services/emailService");
+const {
+	sendPasswordResetEmail,
+	sendPasswordChangeConfirmation,
+	sendWelcomeEmail,
+} = require("../services/emailService");
 const crypto = require("crypto");
 
 // Register new user
@@ -60,6 +64,15 @@ exports.signup = async (req, res) => {
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			secure: process.env.NODE_ENV === "production",
 		});
+
+		// Send welcome email (non-blocking)
+		try {
+			await sendWelcomeEmail(user.email, user.name, user._id);
+			console.log(`Welcome email sent to ${user.email}`);
+		} catch (emailError) {
+			console.error("Welcome email failed:", emailError);
+			// Don't fail registration if welcome email fails
+		}
 
 		// Prepare success message
 		const successMessage =
@@ -314,7 +327,7 @@ exports.forgotPassword = async (req, res) => {
 
 		try {
 			// Send password reset email
-			await sendPasswordResetEmail(user.email, user.name, resetToken, isGoogleOnlyAccount);
+			await sendPasswordResetEmail(user.email, user.name, resetToken, isGoogleOnlyAccount, user._id);
 
 			const responseMessage = isGoogleOnlyAccount
 				? "Password setup email sent successfully. You'll be able to log in with both Google and your new password."
@@ -405,7 +418,7 @@ exports.resetPassword = async (req, res) => {
 
 		try {
 			// Send password change confirmation email
-			await sendPasswordChangeConfirmation(user.email, user.name);
+			await sendPasswordChangeConfirmation(user.email, user.name, user._id);
 		} catch (emailError) {
 			console.error("Confirmation email failed:", emailError);
 			// Don't fail the request if confirmation email fails

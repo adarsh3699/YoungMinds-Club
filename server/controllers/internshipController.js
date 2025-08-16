@@ -1,8 +1,10 @@
 const Internship = require("../models/Internship");
 const InternshipApplication = require("../models/InternshipApplication");
 const UserActivity = require("../models/UserActivity");
+const User = require("../models/User");
 const mongoose = require("mongoose");
 const { deleteImage } = require("../utils/cloudinary");
+const { sendInternshipApplicationEmail } = require("../services/emailService");
 
 // Get all internships with pagination and filters
 exports.getAllInternships = async (req, res) => {
@@ -385,6 +387,30 @@ exports.applyForInternship = async (req, res) => {
 
 		await session.commitTransaction();
 		session.endSession();
+
+		// Send internship application confirmation email (non-blocking)
+		try {
+			const user = await User.findById(userId);
+			if (user) {
+				// Format internship details for email
+				const internshipDetails = {
+					id: internship._id,
+					title: internship.title,
+					category: internship.category,
+					companyName: internship.companyName,
+					duration: internship.duration || "TBD",
+					applicationDeadline: internship.applicationDeadline
+						? new Date(internship.applicationDeadline).toLocaleDateString()
+						: "TBD",
+				};
+
+				await sendInternshipApplicationEmail(user.email, user.name, internshipDetails, user._id);
+				console.log(`Internship application email sent to ${user.email} for internship: ${internship.title}`);
+			}
+		} catch (emailError) {
+			console.error("Internship application email failed:", emailError);
+			// Don't fail application if email fails
+		}
 
 		res.status(200).json({
 			success: true,
