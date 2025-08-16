@@ -139,6 +139,8 @@ SMTP_FROM=noreply@yourdomain.com
 -   **Error Handling**: Graceful error handling for email failures
 -   **Confirmation Emails**: Users receive confirmation when password is changed
 -   **Dual Authentication**: Users can log in with both Google and email/password after setup
+-   **Rate Limiting**: Prevents abuse with smart rate limiting (3 requests per 15 minutes per IP+email)
+-   **User-friendly Feedback**: Clear messaging with remaining time when rate limited
 
 ## API Endpoints
 
@@ -205,7 +207,31 @@ SMTP_FROM=noreply@yourdomain.com
     - Set up SPF, DKIM, and DMARC records
 
 2. **General Recommendations**:
-    - Implement rate limiting for password reset requests
+    - ✅ Rate limiting implemented (3 requests per 15 minutes per IP+email)
     - Log email sending attempts for debugging
     - Monitor email delivery rates and bounces
     - Use email templates for consistency
+
+## Rate Limiting Configuration
+
+The system includes comprehensive rate limiting:
+
+### Password Reset Rate Limiting
+
+-   **Limit**: 3 requests per 15 minutes per IP+email combination
+-   **Behavior**: Combines IP address and email for targeted limiting
+-   **Response**: 429 status with retry information and countdown timer
+-   **Recovery**: Automatic reset after time window expires
+
+### Authentication Rate Limiting
+
+-   **Login**: 10 attempts per 15 minutes per IP
+-   **Signup**: 5 accounts per hour per IP
+-   **Strict Mode**: 5 attempts per hour for sensitive operations
+
+### Frontend Integration
+
+-   Visual feedback for rate limiting (orange styling)
+-   Disabled form during rate limit period
+-   Clear messaging with remaining time from server
+-   Clock icon to indicate waiting period

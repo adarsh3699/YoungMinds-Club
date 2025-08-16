@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 const authController = require("../controllers/authController");
 const { isAuthenticated } = require("../middlewares/auth");
 const { getGoogleAuthURL } = require("../config/google");
+const { passwordResetLimiter, authLimiter, signupLimiter } = require("../middlewares/rateLimiting");
 
 const router = express.Router();
 
@@ -25,14 +26,14 @@ const validateResetPassword = [
 	body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long"),
 ];
 
-// Auth routes
-router.post("/signup", validateSignup, authController.signup);
-router.post("/login", validateLogin, authController.login);
+// Auth routes with rate limiting
+router.post("/signup", signupLimiter, validateSignup, authController.signup);
+router.post("/login", authLimiter, validateLogin, authController.login);
 router.get("/me", isAuthenticated, authController.getCurrentUser);
 router.get("/logout", authController.logout);
 
-// Password reset routes
-router.post("/forgot-password", validateForgotPassword, authController.forgotPassword);
+// Password reset routes with rate limiting
+router.post("/forgot-password", passwordResetLimiter, validateForgotPassword, authController.forgotPassword);
 router.post("/reset-password", validateResetPassword, authController.resetPassword);
 
 // Google OAuth routes

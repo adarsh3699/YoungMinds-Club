@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FormInput, Button } from "../common";
 import { ForgotPasswordFormData, AuthFormErrors } from "@/types";
 import axios, { isAxiosError } from "axios";
+import { ClockIcon } from "@heroicons/react/24/outline";
 
 const ForgotPasswordForm: React.FC = () => {
 	const [formData, setFormData] = useState<ForgotPasswordFormData>({
@@ -12,6 +13,8 @@ const ForgotPasswordForm: React.FC = () => {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const [success, setSuccess] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
+	const [isRateLimited, setIsRateLimited] = useState<boolean>(false);
+	const [remainingTime, setRemainingTime] = useState<string>("");
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		const { name, value } = e.target;
@@ -27,6 +30,10 @@ const ForgotPasswordForm: React.FC = () => {
 			});
 		}
 		if (error) setError("");
+		if (isRateLimited) {
+			setIsRateLimited(false);
+			setRemainingTime("");
+		}
 	};
 
 	const validateForm = (data: ForgotPasswordFormData): AuthFormErrors => {
@@ -60,12 +67,22 @@ const ForgotPasswordForm: React.FC = () => {
 				}
 			} catch (error: unknown) {
 				console.error("Forgot password error:", error);
-				const errorMessage = isAxiosError(error)
-					? error.response?.data?.message ||
-					  error.response?.data?.errors?.[0]?.msg ||
-					  "Something went wrong. Please try again."
-					: "Something went wrong. Please try again.";
-				setError(errorMessage);
+
+				if (isAxiosError(error) && error.response?.status === 429) {
+					// Rate limiting error
+					const remainingTimeMsg = error.response?.data?.remainingTime || "15 minutes";
+					setIsRateLimited(true);
+					setRemainingTime(remainingTimeMsg);
+					setError(error.response?.data?.message || "Too many requests. Please try again later.");
+				} else {
+					// Regular error
+					const errorMessage = isAxiosError(error)
+						? error.response?.data?.message ||
+						  error.response?.data?.errors?.[0]?.msg ||
+						  "Something went wrong. Please try again."
+						: "Something went wrong. Please try again.";
+					setError(errorMessage);
+				}
 			} finally {
 				setIsSubmitting(false);
 			}
@@ -119,10 +136,30 @@ const ForgotPasswordForm: React.FC = () => {
 	return (
 		<div className="p-8">
 			{error && (
-				<div className="ym-bg-card border border-red-400 ym-text-card px-4 py-3 rounded-lg mb-6 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+				<div
+					className={`ym-bg-card border px-4 py-3 rounded-lg mb-6 ${
+						isRateLimited
+							? "border-orange-400 bg-orange-50/80 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
+							: "border-red-400 bg-red-50/80 dark:bg-red-900/20 text-red-600 dark:text-red-400"
+					}`}
+				>
 					<div className="flex items-center">
-						<div className="w-1 h-4 bg-red-500 rounded-full mr-3"></div>
-						{error}
+						<div
+							className={`w-1 h-4 rounded-full mr-3 ${isRateLimited ? "bg-orange-500" : "bg-red-500"}`}
+						></div>
+						<div className="flex-1">
+							{error}
+							{isRateLimited && remainingTime && (
+								<div className="mt-2 text-sm">
+									<div className="flex items-center space-x-2">
+										<ClockIcon className="w-4 h-4" />
+										<span>
+											Try again in: <strong>{remainingTime}</strong>
+										</span>
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			)}
@@ -147,7 +184,11 @@ const ForgotPasswordForm: React.FC = () => {
 					disabled={isSubmitting}
 				/>
 
-				<Button type="submit" className="w-full py-3 text-base font-medium" disabled={isSubmitting}>
+				<Button
+					type="submit"
+					className="w-full py-3 text-base font-medium"
+					disabled={isSubmitting || isRateLimited}
+				>
 					{isSubmitting ? (
 						<div className="flex items-center justify-center">
 							<svg
@@ -172,6 +213,8 @@ const ForgotPasswordForm: React.FC = () => {
 							</svg>
 							Sending...
 						</div>
+					) : isRateLimited ? (
+						`Try again in ${remainingTime}`
 					) : (
 						"Send Reset Link"
 					)}
