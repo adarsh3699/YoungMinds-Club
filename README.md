@@ -228,7 +228,7 @@ Create `.env` file in the `server` directory:
 
 ```env
 # Server Configuration
-PORT=5000
+PORT=4000
 NODE_ENV=development
 
 # Database
@@ -247,7 +247,7 @@ JWT_EXPIRES_IN=7d
 # Google OAuth (Get from Google Cloud Console)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:4000/auth/google/callback
 
 # Cloudinary Configuration (Get from Cloudinary Dashboard)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -256,7 +256,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 # Email Service (SMTP)
 SMTP_HOST=email-smtp.ap-south-1.amazonaws.com
-EMAIL_PORT=587
+SMTP_PORT=587
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password_not_regular_password
 ```
@@ -271,7 +271,7 @@ npm install
 Create `.env` file in the `client` directory:
 
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:4000
 VITE_CLIENT_URL=http://localhost:5173
 ```
 
@@ -294,7 +294,7 @@ npm run dev
 ### 5. Access the Application
 
 -   **Frontend:** http://localhost:5173
--   **Backend API:** http://localhost:5000
+-   **Backend API:** http://localhost:4000
 
 ## 🌐 Production Deployment
 
