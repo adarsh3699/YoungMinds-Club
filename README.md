@@ -1,296 +1,576 @@
 # YoungMinds Club 🌟
 
-A comprehensive platform for youth engagement activities and events with role-based access control (RBAC), built using the MERN stack. This platform enables seamless event management, user authentication, and role-based dashboards for different user types.
+A comprehensive platform for youth engagement, event management, and career opportunities with advanced role-based access control (RBAC), built using the modern MERN stack with TypeScript.
 
-## ✨ Features
+## ✨ Key Features
 
--   🔐 **Secure Authentication**: JWT + Google OAuth integration
--   👥 **Role-Based Access Control**: User, Organizer, and Admin roles
--   📱 **Responsive Dashboards**: Tailored views for different user roles
--   🎉 **Event Management**: Create, update, and manage events
--   🔍 **Event Discovery**: Browse and book available events
--   👤 **Profile Management**: Complete profile system with image uploads
--   ☁️ **Cloud Storage**: Cloudinary integration for image handling
--   📊 **QR Code Generation**: Event ticketing with QR codes
+### 🔐 **Authentication & Security**
 
-## 🚀 Tech Stack
+-   **JWT Authentication** with secure token handling
+-   **Google OAuth Integration** for seamless social login
+-   **Role-Based Access Control** (User, Organizer, Admin)
+-   **Password Reset** with email verification
+-   **Account Security** with bcrypt encryption
 
-### Frontend
+### 🎉 **Event Management System**
 
--   **React 19** with **TypeScript** support and Vite for fast development
--   **React Router DOM 7.5** for client-side routing
--   **Tailwind CSS 4.1** for modern, responsive styling with animation support
--   **Headless UI 2.2** and **Heroicons 2.2** for accessible components
--   **Axios 1.8** for API communication
--   **JWT Decode 4.0** for token handling
--   **React Datepicker 8.4** for date selection
--   **React Dropzone 14.3** for file uploads
--   **QRCode.react 4.2** for QR code generation
--   **Date-fns 4.1** for date utilities
+-   **Complete Event Lifecycle** - Create, update, manage, and track events
+-   **Event Discovery** with smart filtering and search
+-   **QR Code Generation** for event tickets and check-ins
+-   **Registration Management** with capacity tracking
+-   **Event Analytics** with detailed performance metrics
+-   **Featured Events** system for promoting key events
 
-### Backend
+### 💼 **Internship Management Platform**
 
--   **Node.js** with **Express.js 4.19** framework
--   **MongoDB** with **Mongoose 8.2** ODM
--   **JWT 9.0** for secure authentication
--   **Google APIs 133.0** for OAuth integration
--   **Bcrypt 5.1** for password encryption
--   **Express Validator 7.0** for request validation
--   **Cloudinary 1.41** for cloud-based image storage
--   **Multer 1.4** for file upload handling
--   **Cookie Parser 1.4** for cookie management
--   **CORS 2.8** for cross-origin resource sharing
+-   **Full Internship Lifecycle** - Post, manage, and track internships
+-   **Application System** with status tracking
+-   **Compensation Management** (Paid/Unpaid with currency support)
+-   **Location Types** - Remote, On-site, Hybrid
+-   **Skills & Requirements** matching
+-   **Application Analytics** with daily tracking
+-   **Third-party Integration** support
+
+### 👤 **Advanced User Profiles**
+
+-   **XP (Experience Points) System** with activity tracking
+-   **Badge Collection** - Newbie, Regular, Champ, Veteran, Master
+-   **Streak Tracking** for consistent engagement
+-   **Profile Customization** with image uploads
+-   **Organizer Application System** with approval workflow
+-   **Activity History** and achievement tracking
+
+### 🛡️ **Admin Dashboard & Analytics**
+
+-   **Comprehensive User Management** with role modifications
+-   **Content Moderation** with flagging system
+-   **Real-time Analytics** and performance metrics
+-   **System-wide Announcements** management
+-   **Email Monitoring Dashboard** with deliverability tracking
+-   **Advanced Filtering** and search capabilities
+
+### 📧 **Professional Email System**
+
+-   **Automated Email Notifications** for all user actions
+-   **Email Monitoring & Analytics** with delivery tracking
+-   **Bounce & Complaint Handling** with automatic suppression
+-   **Professional HTML Templates** with responsive design
+-   **Rate Limiting** to prevent spam
+-   **Email Health Scoring** (0-100 performance metrics)
+
+### 🎨 **Modern UI/UX**
+
+-   **Responsive Design** optimized for all devices
+-   **Dark/Light Theme** support
+-   **Smooth Animations** with CSS transitions
+-   **Accessible Components** using Headless UI
+-   **Interactive Elements** with Heroicons
+-   **Professional Styling** with Tailwind CSS
+
+## 🚀 Technology Stack
+
+### Frontend (React + TypeScript)
+
+-   **React 19** - Latest React with concurrent features
+-   **TypeScript 5.8** - Full type safety and better DX
+-   **Vite 6.3** - Lightning-fast build tool and dev server
+-   **React Router DOM 7.5** - Client-side routing
+-   **Tailwind CSS 4.1** - Utility-first CSS framework
+-   **Headless UI 2.2** - Unstyled, accessible UI components
+-   **Heroicons 2.2** - Beautiful hand-crafted SVG icons
+
+### Backend (Node.js + Express)
+
+-   **Node.js** - JavaScript runtime
+-   **Express.js 4.19** - Web application framework
+-   **MongoDB** - NoSQL database
+-   **Mongoose 8.2** - MongoDB object modeling
+-   **JWT 9.0** - JSON Web Token authentication
+-   **Google APIs 133.0** - OAuth integration
+
+### Cloud Services & Integrations
+
+-   **Cloudinary 1.41** - Image and video management
+-   **Nodemailer 7.0** - Email sending service
+-   **Google Calendar API** - Calendar integration
+-   **AWS SES** - Email monitoring and delivery
 
 ### Development Tools
 
--   **TypeScript 5.8** for type-safe development
--   **ESLint 9.22** for code linting
--   **Vite 6.3** for fast build tooling
--   **Nodemon 3.1** for development server auto-restart
--   **Morgan 1.10** for HTTP request logging
+-   **ESLint 9.22** - Code linting and formatting
+-   **Nodemon 3.1** - Development auto-restart
+-   **Morgan 1.10** - HTTP request logging
+-   **Express Rate Limit 8.0** - API rate limiting
+-   **Express Validator 7.0** - Request validation
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
 YoungMinds Club/
-├── client/                 # Frontend - React + TypeScript application
-│   ├── public/             # Static files
-│   ├── src/                # TypeScript source files
-│   │   ├── assets/         # Images, fonts, etc.
-│   │   ├── components/     # React components
-│   │   │   ├── admin/      # Admin-specific components
-│   │   │   ├── auth/       # Authentication components
-│   │   │   ├── common/     # Shared/reusable components
-│   │   │   ├── organizer/  # Organizer-specific components
-│   │   │   └── user/       # User-specific components
-│   │   ├── context/        # React Context providers
-│   │   ├── pages/          # Page components
-│   │   │   ├── admin/      # Admin dashboard pages
-│   │   │   ├── organizer/  # Organizer dashboard pages
-│   │   │   └── user/       # User dashboard pages
-│   │   ├── styles/         # Global CSS files
-│   │   └── utils/          # Utility functions
-│   ├── dist/               # Production build output
-│   ├── package.json        # Frontend dependencies
-│   ├── tsconfig.json       # TypeScript configuration
-│   ├── vite.config.ts      # Vite configuration
-│   ├── vercel.json         # Vercel deployment config
-│   └── .env                # Environment variables
+├── client/                     # Frontend Application (React + TypeScript)
+│   ├── public/                 # Static assets and favicon
+│   │   ├── brandLogo_3.png    # Main brand logo
+│   │   └── dummy-profile.svg   # Default profile image
+│   ├── src/
+│   │   ├── assets/            # Images, logos, and static files
+│   │   ├── components/        # Reusable React components
+│   │   │   ├── admin/         # Admin-specific components
+│   │   │   │   ├── cards/     # Stats and user cards
+│   │   │   │   ├── forms/     # Announcement forms
+│   │   │   │   ├── layout/    # Admin layout components
+│   │   │   │   ├── modals/    # Admin confirmation modals
+│   │   │   │   └── tables/    # Data tables with filtering
+│   │   │   ├── auth/          # Authentication components
+│   │   │   ├── common/        # Shared UI components
+│   │   │   ├── home_comp/     # Homepage sections
+│   │   │   ├── organizer/     # Organizer dashboard components
+│   │   │   └── user/          # User profile and dashboard
+│   │   ├── context/           # React Context providers
+│   │   │   ├── AuthContext.tsx    # Authentication state
+│   │   │   └── ErrorContext.tsx   # Global error handling
+│   │   ├── pages/             # Page components
+│   │   │   ├── admin/         # Admin management pages
+│   │   │   ├── auth/          # Login, register, password reset
+│   │   │   ├── organizer/     # Organizer dashboard and tools
+│   │   │   └── user/          # User dashboard and profile
+│   │   ├── styles/            # Global CSS and themes
+│   │   ├── types/             # TypeScript type definitions
+│   │   │   ├── admin.types.ts     # Admin-specific types
+│   │   │   ├── core.types.ts      # Core application types
+│   │   │   ├── events.types.ts    # Event-related types
+│   │   │   ├── internships.types.ts # Internship types
+│   │   │   └── user.types.ts      # User and profile types
+│   │   └── utils/             # Utility functions
+│   ├── package.json           # Frontend dependencies
+│   ├── tsconfig.json          # TypeScript configuration
+│   ├── vite.config.ts         # Vite build configuration
+│   └── vercel.json            # Vercel deployment config
 │
-├── server/                 # Backend - Express application
-│   ├── config/             # Database and service configurations
-│   ├── controllers/        # Route controllers and business logic
-│   ├── docs/               # API documentation
-│   ├── middlewares/        # Custom Express middlewares
-│   ├── models/             # Mongoose database models
-│   ├── routes/             # Express route definitions
-│   ├── services/           # Business service layer
-│   ├── utils/              # Utility functions and helpers
-│   ├── index.js            # Server entry point
-│   ├── package.json        # Backend dependencies
-│   ├── vercel.json         # Vercel deployment config
-│   └── .env                # Environment variables
+├── server/                     # Backend Application (Node.js + Express)
+│   ├── config/                # Service configurations
+│   │   ├── cloudinary.js      # Image upload configuration
+│   │   └── google.js          # Google OAuth setup
+│   ├── controllers/           # Route controllers and business logic
+│   │   ├── adminController.js         # Admin management
+│   │   ├── announcementController.js  # System announcements
+│   │   ├── authController.js          # Authentication
+│   │   ├── emailMonitoringController.js # Email analytics
+│   │   ├── eventController.js         # Event management
+│   │   ├── filtersController.js       # Search and filtering
+│   │   ├── internshipController.js    # Internship management
+│   │   ├── organizerController.js     # Organizer features
+│   │   ├── userActivityController.js  # XP and badge system
+│   │   └── userController.js          # User management
+│   ├── docs/                  # API documentation
+│   │   └── google-apis.md     # Google integration guide
+│   ├── middlewares/           # Express middleware
+│   │   ├── auth.js            # JWT authentication
+│   │   ├── otherUtils.js      # Utility middleware
+│   │   └── rateLimiting.js    # API rate limiting
+│   ├── models/                # MongoDB schemas
+│   │   ├── Announcement.js        # System announcements
+│   │   ├── Event.js               # Event data model
+│   │   ├── EventRegistration.js   # Event registrations
+│   │   ├── Internship.js          # Internship data model
+│   │   ├── InternshipApplication.js # Internship applications
+│   │   ├── User.js                # User accounts
+│   │   └── UserActivity.js        # XP, badges, and streaks
+│   ├── routes/                # API route definitions
+│   │   ├── admin.js           # Admin endpoints
+│   │   ├── auth.js            # Authentication routes
+│   │   ├── emailMonitoring.js # Email analytics routes
+│   │   ├── event.js           # Event CRUD operations
+│   │   ├── filters.js         # Search and filter endpoints
+│   │   ├── internship.js      # Internship CRUD operations
+│   │   ├── organizer.js       # Organizer dashboard routes
+│   │   └── user.js            # User profile and activity
+│   ├── services/              # Business logic services
+│   │   ├── emailMonitoring.js # Email tracking and analytics
+│   │   ├── emailService.js    # Email sending service
+│   │   └── googleCalendar.js  # Calendar integration
+│   ├── utils/                 # Helper functions
+│   │   ├── cloudinary.js      # Image processing
+│   │   ├── eventHelpers.js    # Event utilities
+│   │   ├── filterConstants.js # Search constants
+│   │   └── jwt.js             # Token utilities
+│   ├── package.json           # Backend dependencies
+│   ├── vercel.json            # Vercel serverless config
+│   └── example.env            # Environment variables template
 │
-├── .gitignore              # Git ignore rules
-├── .prettierrc.json        # Prettier configuration
-└── README.md               # Project documentation
+├── README.md                   # Project documentation
+└── .gitignore                  # Git ignore rules
 ```
 
-## 🛠️ Getting Started
+## 🛠️ Installation & Setup
 
 ### Prerequisites
 
 -   **Node.js** (v18 or higher)
--   **npm** or **yarn**
--   **MongoDB** (local installation or MongoDB Atlas)
+-   **npm** or **pnpm** (recommended)
+-   **MongoDB** (local or Atlas)
 -   **Git** for version control
 
-### Installation
+### 1. Clone the Repository
 
-1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd "YoungMinds Club"
+```
 
-    ```bash
-    git clone <repository-url>
-    cd "YoungMinds Club"
-    ```
+### 2. Backend Setup
 
-2. **Install backend dependencies**
+```bash
+cd server
+npm install
+```
 
-    ```bash
-    cd server
-    npm install
-    ```
+Create `.env` file in the `server` directory:
 
-3. **Set up backend environment variables**
+```env
+# Server Configuration
+PORT=5000
+NODE_ENV=development
 
-    Create a `.env` file in the `server` directory:
+# Database
+MONGODB_URI=mongodb://localhost:27017/youngmindsclub
 
-    ```env
-    # Server Configuration
-    PORT=5000
-    NODE_ENV=development
+# Client URL
+CLIENT_URL=http://localhost:5173
 
-    # Database
-    MONGODB_URI=mongodb://localhost:27017/youngmindsclub
+# CORS Configuration
+CORS_URL_LIST=http://localhost:5173,http://localhost:3000
 
-    # Frontend URL
-    CLIENT_URL=http://localhost:5173
+# JWT Configuration
+JWT_SECRET=your_super_secure_jwt_secret_key_here
+JWT_EXPIRES_IN=7d
 
-    # JWT Configuration
-    JWT_SECRET=your_super_secure_jwt_secret_key_here
-    JWT_EXPIRES_IN=7d
+# Google OAuth (Get from Google Cloud Console)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
 
-    # Google OAuth
-    GOOGLE_CLIENT_ID=your_google_client_id
-    GOOGLE_CLIENT_SECRET=your_google_client_secret
-    GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
+# Cloudinary Configuration (Get from Cloudinary Dashboard)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 
-    # Cloudinary Configuration
-    CLOUDINARY_CLOUD_NAME=your_cloud_name
-    CLOUDINARY_API_KEY=your_api_key
-    CLOUDINARY_API_SECRET=your_api_secret
-    ```
+# Email Service (SMTP)
+SMTP_HOST=email-smtp.ap-south-1.amazonaws.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password_not_regular_password
+```
 
-4. **Install frontend dependencies**
+### 3. Frontend Setup
 
-    ```bash
-    cd ../client
-    npm install
-    ```
+```bash
+cd ../client
+npm install
+```
 
-5. **Set up frontend environment variables**
+Create `.env` file in the `client` directory:
 
-    Create a `.env` file in the `client` directory:
+```env
+VITE_API_URL=http://localhost:5000
+VITE_CLIENT_URL=http://localhost:5173
+```
 
-    ```env
-    VITE_API_URL=http://localhost:5000
-    VITE_CLIENT_URL=http://localhost:5173
-    ```
+### 4. Start Development Servers
 
-### 🚀 Running the Application
+**Backend Server:**
 
-#### Development Mode
+```bash
+cd server
+npm run dev
+```
 
-1. **Start the backend server**
+**Frontend Development Server:**
 
-    ```bash
-    cd server
-    npm run dev
-    ```
+```bash
+cd client
+npm run dev
+```
 
-2. **Start the frontend development server**
+### 5. Access the Application
 
-    ```bash
-    cd client
-    npm run dev
-    ```
+-   **Frontend:** http://localhost:5173
+-   **Backend API:** http://localhost:5000
 
-3. **Access the application**
-    - **Frontend**: http://localhost:5173
-    - **Backend API**: http://localhost:5000
+## 🌐 Production Deployment
 
-#### Production Build
+### Vercel Deployment (Recommended)
 
-1. **Build the frontend**
+This project is optimized for **Vercel** deployment with separate configurations for frontend and backend.
 
-    ```bash
-    cd client
-    npm run build
-    ```
-
-2. **Start the production server**
-    ```bash
-    cd server
-    npm start
-    ```
-
-## 🌐 Deployment
-
-This project is configured for deployment on **Vercel** with separate deployments for frontend and backend.
-
-### Frontend Deployment
+#### Frontend Deployment
 
 -   Automatically deploys from the `client` directory
--   Uses Vite build system with TypeScript support for optimized production builds
+-   Uses Vite build system with TypeScript compilation
 -   SPA routing handled by `vercel.json` configuration
-
-### Backend Deployment
-
--   Deploys as a serverless function on Vercel
--   Uses Node.js runtime with Express.js
 -   Environment variables configured in Vercel dashboard
+
+#### Backend Deployment
+
+-   Deploys as serverless functions on Vercel
+-   Uses Node.js runtime with Express.js
+-   MongoDB Atlas recommended for production database
+-   Environment variables configured in Vercel dashboard
+
+### Build Commands
+
+**Frontend Production Build:**
+
+```bash
+cd client
+npm run build
+```
+
+**Backend Production Start:**
+
+```bash
+cd server
+npm start
+```
 
 ## 📚 API Documentation
 
 ### Authentication Endpoints
 
-| Method | Endpoint                | Description               |
-| ------ | ----------------------- | ------------------------- |
-| `POST` | `/auth/signup`          | Register a new user       |
-| `POST` | `/auth/login`           | Login with email/password |
-| `GET`  | `/auth/logout`          | Logout current user       |
-| `GET`  | `/auth/me`              | Get current user profile  |
-| `GET`  | `/auth/google`          | Initiate Google OAuth     |
-| `GET`  | `/auth/google/callback` | Google OAuth callback     |
+| Method | Endpoint                | Description                  |
+| ------ | ----------------------- | ---------------------------- |
+| `POST` | `/auth/signup`          | Register new user account    |
+| `POST` | `/auth/login`           | Login with email/password    |
+| `GET`  | `/auth/logout`          | Logout current session       |
+| `GET`  | `/auth/me`              | Get current user profile     |
+| `GET`  | `/auth/google`          | Initiate Google OAuth flow   |
+| `GET`  | `/auth/google/callback` | Handle Google OAuth callback |
+| `POST` | `/auth/forgot-password` | Request password reset       |
+| `POST` | `/auth/reset-password`  | Reset password with token    |
 
-### User Endpoints
+### User Management Endpoints
 
-| Method | Endpoint          | Description              |
-| ------ | ----------------- | ------------------------ |
-| `GET`  | `/user/dashboard` | Get user dashboard data  |
-| `PUT`  | `/user/profile`   | Update user profile      |
-| `GET`  | `/user/events`    | Get user's booked events |
+| Method | Endpoint                      | Description                     |
+| ------ | ----------------------------- | ------------------------------- |
+| `GET`  | `/user/profile`               | Get user profile with XP/badges |
+| `PUT`  | `/user/profile`               | Update user profile information |
+| `POST` | `/user/profile/picture`       | Upload profile picture          |
+| `GET`  | `/user/dashboard`             | Get user dashboard data         |
+| `GET`  | `/user/xp-history`            | Get XP earning history          |
+| `GET`  | `/user/badges`                | Get user badge collection       |
+| `POST` | `/user/organizer-application` | Apply to become organizer       |
+
+### Event Management Endpoints
+
+| Method | Endpoint               | Description                             |
+| ------ | ---------------------- | --------------------------------------- |
+| `GET`  | `/events`              | Get all published events with filtering |
+| `GET`  | `/events/:id`          | Get specific event details              |
+| `POST` | `/events/:id/register` | Register for an event                   |
+| `GET`  | `/events/:id/qr`       | Generate QR code for event              |
+| `POST` | `/events/:id/feedback` | Submit event feedback                   |
+
+### Internship Management Endpoints
+
+| Method | Endpoint                  | Description                     |
+| ------ | ------------------------- | ------------------------------- |
+| `GET`  | `/internships`            | Get all published internships   |
+| `GET`  | `/internships/:id`        | Get specific internship details |
+| `POST` | `/internships/:id/apply`  | Apply for internship            |
+| `GET`  | `/internships/categories` | Get internship categories       |
+| `GET`  | `/internships/filters`    | Get filter options              |
 
 ### Organizer Endpoints
 
-| Method   | Endpoint                | Description             |
-| -------- | ----------------------- | ----------------------- |
-| `GET`    | `/organizer/dashboard`  | Get organizer dashboard |
-| `GET`    | `/organizer/events`     | Get organizer's events  |
-| `POST`   | `/organizer/events`     | Create a new event      |
-| `PUT`    | `/organizer/events/:id` | Update an event         |
-| `DELETE` | `/organizer/events/:id` | Delete an event         |
+| Method   | Endpoint                     | Description                   |
+| -------- | ---------------------------- | ----------------------------- |
+| `GET`    | `/organizer/dashboard`       | Get organizer dashboard stats |
+| `GET`    | `/organizer/events`          | Get organizer's events        |
+| `POST`   | `/organizer/events`          | Create new event              |
+| `PUT`    | `/organizer/events/:id`      | Update existing event         |
+| `DELETE` | `/organizer/events/:id`      | Delete event                  |
+| `GET`    | `/organizer/internships`     | Get organizer's internships   |
+| `POST`   | `/organizer/internships`     | Create new internship         |
+| `PUT`    | `/organizer/internships/:id` | Update internship             |
+| `DELETE` | `/organizer/internships/:id` | Delete internship             |
 
-### Admin Endpoints
+### Admin Management Endpoints
 
-| Method   | Endpoint                | Description         |
-| -------- | ----------------------- | ------------------- |
-| `GET`    | `/admin/users`          | Get all users       |
-| `GET`    | `/admin/users/:id`      | Get specific user   |
-| `PUT`    | `/admin/users/:id/role` | Update user role    |
-| `DELETE` | `/admin/users/:id`      | Delete a user       |
-| `GET`    | `/admin/events`         | Get all events      |
-| `PUT`    | `/admin/events/:id`     | Update event status |
+| Method   | Endpoint                         | Description                        |
+| -------- | -------------------------------- | ---------------------------------- |
+| `GET`    | `/admin/dashboard/stats`         | Get admin dashboard statistics     |
+| `GET`    | `/admin/users`                   | Get all users with filtering       |
+| `PUT`    | `/admin/users/:id/role`          | Update user role                   |
+| `DELETE` | `/admin/users/:id`               | Delete user account                |
+| `GET`    | `/admin/events`                  | Get all events for management      |
+| `PUT`    | `/admin/events/:id/feature`      | Toggle event featured status       |
+| `PUT`    | `/admin/events/:id/flag`         | Flag/unflag event                  |
+| `GET`    | `/admin/internships`             | Get all internships for management |
+| `PUT`    | `/admin/internships/:id/feature` | Toggle internship featured status  |
+| `PUT`    | `/admin/internships/:id/flag`    | Flag/unflag internship             |
+| `GET`    | `/admin/announcements`           | Get system announcements           |
+| `POST`   | `/admin/announcements`           | Create new announcement            |
+
+### Email Monitoring Endpoints
+
+| Method | Endpoint                               | Description                   |
+| ------ | -------------------------------------- | ----------------------------- |
+| `GET`  | `/email-monitoring/dashboard`          | Get email system overview     |
+| `GET`  | `/email-monitoring/stats`              | Get delivery statistics       |
+| `GET`  | `/email-monitoring/stats/by-type`      | Get stats by email type       |
+| `GET`  | `/email-monitoring/problematic-emails` | Get high-risk email addresses |
+
+## 🎮 Gamification System
+
+### XP (Experience Points) System
+
+-   **Event Registration:** +10 XP
+-   **Event Attendance:** +25 XP
+-   **Internship Application:** +15 XP
+-   **Profile Completion:** +20 XP
+-   **Daily Login Streak:** +5 XP per day
+
+### Badge Progression
+
+-   **Newbie** (0-49 XP) - New to the platform
+-   **Regular** (50-149 XP) - Active participant
+-   **Champ** (150-299 XP) - Engaged community member
+-   **Veteran** (300-499 XP) - Experienced user
+-   **Master** (500+ XP) - Platform expert
+
+### Streak System
+
+-   Daily login streaks tracked automatically
+-   Bonus XP for maintaining streaks
+-   Visual indicators for streak achievements
+
+## 📧 Email System Features
+
+### Email Types Monitored
+
+1. **Authentication Emails**
+
+    - Password reset requests
+    - Password setup for Google users
+    - Password change confirmations
+
+2. **Event Notifications**
+
+    - Event registration confirmations
+    - Event reminder notifications
+
+3. **Internship Communications**
+
+    - Application confirmations
+    - Status update notifications
+
+4. **Administrative Emails**
+    - Organizer approval/rejection
+    - System announcements
+
+### Email Performance Metrics
+
+-   **Delivery Rate:** >98% target
+-   **Bounce Rate:** <2% target
+-   **Complaint Rate:** <0.1% target
+-   **Health Score:** 90-100 (excellent)
+
+### Advanced Features
+
+-   **Automatic Suppression** for problematic email addresses
+-   **Real-time Monitoring** with bounce/complaint tracking
+-   **Professional HTML Templates** with responsive design
+-   **Rate Limiting** to prevent spam
+-   **Performance Analytics** with detailed reporting
 
 ## 🔧 Development Scripts
 
-### Frontend (client)
+### Frontend (client/)
 
 ```bash
-npm run dev      # Start development server with TypeScript
-npm run build    # Build for production (includes type checking)
-npm run preview  # Preview production build
-npm run lint     # Run ESLint with TypeScript support
+npm run dev          # Start development server with HMR
+npm run build        # Build for production with TypeScript
+npm run type-check   # Run TypeScript type checking
+npm run lint         # Run ESLint with TypeScript support
+npm run preview      # Preview production build locally
 ```
 
-### Backend (server)
+### Backend (server/)
 
 ```bash
-npm run dev      # Start with nodemon (auto-restart)
-npm start        # Start production server
-npm test         # Run tests (placeholder)
+npm run dev          # Start with nodemon (auto-restart)
+npm start            # Start production server
+npm test             # Run tests (placeholder)
 ```
 
-## 🛠️ TypeScript Support
+## 🛡️ Security Features
 
-The frontend is built with **TypeScript** for enhanced development experience:
+### Authentication Security
 
--   **Type Safety**: Catch errors at compile time
--   **Better IntelliSense**: Enhanced autocompletion and documentation
--   **Refactoring Support**: Safe code transformations
--   **Modern ES Features**: Latest JavaScript features with backward compatibility
+-   **JWT Tokens** with secure expiration
+-   **Password Hashing** using bcrypt
+-   **Rate Limiting** on authentication endpoints
+-   **CORS Protection** with configurable origins
+
+### Data Protection
+
+-   **Input Validation** using Express Validator
+-   **XSS Protection** with sanitized inputs
+-   **MongoDB Injection** prevention
+-   **File Upload Security** with Cloudinary integration
+
+### Role-Based Access Control
+
+-   **Three-tier Role System** (User, Organizer, Admin)
+-   **Protected Routes** with middleware authentication
+-   **Permission-based Actions** for sensitive operations
+-   **Audit Logging** for administrative actions
+
+## 🎨 UI/UX Features
+
+### Design System
+
+-   **Consistent Color Palette** with CSS custom properties
+-   **Responsive Breakpoints** for all device sizes
+-   **Accessible Components** following WCAG guidelines
+-   **Smooth Animations** with CSS transitions
+-   **Loading States** for better user experience
+
+### Interactive Elements
+
+-   **Real-time Feedback** for form submissions
+-   **Toast Notifications** for user actions
+-   **Modal Dialogs** for confirmations
+-   **Skeleton Loading** for content placeholders
+-   **Infinite Scroll** for large data sets
+
+### Mobile Optimization
+
+-   **Touch-friendly Interface** with appropriate tap targets
+-   **Swipe Gestures** for navigation
+-   **Optimized Images** with responsive loading
+-   **Fast Loading Times** with code splitting
+
+## 🚀 Performance Optimizations
+
+### Frontend Optimizations
+
+-   **Code Splitting** with React lazy loading
+-   **Bundle Analysis** with Vite build tools
+-   **Image Optimization** with Cloudinary transformations
+-   **Caching Strategies** for API responses
+-   **Tree Shaking** for minimal bundle size
+
+### Backend Optimizations
+
+-   **Database Indexing** for fast queries
+-   **Connection Pooling** for MongoDB
+-   **Compression Middleware** for response optimization
+-   **Caching Headers** for static assets
+-   **Rate Limiting** for API protection
 
 ## 🤝 Contributing
+
+### Development Workflow
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -298,12 +578,21 @@ The frontend is built with **TypeScript** for enhanced development experience:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Development Guidelines
+### Code Standards
 
--   Follow TypeScript best practices for frontend development
--   Use ESLint configuration for consistent code style
--   Write meaningful commit messages
--   Add proper type annotations for new components and functions
+-   **TypeScript** for type safety in frontend
+-   **ESLint** configuration for consistent code style
+-   **Meaningful Commit Messages** following conventional commits
+-   **Component Documentation** with JSDoc comments
+-   **Test Coverage** for new features
+
+### Pull Request Guidelines
+
+-   Include detailed description of changes
+-   Add screenshots for UI changes
+-   Ensure all tests pass
+-   Update documentation as needed
+-   Request review from maintainers
 
 ## 📄 License
 
@@ -311,12 +600,24 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🙏 Acknowledgments
 
--   Built with ❤️ using the MERN stack + TypeScript
--   UI components powered by Tailwind CSS and Headless UI
--   Cloud storage provided by Cloudinary
--   Deployed on Vercel platform
--   Fast development experience with Vite
+-   **MERN Stack Community** for excellent documentation and support
+-   **TypeScript Team** for making JavaScript development better
+-   **Tailwind CSS** for the amazing utility-first CSS framework
+-   **Vercel Platform** for seamless deployment experience
+-   **MongoDB Atlas** for reliable cloud database hosting
+-   **Cloudinary** for powerful image and video management
+-   **Google APIs** for authentication and calendar integration
+
+## 📞 Support & Contact
+
+For questions, bug reports, or feature requests:
+
+-   **Create an Issue** in the GitHub repository
+-   **Join our Community** discussions
+-   **Follow Updates** on our social media channels
 
 ---
 
-For questions or support, please open an issue in the repository.
+**Built with ❤️ by the YoungMinds Club team**
+
+_Empowering young professionals through technology and community_
