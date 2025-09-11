@@ -35,8 +35,10 @@ app.use(morgan("dev"));
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Connect to MongoDB (optimized for serverless)
-connectDB().catch((err) => console.error("MongoDB connection error:", err));
+// Initialize database connection on startup
+connectDB()
+	.then(() => console.log("Database connected successfully"))
+	.catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
 app.use("/auth", authRoutes);
