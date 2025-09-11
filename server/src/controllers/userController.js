@@ -17,10 +17,14 @@ if (hasCloudinaryCredentials) {
 	// Use the centralized Cloudinary configuration
 	upload = uploadProfilePicture.single("profilePicture");
 } else {
-	// Create uploads directory if it doesn't exist
+	// Create uploads directory if it doesn't exist (only in non-serverless environments)
 	const uploadsDir = path.join(__dirname, "../uploads/profile_pictures");
-	if (!fs.existsSync(uploadsDir)) {
-		fs.mkdirSync(uploadsDir, { recursive: true });
+	try {
+		if (!fs.existsSync(uploadsDir)) {
+			fs.mkdirSync(uploadsDir, { recursive: true });
+		}
+	} catch (error) {
+		console.warn("Could not create uploads directory (serverless environment):", error.message);
 	}
 
 	// Configure local disk storage for development
