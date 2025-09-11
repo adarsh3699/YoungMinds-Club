@@ -15,16 +15,20 @@ This is the backend server for the YoungMinds Club platform, built with Node.js,
 
 ```
 server/
-├── config/           # Configuration files and environment setup
-├── controllers/      # Route controllers for all endpoints
-├── docs/             # API documentation
-├── middlewares/      # Custom middleware functions
-├── models/           # Mongoose models
-├── public/           # Static files
-│   └── uploads/      # Uploaded files before cloud storage
-├── routes/           # API route definitions
-├── services/         # Business logic services
-└── utils/            # Utility functions and helpers
+├── index.js          # Main application entry point
+├── package.json      # Dependencies and scripts
+├── vercel.json       # Vercel deployment configuration
+├── example.env       # Environment variables template
+├── docs/             # API documentation and guides
+├── src/              # Source code directory
+│   ├── config/       # Configuration files (database, cloudinary, etc.)
+│   ├── controllers/  # Route controllers for all endpoints
+│   ├── middlewares/  # Custom middleware functions (auth, rate limiting)
+│   ├── models/       # Mongoose database models
+│   ├── routes/       # API route definitions
+│   ├── services/     # Business logic services (email, calendar)
+│   └── utils/        # Utility functions and helpers
+└── node_modules/     # Dependencies
 ```
 
 ## Getting Started
@@ -32,18 +36,26 @@ server/
 ### Prerequisites
 
 -   Node.js (v14 or higher)
--   npm or yarn
+-   pnpm (recommended) or npm
 -   MongoDB (local or Atlas)
 
 ### Installation
 
-1. Install dependencies
+1. Clone the repository and navigate to the server directory
 
 ```bash
+cd server
+```
+
+2. Install dependencies
+
+```bash
+pnpm install
+# or
 npm install
 ```
 
-2. Create a `.env` file in the root directory with the following variables:
+3. Create a `.env` file in the root directory with the following variables:
 
 ```
 PORT=5000
@@ -66,11 +78,15 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-3. Start the development server
+4. Start the development server
 
 ```bash
+pnpm dev
+# or
 npm run dev
 ```
+
+The server will start on `http://localhost:5000`
 
 ## API Endpoints
 
@@ -107,6 +123,67 @@ npm run dev
 
 ## Available Scripts
 
--   `npm run start` - Start the server
--   `npm run dev` - Start the server with nodemon
--   `npm run test` - Run tests
+-   `pnpm start` - Start the production server
+-   `pnpm dev` - Start the development server with nodemon
+-   `pnpm test` - Run tests
+
+> Note: You can also use `npm run <script>` instead of `pnpm <script>`
+
+## Deployment
+
+### Vercel Deployment
+
+This server is configured for easy deployment on Vercel:
+
+1. Install Vercel CLI:
+
+```bash
+pnpm add -g vercel
+# or
+npm install -g vercel
+```
+
+2. Login to Vercel:
+
+```bash
+vercel login
+```
+
+3. Deploy:
+
+```bash
+vercel --prod
+```
+
+4. Configure environment variables in the Vercel dashboard with your production values.
+
+### Environment Variables for Production
+
+For production deployment, make sure to set these environment variables:
+
+-   `MONGODB_URI` - MongoDB Atlas connection string
+-   `JWT_SECRET` - Strong secret key for JWT tokens
+-   `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
+-   `CLOUDINARY_*` - Cloudinary configuration for image uploads
+-   `EMAIL_*` - SMTP configuration for email services
+-   `CORS_URL_LIST` - Comma-separated list of allowed origins
+-   `CLIENT_URL` - Frontend application URL
+
+## Development
+
+The codebase follows a clean architecture pattern:
+
+-   **Controllers** handle HTTP requests and responses
+-   **Services** contain business logic
+-   **Models** define database schemas
+-   **Middlewares** handle cross-cutting concerns (auth, validation, etc.)
+-   **Routes** define API endpoints
+-   **Utils** contain helper functions
+-   **Config** manages application configuration
+
+## Contributing
+
+1. Follow the existing code structure
+2. Add proper error handling
+3. Write meaningful commit messages
+4. Test your changes locally before submitting

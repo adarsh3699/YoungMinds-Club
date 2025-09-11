@@ -1,20 +1,20 @@
 require("dotenv").config();
 const express = require("express");
-const connectDB = require("./config/database");
+const connectDB = require("./src/config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const path = require("path");
 
 // Import routes
-const authRoutes = require("./routes/auth");
-const adminRoutes = require("./routes/admin");
-const organizerRoutes = require("./routes/organizer");
-const userRoutes = require("./routes/user");
-const eventRoutes = require("./routes/event");
-const internshipRoutes = require("./routes/internship");
-const filtersRoutes = require("./routes/filters");
-const emailMonitoringRoutes = require("./routes/emailMonitoring");
+const authRoutes = require("./src/routes/auth");
+const adminRoutes = require("./src/routes/admin");
+const organizerRoutes = require("./src/routes/organizer");
+const userRoutes = require("./src/routes/user");
+const eventRoutes = require("./src/routes/event");
+const internshipRoutes = require("./src/routes/internship");
+const filtersRoutes = require("./src/routes/filters");
+const emailMonitoringRoutes = require("./src/routes/emailMonitoring");
 
 // Create Express app
 const app = express();
@@ -49,7 +49,7 @@ app.use("/filters", filtersRoutes);
 app.use("/email-monitoring", emailMonitoringRoutes);
 
 // Additional public routes
-app.get("/leaderboard", require("./controllers/userActivityController").getLeaderboard);
+app.get("/leaderboard", require("./src/controllers/userActivityController").getLeaderboard);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
