@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
+const connectDB = require("./config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
@@ -35,11 +35,8 @@ app.use(morgan("dev"));
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Connect to MongoDB
-mongoose
-	.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/eventplatform")
-	.then(() => console.log("Connected to MongoDB"))
-	.catch((err) => console.error("MongoDB connection error:", err));
+// Connect to MongoDB (optimized for serverless)
+connectDB().catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
 app.use("/auth", authRoutes);
@@ -69,7 +66,12 @@ app.get("/", (req, res) => {
 	res.send("Event Booking API is running");
 });
 
-// Start server
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
-});
+// Export the app for Vercel
+module.exports = app;
+
+// Only start server if not in production (for local development)
+if (process.env.NODE_ENV !== "production") {
+	app.listen(PORT, () => {
+		console.log(`Server running on port ${PORT}`);
+	});
+}

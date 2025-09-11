@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+pnpm-lock.yaml
+package-lock.json
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Development files
+nodemon.json
+
+# Documentation
+README.md
+README-SMTP.md
+EMAIL-IMPLEMENTATION-SUMMARY.md
+EMAIL-MONITORING.md
+docs/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
