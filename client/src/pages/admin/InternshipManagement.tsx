@@ -30,6 +30,7 @@ type InternshipModalState = {
 	isFlagged: boolean;
 	flagReason: string;
 	internshipData?: AdminInternshipData | null;
+	isLoading: boolean;
 };
 
 const InternshipManagement: React.FC = () => {
@@ -46,6 +47,7 @@ const InternshipManagement: React.FC = () => {
 		isFlagged: false,
 		flagReason: "",
 		internshipData: null,
+		isLoading: false,
 	});
 
 	// Filter options
@@ -191,15 +193,20 @@ const InternshipManagement: React.FC = () => {
 	const deleteInternship = useCallback(async () => {
 		if (!modal.internshipId) return;
 
+		// Set loading state
+		setModal((prev) => ({ ...prev, isLoading: true }));
+
 		try {
 			const { data } = await axios.delete(`/admin/internships/${modal.internshipId}`);
 			if (data.success) {
 				setInternships((prev) => prev.filter((internship) => internship._id !== modal.internshipId));
-				setModal((prev) => ({ ...prev, isOpen: false }));
+				setModal((prev) => ({ ...prev, isOpen: false, isLoading: false }));
 			}
 		} catch (error) {
 			console.error("Error deleting internship:", error);
 			setError("Failed to delete internship. Please try again.");
+			// Reset loading state on error
+			setModal((prev) => ({ ...prev, isLoading: false }));
 		}
 	}, [modal.internshipId]);
 
@@ -275,6 +282,7 @@ const InternshipManagement: React.FC = () => {
 			isFlagged: internship.isFlagged || false,
 			flagReason: internship.flagReason || "",
 			internshipData: type === "edit" ? internship : null,
+			isLoading: false,
 		});
 	}, []);
 
@@ -284,6 +292,7 @@ const InternshipManagement: React.FC = () => {
 			isOpen: false,
 			type: null,
 			internshipData: null,
+			isLoading: false,
 		}));
 	}, []);
 
@@ -576,6 +585,7 @@ const InternshipManagement: React.FC = () => {
 					onFlagReasonChange={(e) => setModal((prev) => ({ ...prev, flagReason: e.target.value }))}
 					onConfirm={handleConfirm}
 					context="internship"
+					isLoading={modal.isLoading}
 				/>
 
 				{/* Edit Internship Modal */}

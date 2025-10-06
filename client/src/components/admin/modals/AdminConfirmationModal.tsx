@@ -31,8 +31,7 @@ const getModalConfigurations = (
 			}"? This action cannot be undone.`,
 			confirmClass: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
 			getIcon: () => <ExclamationTriangleIcon className="w-8 h-8 text-destructive" />,
-			getConfirmText: (deleteAllData: boolean) =>
-				deleteAllData ? "Delete Everything" : `Delete ${entityType} Only`,
+			getConfirmText: (deleteAllData: boolean) => (deleteAllData ? "Delete Everything" : `Delete ${entityType}`),
 		},
 		[MODAL_TYPES.STATUS]: {
 			iconBg: "bg-warning/10",
@@ -121,6 +120,7 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 		onFlagReasonChange,
 		onConfirm,
 		context = "user", // Default to 'user' for backward compatibility
+		isLoading = false,
 	}) => {
 		// Memoized modal configuration with optimized logic
 		const config = useMemo((): ExtendedConfig => {
@@ -179,8 +179,8 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 
 		// Optimized disabled state calculation
 		const isDisabled = useMemo(
-			() => modalType === MODAL_TYPES.FLAG && !isFlagged && !flagReason?.trim(),
-			[modalType, isFlagged, flagReason]
+			() => isLoading || (modalType === MODAL_TYPES.FLAG && !isFlagged && !flagReason?.trim()),
+			[modalType, isFlagged, flagReason, isLoading]
 		);
 
 		// Memoized button classes with performance optimization
@@ -341,7 +341,14 @@ const AdminConfirmationModal: React.FC<AdminConfirmationModalProps> = memo(
 						Cancel
 					</button>
 					<button type="button" className={buttonClasses} onClick={onConfirm} disabled={isDisabled}>
-						{config.confirmText}
+						{isLoading ? (
+							<div className="flex items-center justify-center gap-2">
+								<div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+								<span>Processing...</span>
+							</div>
+						) : (
+							config.confirmText
+						)}
 					</button>
 				</div>
 			</Modal>

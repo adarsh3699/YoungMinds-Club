@@ -1400,8 +1400,8 @@ exports.deleteInternship = async (req, res) => {
 
 			// Remove this internship from all users' saved internships lists
 			await UserActivity.updateMany(
-				{ savedInternships: req.params.id },
-				{ $pull: { savedInternships: req.params.id } }
+				{ "savedInternships.internship": req.params.id },
+				{ $pull: { savedInternships: { internship: req.params.id } } }
 			).session(session);
 
 			// Commit the transaction

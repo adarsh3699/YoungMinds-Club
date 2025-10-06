@@ -23,6 +23,7 @@ export interface AdminConfirmationModalProps {
 	onFlagReasonChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onConfirm: () => void;
 	context?: "user" | "event" | "internship";
+	isLoading?: boolean;
 }
 
 export interface StatusOption {

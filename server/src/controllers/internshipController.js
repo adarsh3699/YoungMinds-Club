@@ -198,7 +198,8 @@ exports.getInternshipById = async (req, res) => {
 			// Check if user has saved this internship
 			const UserActivity = require("../models/UserActivity");
 			const userActivity = await UserActivity.findOne({ user: userId });
-			const hasSaved = userActivity?.savedInternships?.includes(req.params.id) || false;
+			const hasSaved =
+				userActivity?.savedInternships?.some((saved) => saved.internship.toString() === req.params.id) || false;
 
 			responseData.userStatus = {
 				isApplied: !!hasApplied,
@@ -436,7 +437,7 @@ exports.saveInternship = async (req, res) => {
 		if (!userActivity) {
 			userActivity = await UserActivity.create({
 				user: userId,
-				savedInternships: [internshipId],
+				savedInternships: [{ internship: internshipId, savedAt: new Date() }],
 			});
 
 			return res.status(200).json({
@@ -452,11 +453,15 @@ exports.saveInternship = async (req, res) => {
 		}
 
 		// Check if internship is already saved
-		const savedIndex = userActivity.savedInternships.indexOf(internshipId);
+		const alreadySaved = userActivity.savedInternships.some(
+			(saved) => saved.internship.toString() === internshipId
+		);
 
-		if (savedIndex > -1) {
+		if (alreadySaved) {
 			// Remove from saved
-			userActivity.savedInternships.splice(savedIndex, 1);
+			userActivity.savedInternships = userActivity.savedInternships.filter(
+				(saved) => saved.internship.toString() !== internshipId
+			);
 			await userActivity.save();
 
 			return res.status(200).json({
@@ -466,7 +471,7 @@ exports.saveInternship = async (req, res) => {
 			});
 		} else {
 			// Add to saved
-			userActivity.savedInternships.push(internshipId);
+			userActivity.savedInternships.push({ internship: internshipId, savedAt: new Date() });
 			await userActivity.save();
 
 			return res.status(200).json({
@@ -589,8 +594,8 @@ exports.deleteInternship = async (req, res) => {
 
 			// Remove this internship from all users' saved internships lists
 			await UserActivity.updateMany(
-				{ savedInternships: req.params.id },
-				{ $pull: { savedInternships: req.params.id } }
+				{ "savedInternships.internship": req.params.id },
+				{ $pull: { savedInternships: { internship: req.params.id } } }
 			).session(session);
 
 			// Commit the transaction
