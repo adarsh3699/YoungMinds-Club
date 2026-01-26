@@ -4,12 +4,12 @@ This is the backend server for the YoungMinds Club platform, built with Node.js,
 
 ## Features
 
--   RESTful API architecture
--   JWT authentication with Google OAuth support
--   Role-based access control (RBAC)
--   MongoDB database with Mongoose ODM
--   Secure password handling with bcrypt
--   Image upload with Cloudinary
+- RESTful API architecture
+- JWT authentication with Google OAuth support
+- Role-based access control (RBAC)
+- MongoDB database with Mongoose ODM
+- Secure password handling with bcrypt
+- Image upload with Cloudinary
 
 ## Project Structure
 
@@ -35,9 +35,9 @@ server/
 
 ### Prerequisites
 
--   Node.js (v14 or higher)
--   pnpm (recommended) or npm
--   MongoDB (local or Atlas)
+- Node.js (v14 or higher)
+- pnpm (recommended) or npm
+- MongoDB (local or Atlas)
 
 ### Installation
 
@@ -58,7 +58,7 @@ npm install
 3. Create a `.env` file in the root directory with the following variables:
 
 ```
-PORT=5000
+PORT=4000
 NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/youngmindsclub
 CLIENT_URL=http://localhost:5173
@@ -86,46 +86,46 @@ pnpm dev
 npm run dev
 ```
 
-The server will start on `http://localhost:5000`
+The server will start on `http://localhost:4000`
 
 ## API Endpoints
 
 ### Authentication
 
--   `POST /auth/signup` - Register a new user
--   `POST /auth/login` - Login a user
--   `GET /auth/logout` - Logout a user
--   `GET /auth/me` - Get current user data
--   `GET /auth/google` - Google OAuth login
--   `GET /auth/google/callback` - Google OAuth callback
+- `POST /auth/signup` - Register a new user
+- `POST /auth/login` - Login a user
+- `GET /auth/logout` - Logout a user
+- `GET /auth/me` - Get current user data
+- `GET /auth/google` - Google OAuth login
+- `GET /auth/google/callback` - Google OAuth callback
 
 ### Users
 
--   `GET /users/profile` - Get user profile
--   `PUT /users/profile` - Update user profile
--   `POST /users/profile/picture` - Upload profile picture
+- `GET /users/profile` - Get user profile
+- `PUT /users/profile` - Update user profile
+- `POST /users/profile/picture` - Upload profile picture
 
 ### Events
 
--   `GET /events` - Get all events
--   `GET pi/events/:id` - Get event by ID
--   `POST /events` - Create event (organizer only)
--   `PUT /events/:id` - Update event (organizer only)
--   `DELETE /events/:id` - Delete event (organizer only)
+- `GET /events` - Get all events
+- `GET pi/events/:id` - Get event by ID
+- `POST /events` - Create event (organizer only)
+- `PUT /events/:id` - Update event (organizer only)
+- `DELETE /events/:id` - Delete event (organizer only)
 
 ### Admin
 
--   `GET /admin/users` - Get all users
--   `PUT /admin/users/:id/role` - Update user role
--   `DELETE /admin/users/:id` - Delete user
--   `GET /admin/events` - Get all events with admin data
--   `PUT /admin/events/:id` - Update event status
+- `GET /admin/users` - Get all users
+- `PUT /admin/users/:id/role` - Update user role
+- `DELETE /admin/users/:id` - Delete user
+- `GET /admin/events` - Get all events with admin data
+- `PUT /admin/events/:id` - Update event status
 
 ## Available Scripts
 
--   `pnpm start` - Start the production server
--   `pnpm dev` - Start the development server with nodemon
--   `pnpm test` - Run tests
+- `pnpm start` - Start the production server
+- `pnpm dev` - Start the development server with nodemon
+- `pnpm test` - Run tests
 
 > Note: You can also use `npm run <script>` instead of `pnpm <script>`
 
@@ -161,25 +161,25 @@ vercel --prod
 
 For production deployment, make sure to set these environment variables:
 
--   `MONGODB_URI` - MongoDB Atlas connection string
--   `JWT_SECRET` - Strong secret key for JWT tokens
--   `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
--   `CLOUDINARY_*` - Cloudinary configuration for image uploads
--   `EMAIL_*` - SMTP configuration for email services
--   `CORS_URL_LIST` - Comma-separated list of allowed origins
--   `CLIENT_URL` - Frontend application URL
+- `MONGODB_URI` - MongoDB Atlas connection string
+- `JWT_SECRET` - Strong secret key for JWT tokens
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
+- `CLOUDINARY_*` - Cloudinary configuration for image uploads
+- `EMAIL_*` - SMTP configuration for email services
+- `CORS_URL_LIST` - Comma-separated list of allowed origins
+- `CLIENT_URL` - Frontend application URL
 
 ## Development
 
 The codebase follows a clean architecture pattern:
 
--   **Controllers** handle HTTP requests and responses
--   **Services** contain business logic
--   **Models** define database schemas
--   **Middlewares** handle cross-cutting concerns (auth, validation, etc.)
--   **Routes** define API endpoints
--   **Utils** contain helper functions
--   **Config** manages application configuration
+- **Controllers** handle HTTP requests and responses
+- **Services** contain business logic
+- **Models** define database schemas
+- **Middlewares** handle cross-cutting concerns (auth, validation, etc.)
+- **Routes** define API endpoints
+- **Utils** contain helper functions
+- **Config** manages application configuration
 
 ## Contributing
 

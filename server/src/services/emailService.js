@@ -3,8 +3,9 @@ const crypto = require("crypto");
 const { EmailMonitoringService } = require("./emailMonitoring");
 
 // Create reusable transporter object using SMTP transport
+// Create reusable transporter object using SMTP transport
 const createTransporter = () => {
-	return nodemailer.createTransport({
+	const config = {
 		host: process.env.SMTP_HOST,
 		port: process.env.SMTP_PORT || 587,
 		secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
@@ -12,7 +13,18 @@ const createTransporter = () => {
 			user: process.env.SMTP_USER,
 			pass: process.env.SMTP_PASS,
 		},
-	});
+		// Add timeout settings (1 minute)
+		connectionTimeout: 60000,
+		greetingTimeout: 30000,
+		socketTimeout: 60000,
+		// Enable logging for debugging
+		logger: true,
+		debug: true,
+	};
+
+	console.log(`Creating mail transporter: ${config.host}:${config.port} (Secure: ${config.secure})`);
+
+	return nodemailer.createTransport(config);
 };
 
 // Helper function to check email suppression and send email
@@ -560,8 +572,8 @@ const sendInternshipApplicationEmail = async (userEmail, userName, internshipDet
 					
 					<p style="color: #4a5568; font-size: 16px; margin-bottom: 24px; line-height: 1.5;">
 						Thank you for your application! We have received your application for <strong>${internshipDetails.title}</strong> at ${
-			internshipDetails.companyName
-		}.
+							internshipDetails.companyName
+						}.
 					</p>
 					
 					<!-- Application Status -->
