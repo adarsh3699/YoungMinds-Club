@@ -1,30 +1,22 @@
 const nodemailer = require("nodemailer");
+const { SESv2Client, SendEmailCommand } = require("@aws-sdk/client-sesv2");
 const crypto = require("crypto");
 const { EmailMonitoringService } = require("./emailMonitoring");
 
-// Create reusable transporter object using SMTP transport
-// Create reusable transporter object using SMTP transport
+// Create reusable transporter object using AWS SES v2
+// Uses AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from environment variables automatically
 const createTransporter = () => {
-	const config = {
-		host: process.env.SMTP_HOST,
-		port: process.env.SMTP_PORT || 587,
-		secure: process.env.SMTP_SECURE === "true", // true for 465, false for other ports
-		auth: {
-			user: process.env.SMTP_USER,
-			pass: process.env.SMTP_PASS,
+	const ses = new SESv2Client({
+		region: "ap-south-1",
+		credentials: {
+			accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+			secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 		},
-		// Add timeout settings (1 minute)
-		connectionTimeout: 60000,
-		greetingTimeout: 30000,
-		socketTimeout: 60000,
-		// Enable logging for debugging
-		logger: true,
-		debug: true,
-	};
+	});
 
-	console.log(`Creating mail transporter: ${config.host}:${config.port} (Secure: ${config.secure})`);
-
-	return nodemailer.createTransport(config);
+	return nodemailer.createTransport({
+		SES: { sesClient: ses, SendEmailCommand },
+	});
 };
 
 // Helper function to check email suppression and send email
