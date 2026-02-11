@@ -70,12 +70,17 @@ JWT_EXPIRES_IN=7d
 # Google OAuth
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:4000/auth/google/callback
 
 # Cloudinary (for image uploads)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# AWS SES Configuration (Email Service)
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+SMTP_FROM=your_verified_sender_email
 ```
 
 4. Start the development server
@@ -165,7 +170,8 @@ For production deployment, make sure to set these environment variables:
 - `JWT_SECRET` - Strong secret key for JWT tokens
 - `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
 - `CLOUDINARY_*` - Cloudinary configuration for image uploads
-- `EMAIL_*` - SMTP configuration for email services
+- `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY` - AWS credentials for SES
+- `SMTP_FROM` - Verified sender email address
 - `CORS_URL_LIST` - Comma-separated list of allowed origins
 - `CLIENT_URL` - Frontend application URL
 

@@ -116,3 +116,27 @@
 .toggle-label {
 	transition: background-color 0.2s ease;
 }
+
+/* Navbar Styles */
+.nav-link {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	height: 100%;
+}
+
+.nav-link::after {
+	content: "";
+	position: absolute;
+	bottom: 15px;
+	left: 0;
+	width: 0%;
+	height: 2px;
+	background-color: #f59e0b;
+	transition: width 0.3s ease-in-out;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+	width: 100%;
+}

@@ -1,14 +1,14 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
-import { NavigationItem, UserProfileResponse, ClassNamesFunction } from '@/types';
-import logoImg from '../../assets/brandLogo_1.png';
+import React, { useState, useEffect, Fragment } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { NavigationItem, UserProfileResponse, ClassNamesFunction } from "@/types";
+import logoImg from "../../assets/brandLogo_1.png";
 
 const classNames: ClassNamesFunction = (...classes) => {
-	return classes.filter(Boolean).join(' ');
+	return classes.filter(Boolean).join(" ");
 };
 
 const Navigation: React.FC = () => {
@@ -23,14 +23,14 @@ const Navigation: React.FC = () => {
 		if (isAuthenticated && !isOrganizer) {
 			const fetchUserProfile = async (): Promise<void> => {
 				try {
-					const response = await axios.get<UserProfileResponse>('/user/dashboard');
+					const response = await axios.get<UserProfileResponse>("/user/dashboard");
 
 					if (response.data.success && response.data.profile) {
 						setUserXP(response.data.profile.xp);
 						setUserBadge(response.data.profile.badge);
 					}
 				} catch (error) {
-					console.error('Error fetching user profile:', error);
+					console.error("Error fetching user profile:", error);
 					// Don't log out on network errors
 				}
 			};
@@ -41,7 +41,7 @@ const Navigation: React.FC = () => {
 
 	const handleLogout = async (): Promise<void> => {
 		await logout();
-		navigate('/login');
+		navigate("/login");
 	};
 
 	// Generate user navigation items based on role
@@ -49,34 +49,34 @@ const Navigation: React.FC = () => {
 
 	// Add role-specific profile link and items
 	if (isAdmin) {
-		userNavigation.push({ name: 'Dashboard', href: '/dashboard' });
-		userNavigation.push({ name: 'Profile', href: '/admin/profile' });
-		userNavigation.push({ name: 'Admin Panel', href: '/admin/users' });
+		userNavigation.push({ name: "Dashboard", href: "/dashboard" });
+		userNavigation.push({ name: "Profile", href: "/admin/profile" });
+		userNavigation.push({ name: "Admin Panel", href: "/admin/users" });
 	} else if (isOrganizer) {
-		userNavigation.push({ name: 'Profile', href: '/organizer/profile' });
-		userNavigation.push({ name: 'Settings', href: '/organizer/settings' });
+		userNavigation.push({ name: "Profile", href: "/organizer/profile" });
+		userNavigation.push({ name: "Settings", href: "/organizer/settings" });
 	} else {
-		userNavigation.push({ name: 'Dashboard', href: '/dashboard' });
-		userNavigation.push({ name: 'Profile', href: '/user/profile' });
+		userNavigation.push({ name: "Dashboard", href: "/dashboard" });
+		userNavigation.push({ name: "Profile", href: "/user/profile" });
 	}
 
 	// Public navigation items
 	const publicNavigation: NavigationItem[] = [
-		{ name: 'Home', href: '/' },
-		{ name: 'Events', href: '/events' },
-		{ name: 'Internships', href: '/internships' },
+		{ name: "Home", href: "/" },
+		{ name: "Events", href: "/events" },
+		{ name: "Internships", href: "/internships" },
 	];
 
 	// Add Dashboard to navbar for organizers and admins
 	if (isAdmin) {
-		publicNavigation.push({ name: 'Dashboard', href: '/admin/dashboard' });
+		publicNavigation.push({ name: "Dashboard", href: "/admin/dashboard" });
 	} else if (isOrganizer) {
-		publicNavigation.push({ name: 'Dashboard', href: '/organizer/dashboard' });
+		publicNavigation.push({ name: "Dashboard", href: "/organizer/dashboard" });
 	}
 
 	const isActiveRoute = (path: string): boolean => {
-		if (path === '/') {
-			return location.pathname === '/';
+		if (path === "/") {
+			return location.pathname === "/";
 		}
 		return location.pathname.startsWith(path);
 	};
@@ -85,25 +85,24 @@ const Navigation: React.FC = () => {
 		<Disclosure as="nav" className="ym-bg-card shadow-sm fixed w-full top-0 z-50 border-b ym-border-card">
 			{({ open }) => (
 				<>
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="w-full mx-auto px-6 sm:px-10 lg:px-16">
 						<div className="flex justify-between h-16">
 							<div className="flex">
 								<div className="flex-shrink-0 flex items-center">
 									<Link to="/" className="flex items-center">
 										<img src={logoImg} alt="YMs Club Logo" className="h-12 object-contain" />
-										{/* <span className="ml-2 text-xl font-bold ym-text-primary">YMs Club</span> */}
 									</Link>
 								</div>
-								<div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+								<div className="hidden sm:ml-8 sm:flex sm:space-x-8">
 									{publicNavigation.map((item) => (
 										<Link
 											key={item.name}
 											to={item.href}
 											className={classNames(
 												isActiveRoute(item.href)
-													? 'border-amber-500 ym-text-primary'
-													: 'border-transparent ym-text-secondary hover:border-amber-300 hover:ym-text-primary',
-												'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors'
+													? "active ym-text-primary"
+													: "ym-text-secondary hover:ym-text-primary",
+												"nav-link px-1 text-sm font-medium transition-colors"
 											)}
 										>
 											{item.name}
@@ -143,7 +142,7 @@ const Navigation: React.FC = () => {
 													<span className="sr-only">Open user menu</span>
 													<div className="h-8 w-8 rounded-full ym-bg-yellow-100 flex items-center justify-center">
 														<span className="font-medium ym-text-yellow-700">
-															{user?.name?.charAt(0).toUpperCase() || 'U'}
+															{user?.name?.charAt(0).toUpperCase() || "U"}
 														</span>
 													</div>
 												</Menu.Button>
@@ -207,8 +206,8 @@ const Navigation: React.FC = () => {
 																<Link
 																	to={item.href}
 																	className={classNames(
-																		active ? 'ym-bg-card-hover' : '',
-																		'block px-4 py-2 text-sm ym-text-card transition-colors'
+																		active ? "ym-bg-card-hover" : "",
+																		"block px-4 py-2 text-sm ym-text-card transition-colors"
 																	)}
 																>
 																	{item.name}
@@ -221,8 +220,8 @@ const Navigation: React.FC = () => {
 															<button
 																onClick={handleLogout}
 																className={classNames(
-																	active ? 'ym-bg-card-hover' : '',
-																	'block w-full text-left px-4 py-2 text-sm ym-text-card transition-colors'
+																	active ? "ym-bg-card-hover" : "",
+																	"block w-full text-left px-4 py-2 text-sm ym-text-card transition-colors"
 																)}
 															>
 																Logout
@@ -274,9 +273,9 @@ const Navigation: React.FC = () => {
 									to={item.href}
 									className={classNames(
 										isActiveRoute(item.href)
-											? 'ym-bg-yellow-100 border-amber-500 ym-text-yellow-700'
-											: 'border-transparent ym-text-secondary hover:ym-bg-card-hover hover:border-amber-300 hover:ym-text-primary',
-										'block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors'
+											? "ym-bg-yellow-100 border-amber-500 ym-text-yellow-700"
+											: "border-transparent ym-text-secondary hover:ym-bg-card-hover hover:border-amber-300 hover:ym-text-primary",
+										"block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors"
 									)}
 								>
 									{item.name}
@@ -289,7 +288,7 @@ const Navigation: React.FC = () => {
 									<div className="flex-shrink-0">
 										<div className="h-10 w-10 rounded-full ym-bg-yellow-100 flex items-center justify-center">
 											<span className="font-medium ym-text-yellow-700">
-												{user?.name?.charAt(0).toUpperCase() || 'U'}
+												{user?.name?.charAt(0).toUpperCase() || "U"}
 											</span>
 										</div>
 									</div>
